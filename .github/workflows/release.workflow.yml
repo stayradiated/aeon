@@ -15,20 +15,17 @@ env:
   IMAGE_NAME: stayradiated/aeon
 
 jobs:
-  build-and-push:
+  build-push-and-release:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
-      # only needed if you enable cosign signing later
-      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Optional (recommended if you want multi-arch images)
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -47,7 +44,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # "latest=auto" will tag :latest for semver tags (and typically not for pre-releases)
           flavor: |
             latest=auto
           tags: |
@@ -68,3 +64,33 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Write release body (includes Docker image info)
+        run: |
+          cat > release.md <<'EOF'
+          ## Docker image
+
+          **Image:** `ghcr.io/${{ env.IMAGE_NAME }}`
+
+          **Pull:**
+          ```bash
+          docker pull ghcr.io/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+          ```
+          (Also published: `:latest`, and a `:sha-…` tag)
+
+          **Digest:**
+          `ghcr.io/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}`
+
+          **All tags pushed by this workflow:**
+          ```
+          ${{ steps.meta.outputs.tags }}
+          ```
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: release.md
+          generate_release_notes: true
