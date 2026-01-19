@@ -26,9 +26,9 @@ ${JSON.stringify(options, null, 2)}
   const { userEmail, verificationCode } = options
   const resend = getResend()
   const result = await resend.emails.send({
-    from: 'pomo@stayradiated.com',
+    from: 'support@aeon.party',
     to: [userEmail],
-    subject: `Your Pomo verification code is ${verificationCode}`,
+    subject: `Your Aeon verification code is ${verificationCode}`,
     html: render(VerifySignupTemplate, {
       props: {
         verificationCode,

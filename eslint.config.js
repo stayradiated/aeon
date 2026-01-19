@@ -7,6 +7,7 @@ import svelteConfig from './svelte.config.js'
 export default defineConfig(
   globalIgnores([
     '.svelte-kit/',
+    '__legacy',
     'build/',
     'coverage/',
     'dist/',

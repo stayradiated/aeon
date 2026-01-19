@@ -11,6 +11,7 @@
     "includes": [
       "**",
       "!!**/.svelte-kit",
+      "!!**/__legacy",
       "!!**/__snapshots__",
       "!!**/build",
       "!!**/coverage",

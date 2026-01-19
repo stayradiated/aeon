@@ -4,6 +4,7 @@ import {
   Head,
   Hr,
   Html,
+  Link,
   Section,
   Text,
 } from '@sveltelaunch/svelte-5-email'
@@ -63,10 +64,10 @@ const footer = {
     <Container style={container}>
       <Text style={paragraph}>Hi there</Text>
       <Text style={title}>Here's the verification code to continue your signup</Text>
-      <Text style={paragraph}>To log into for Pomo, enter this verification code when prompted:</Text>
+      <Text style={paragraph}>To log into for Aeon, enter this verification code when prompted:</Text>
       <Text style={code}>{verificationCode}</Text>
       <Hr style={hr} />
-      <Text style={footer}>pomo.stayradiated.com</Text>
+      <Link href="https://aeon.party" style={footer}>aeon.party</Link>
     </Container>
   </Section>
 </Html>

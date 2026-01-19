@@ -35,10 +35,7 @@ import { promiseAllRecord } from '#lib/utils/promise-all-record.js'
 import { getEntities } from './get-entities.js'
 
 // cvrKey -> ClientViewRecord
-const getCVRCache = onceGlobal(
-  Symbol.for('POMO_CVR'),
-  () => new Map<string, CVR>(),
-)
+const getCVRCache = onceGlobal(Symbol.for('CVR'), () => new Map<string, CVR>())
 const getCVR = (clientViewId: ReplicacheClientViewId): CVR | undefined => {
   const cache = getCVRCache()
   return cache.get(clientViewId)

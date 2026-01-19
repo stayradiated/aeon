@@ -26,7 +26,7 @@ afterNavigate(() => {
 </script>
 
 <header>
-  <h1>Pomo</h1>
+  <h1>Aeon</h1>
 
   {#if sessionUser}
     <div class="user">

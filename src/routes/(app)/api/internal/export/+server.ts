@@ -22,7 +22,7 @@ const GET: RequestHandler = async (event) => {
     return errorResponse(500, snapshot)
   }
 
-  const filename = `pomo-${Date.now()}.json`
+  const filename = `aeon-${Date.now()}.json`
   return new Response(JSON.stringify(snapshot), {
     status: 200,
     headers: {

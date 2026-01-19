@@ -79,6 +79,7 @@
     },
     "ignore": [
       ".kanelrc.cjs",
+      "__legacy/**",
       "gmrc.cjs",
       "justfile",
       "scripts/db/snapshot-schema.ts",
