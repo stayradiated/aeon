@@ -82,6 +82,7 @@
       "__legacy/**",
       "gmrc.cjs",
       "justfile",
+      "prod-server.js",
       "scripts/db/snapshot-schema.ts",
       "src/lib/__generated__/**",
       "src/lib/server/db/log-query.ts"

@@ -29,7 +29,7 @@ COPY patches/ ./patches/
 RUN pnpm install --frozen-lockfile --prod
 COPY --from=builder /app/build /app/build/
 COPY migrations /app/migrations/
-COPY docker-app-start.sh gmrc.cjs /app/
+COPY docker-app-start.sh prod-server.js gmrc.cjs /app/
 WORKDIR /app
 EXPOSE 3000
 CMD ["./docker-app-start.sh"]

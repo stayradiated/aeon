@@ -5,4 +5,4 @@ set -eux
 # run database migrations
 pnpm exec graphile-migrate migrate --config ./gmrc.cjs
 
-exec node ./build/index.js
+exec node ./prod-server.js
