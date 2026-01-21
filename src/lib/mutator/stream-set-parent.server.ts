@@ -2,12 +2,12 @@ import type { ServerMutator } from './types.ts'
 
 import { updateStream } from '#lib/server/db/stream/update-stream.js'
 
-const streamRename: ServerMutator<'stream_rename'> = async (
+const streamSetParent: ServerMutator<'stream_setParent'> = async (
   context,
   options,
 ) => {
   const { db } = context
-  const { streamId, name } = options
+  const { streamId, parentId } = options
 
   const result = await updateStream({
     db,
@@ -16,7 +16,7 @@ const streamRename: ServerMutator<'stream_rename'> = async (
       streamId,
     },
     set: {
-      name,
+      parentId,
     },
   })
   if (result instanceof Error) {
@@ -24,4 +24,4 @@ const streamRename: ServerMutator<'stream_rename'> = async (
   }
 }
 
-export default streamRename
+export default streamSetParent

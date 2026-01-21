@@ -28,15 +28,6 @@ afterNavigate(() => {
 <header>
   <h1>Aeon</h1>
 
-  {#if sessionUser}
-    <div class="user">
-      <span>{sessionUser.email}</span>
-      <form use:enhance action="/?/logout" method="post">
-        <button type="submit">Logout</button>
-      </form>
-    </div>
-  {/if}
-
   <nav class:isMenuOpen>
     <div class="menuContainer">
       <a href="/add">Add</a>
@@ -45,6 +36,15 @@ afterNavigate(() => {
     </div>
     <button class="menuToggle" aria-hidden="true" onclick={toggleMenuOpen}>Menu</button>
   </nav>
+
+  {#if sessionUser}
+    <div class="user">
+      <span>{sessionUser.email}</span>
+      <form use:enhance action="/?/logout" method="post">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+  {/if}
 </header>
 
 {@render children?.()}
@@ -189,4 +189,10 @@ afterNavigate(() => {
 			padding-right: min(0vmin, env(safe-area-inset-right));
 		}
 	}
+
+  .user {
+    display: flex;
+    align-items: center;
+    gap: var(--size-2);
+  }
 </style>

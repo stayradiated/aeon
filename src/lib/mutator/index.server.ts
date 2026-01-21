@@ -4,6 +4,7 @@ const mutators: ServerMutatorDefsImportMap = {
   ping: import('./ping.server.js'),
 
   stream_create: import('./stream-create.server.js'),
+  stream_setParent: import('./stream-set-parent.server.js'),
   stream_rename: import('./stream-rename.server.js'),
   stream_sort: import('./stream-sort.server.js'),
   stream_delete: import('./stream-delete.server.js'),

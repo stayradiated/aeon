@@ -10,7 +10,7 @@ type UpdateStreamOptions = {
     userId: UserId
     streamId: StreamId
   }
-  set: Partial<Pick<Stream, 'name' | 'sortOrder'>>
+  set: Partial<Pick<Stream, 'name' | 'parentId' | 'sortOrder'>>
   now?: number
 }
 
@@ -25,6 +25,7 @@ const updateStream = async (
       .set({
         name: set.name,
         sortOrder: set.sortOrder,
+        parentId: set.parentId,
         updatedAt: now,
       })
       .where('id', '=', options.where.streamId)
