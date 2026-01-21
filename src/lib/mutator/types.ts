@@ -24,6 +24,10 @@ type Mutators = {
     streamId: StreamId
     name: string
   }>
+  stream_setParent: Mutator<{
+    streamId: StreamId
+    parentId: StreamId | undefined
+  }>
   stream_rename: Mutator<{
     streamId: StreamId
     name: string

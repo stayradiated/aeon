@@ -39,7 +39,7 @@ const streamSort: ServerMutator<'stream_sort'> = async (context, options) => {
     if (stream.sortOrder === i) {
       continue
     }
-    await updateStream({
+    const result = await updateStream({
       db,
       where: {
         userId: sessionUserId,
@@ -49,6 +49,9 @@ const streamSort: ServerMutator<'stream_sort'> = async (context, options) => {
         sortOrder: i,
       },
     })
+    if (result instanceof Error) {
+      return result
+    }
   }
 }
 

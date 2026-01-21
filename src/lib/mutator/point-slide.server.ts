@@ -6,7 +6,7 @@ const pointSlide: ServerMutator<'point_slide'> = async (context, options) => {
   const { db } = context
   const { pointId, startedAt } = options
 
-  await updatePoint({
+  const result = await updatePoint({
     db,
     where: {
       userId: context.sessionUserId,
@@ -16,6 +16,9 @@ const pointSlide: ServerMutator<'point_slide'> = async (context, options) => {
       startedAt,
     },
   })
+  if (result instanceof Error) {
+    return result
+  }
 }
 
 export default pointSlide

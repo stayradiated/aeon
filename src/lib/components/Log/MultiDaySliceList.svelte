@@ -31,12 +31,16 @@ let sliceListByDay = $derived(
 )
 </script>
 
-{#each Object.entries(sliceListByDay) as [day, sliceList] (day)}
-  <div class="container">
-    <h2>{day}</h2>
-    <SliceList {streamList} {sliceList} {timeZone} {labelRecord} />
-  </div>
-{/each}
+{#if Object.keys(sliceListByDay).length === 0}
+  <p>No entries found.</p>
+{:else}
+  {#each Object.entries(sliceListByDay) as [day, sliceList] (day)}
+    <div class="container">
+      <h2>{day}</h2>
+      <SliceList {streamList} {sliceList} {timeZone} {labelRecord} />
+    </div>
+  {/each}
+{/if}
 
 <style>
 	.container {
