@@ -23,7 +23,8 @@ const { streamList } = $derived(
 const handleSetParentStream: ChangeEventHandler<HTMLSelectElement> = async (
   event,
 ) => {
-  const parentId = event.currentTarget.value as StreamId | undefined
+  const value = event.currentTarget.value
+  const parentId = value === '' ? undefined : (value as StreamId)
   await store.mutate.stream_setParent({
     streamId: stream.id,
     parentId,

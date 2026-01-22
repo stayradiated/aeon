@@ -30,7 +30,7 @@ const initBoss = () => {
       await garbageCollectEmailVerification({ db })
     })
 
-    await boss.schedule(GC_EMAIL_VERIFICATION, '* * * * *')
+    await boss.schedule(GC_EMAIL_VERIFICATION, '0 0 * * *')
   })().catch((error) => {
     console.error('[worker] Failed to start worker', error)
   })

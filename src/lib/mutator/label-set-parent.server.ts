@@ -1,19 +1,19 @@
 import type { ServerMutator } from './types.ts'
 
-import { updateStream } from '#lib/server/db/stream/update-stream.js'
+import { updateLabel } from '#lib/server/db/label/update-label.js'
 
-const streamSetParent: ServerMutator<'stream_setParent'> = async (
+const labelSetParent: ServerMutator<'label_setParent'> = async (
   context,
   options,
 ) => {
   const { db } = context
-  const { streamId, parentId } = options
+  const { labelId, parentId } = options
 
-  const result = await updateStream({
+  const result = await updateLabel({
     db,
     where: {
       userId: context.sessionUserId,
-      streamId,
+      labelId,
     },
     set: {
       parentId: parentId ?? null,
@@ -24,4 +24,4 @@ const streamSetParent: ServerMutator<'stream_setParent'> = async (
   }
 }
 
-export default streamSetParent
+export default labelSetParent

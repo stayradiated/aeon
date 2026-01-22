@@ -6,7 +6,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Stream } from '#lib/types.local.js'
 
-import { getLabelListForStream } from '#lib/core/select/label.js'
+import { getLabelList } from '#lib/core/select/label.js'
 
 import { query } from '#lib/utils/query.js'
 
@@ -44,7 +44,7 @@ onMount(() => {
 
 const { streamLabelList } = $derived(
   query({
-    streamLabelList: getLabelListForStream(store, stream.id),
+    streamLabelList: getLabelList(store, stream.id),
   }),
 )
 

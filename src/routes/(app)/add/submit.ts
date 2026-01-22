@@ -35,6 +35,7 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
           name: label.name,
           color: undefined,
           icon: undefined,
+          parentId: undefined,
         })
         return labelId
       }),
