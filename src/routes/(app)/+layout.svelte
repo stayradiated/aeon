@@ -32,6 +32,7 @@ afterNavigate(() => {
     <div class="menuContainer">
       <a href="/add">Add</a>
       <a href="/log">Log</a>
+      <a href="/label">Labels</a>
       <a href="/settings">Settings</a>
     </div>
     <button class="menuToggle" aria-hidden="true" onclick={toggleMenuOpen}>Menu</button>

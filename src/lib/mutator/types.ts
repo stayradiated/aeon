@@ -15,8 +15,25 @@ type Mutators = {
   label_create: Mutator<{
     labelId: LabelId
     streamId: StreamId
+    parentId: LabelId | undefined
     name: string
     color: string | undefined
+    icon: string | undefined
+  }>
+  label_rename: Mutator<{
+    labelId: LabelId
+    name: string
+  }>
+  label_setParent: Mutator<{
+    labelId: LabelId
+    parentId: LabelId | undefined
+  }>
+  label_setColor: Mutator<{
+    labelId: LabelId
+    color: string | undefined
+  }>
+  label_setIcon: Mutator<{
+    labelId: LabelId
     icon: string | undefined
   }>
 

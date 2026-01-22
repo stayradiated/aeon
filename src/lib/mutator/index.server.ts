@@ -10,6 +10,10 @@ const mutators: ServerMutatorDefsImportMap = {
   stream_delete: import('./stream-delete.server.js'),
 
   label_create: import('./label-create.server.js'),
+  label_rename: import('./label-rename.server.js'),
+  label_setParent: import('./label-set-parent.server.js'),
+  label_setColor: import('./label-set-color.server.js'),
+  label_setIcon: import('./label-set-icon.server.js'),
 
   point_create: import('./point-create.server.js'),
   point_slide: import('./point-slide.server.js'),

@@ -1,0 +1,36 @@
+<script lang="ts">
+import type { Store } from '#lib/core/replicache/store.js'
+import type { StreamId } from '#lib/ids.js'
+
+import { getLabelListGroupedByParent } from '#lib/core/select/label.js'
+
+import { query } from '#lib/utils/query.js'
+
+import LabelList from './LabelList.svelte'
+
+type Props = {
+  store: Store
+  streamId: StreamId
+}
+
+const { store, streamId }: Props = $props()
+
+const { stream, groupedLabelList } = $derived(
+  query({
+    stream: store.stream.get(streamId),
+    groupedLabelList: getLabelListGroupedByParent(store, streamId),
+  }),
+)
+</script>
+
+<h3>{stream?.name ?? '⚠️ Missing'}</h3>
+
+{#each groupedLabelList as [parentLabel] (parentLabel?.id)}
+  {#if parentLabel}
+    <a href="#label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</a>
+  {/if}
+{/each}
+
+{#each groupedLabelList as [parentLabel, labelList] (parentLabel?.id)}
+  <LabelList {store} {parentLabel} {labelList} />
+{/each}
