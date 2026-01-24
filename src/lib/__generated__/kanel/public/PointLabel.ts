@@ -1,5 +1,6 @@
 import { pointId, type PointId } from './Point';
 import { labelId, type LabelId } from './Label';
+import { streamId, type StreamId } from './Stream';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 
@@ -16,6 +17,8 @@ export default interface PointLabelTable {
   createdAt: ColumnType<number, number, number>;
 
   updatedAt: ColumnType<number, number, number>;
+
+  streamId: ColumnType<StreamId, StreamId, StreamId>;
 }
 
 export type PointLabel = Selectable<PointLabelTable>;
@@ -31,6 +34,7 @@ export const pointLabel = z.object({
   sortOrder: z.number(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  streamId: streamId,
 });
 
 export const pointLabelInitializer = z.object({
@@ -40,6 +44,7 @@ export const pointLabelInitializer = z.object({
   sortOrder: z.number(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  streamId: streamId,
 });
 
 export const pointLabelMutator = z.object({
@@ -49,4 +54,5 @@ export const pointLabelMutator = z.object({
   sortOrder: z.number().optional(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
+  streamId: streamId.optional(),
 });

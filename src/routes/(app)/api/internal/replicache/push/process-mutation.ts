@@ -96,27 +96,25 @@ const processMutation = async (
     }
   }
 
-  const [updatedReplicacheClient, updatedReplicacheClientGroup] =
-    await Promise.all([
-      upsertReplicacheClient({
-        db,
-        where: { replicacheClientId },
-        set: { replicacheClientGroupId, lastMutationId: nextMutationId },
-      }),
-      upsertReplicacheClientGroup({
-        db,
-        where: { replicacheClientGroupId },
-        set: {
-          userId: sessionUserId,
-          cvrVersion: replicacheClientGroup.cvrVersion,
-        },
-      }),
-    ])
-  if (updatedReplicacheClient instanceof Error) {
-    return updatedReplicacheClient
-  }
+  const updatedReplicacheClientGroup = await upsertReplicacheClientGroup({
+    db,
+    where: { replicacheClientGroupId },
+    set: {
+      userId: sessionUserId,
+      cvrVersion: replicacheClientGroup.cvrVersion,
+    },
+  })
   if (updatedReplicacheClientGroup instanceof Error) {
     return updatedReplicacheClientGroup
+  }
+
+  const updatedReplicacheClient = await upsertReplicacheClient({
+    db,
+    where: { replicacheClientId },
+    set: { replicacheClientGroupId, lastMutationId: nextMutationId },
+  })
+  if (updatedReplicacheClient instanceof Error) {
+    return updatedReplicacheClient
   }
 }
 

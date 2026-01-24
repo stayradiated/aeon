@@ -256,7 +256,7 @@ async function main() {
     'pg_dump',
     DATABASE_URL,
     '--exclude-schema=graphile_migrate',
-    '--exclude-schema=graphile_worker',
+    '--exclude-schema=pgboss',
     '--schema-only',
     '--no-owner',
     '--format=p',
