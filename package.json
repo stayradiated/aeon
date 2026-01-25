@@ -52,7 +52,7 @@
     "kanel-zod": "1.7.0",
     "knip": "5.82.1",
     "kysely": "0.28.10",
-    "svelte": "5.48.1",
+    "svelte": "5.48.2",
     "svelte-check": "4.3.5",
     "test-fixture-factory": "2.1.0",
     "type-fest": "5.4.1",
