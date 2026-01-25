@@ -8,10 +8,6 @@ import type { Transaction } from '#lib/server/db/types.js'
  */
 
 type Mutators = {
-  ping: Mutator<{
-    message: string
-  }>
-
   label_create: Mutator<{
     labelId: LabelId
     streamId: StreamId
@@ -68,6 +64,8 @@ type Mutators = {
     pointId: PointId
     startedAt: number
   }>
+
+  migrate_fixupLabelParents: Mutator<Record<string, never>>
 
   danger_deleteAllData: Mutator<{
     userHasConfirmed: boolean

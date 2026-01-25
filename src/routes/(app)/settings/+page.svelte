@@ -47,6 +47,10 @@ const handleDeleteAllData = async () => {
     userHasConfirmed: true,
   })
 }
+
+const handleAssignLabelParent = async () => {
+  await store.mutate.migrate_fixupLabelParents({})
+}
 </script>
 
 <main>
@@ -61,6 +65,12 @@ const handleDeleteAllData = async () => {
   <section>
     <h2>Streams</h2>
     <StreamManager {store} />
+  </section>
+
+  <section>
+    <h2>Assign Parent Labels</h2>
+    <p>Scan existing labels and associate them with the correct parent.</p>
+    <button onclick={handleAssignLabelParent}>Assign Label Parent</button>
   </section>
 
   <section>

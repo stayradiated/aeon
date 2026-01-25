@@ -1,43 +1,47 @@
 import { errorBoundary } from '@stayradiated/error-boundary'
 
-import type { LabelId, StreamId, UserId } from '#lib/ids.js'
+import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
-import type { Label } from '#lib/server/types.js'
+import type { PointLabel } from '#lib/server/types.js'
 
 import { extendWhere } from '#lib/server/db/where.js'
 
-type UpdateLabelOptions = {
+type UpdatePointLabelOptions = {
   db: KyselyDb
   where: Where<{
     userId: UserId
+    pointId?: PointId
     labelId?: LabelId
     streamId?: StreamId
   }>
-  set: Partial<Pick<Label, 'streamId' | 'name' | 'parentId' | 'color' | 'icon'>>
+  set: Partial<
+    Pick<PointLabel, 'pointId' | 'labelId' | 'streamId' | 'sortOrder'>
+  >
   now?: number
 }
 
-const updateLabel = async (
-  options: UpdateLabelOptions,
-): Promise<Label[] | Error> => {
+const updatePointLabel = async (
+  options: UpdatePointLabelOptions,
+): Promise<PointLabel[] | Error> => {
   const { db, where, set, now = Date.now() } = options
 
   return errorBoundary(() => {
     let query = db
-      .updateTable('label')
+      .updateTable('pointLabel')
       .set({
-        name: set.name,
-        parentId: set.parentId,
-        color: set.color,
-        icon: set.icon,
+        pointId: set.pointId,
+        labelId: set.labelId,
+        streamId: set.streamId,
+        sortOrder: set.sortOrder,
         updatedAt: now,
       })
       .returningAll()
 
     query = extendWhere(query)
-      .string('id', where.labelId)
+      .string('pointId', where.pointId)
       .string('userId', where.userId)
+      .string('labelId', where.labelId)
       .string('streamId', where.streamId)
       .done()
 
@@ -45,4 +49,4 @@ const updateLabel = async (
   })
 }
 
-export { updateLabel }
+export { updatePointLabel }

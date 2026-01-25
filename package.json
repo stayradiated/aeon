@@ -29,16 +29,16 @@
     "replicache": "15.3.0",
     "resend": "6.8.0",
     "signia": "0.1.5",
-    "svelte-awesome-color-picker": "4.1.0",
+    "svelte-awesome-color-picker": "4.1.1",
     "websocket-ts": "2.2.1",
     "ws": "8.19.0",
-    "zod": "4.3.5"
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.11",
     "@roughapp/replimock": "15.2.0",
     "@stayradiated/error-boundary": "4.3.0",
-    "@sveltejs/adapter-node": "5.5.0",
+    "@sveltejs/adapter-node": "5.5.1",
     "@sveltejs/kit": "2.50.0",
     "@sveltejs/vite-plugin-svelte": "6.2.4",
     "@types/node": "25.0.10",
@@ -53,13 +53,13 @@
     "knip": "5.82.1",
     "kysely": "0.28.10",
     "svelte": "5.48.0",
-    "svelte-check": "4.3.4",
+    "svelte-check": "4.3.5",
     "test-fixture-factory": "2.1.0",
     "type-fest": "5.4.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
-    "vite": "7.3.0",
-    "vitest": "4.0.17"
+    "vite": "7.3.1",
+    "vitest": "4.0.18"
   },
   "knip": {
     "vite": false,

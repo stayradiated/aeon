@@ -80,7 +80,8 @@ CREATE TABLE public.point_label (
     user_id text NOT NULL,
     sort_order integer NOT NULL,
     created_at bigint NOT NULL,
-    updated_at bigint NOT NULL
+    updated_at bigint NOT NULL,
+    stream_id text NOT NULL
 );
 
 
@@ -199,6 +200,14 @@ ALTER TABLE ONLY public.label
 
 
 --
+-- Name: label label:unique(id,stream_id); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.label
+    ADD CONSTRAINT "label:unique(id,stream_id)" UNIQUE (id, stream_id);
+
+
+--
 -- Name: label label:unique(id,user_id); Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -212,6 +221,14 @@ ALTER TABLE ONLY public.label
 
 ALTER TABLE ONLY public.point
     ADD CONSTRAINT "point:primaryKey(id)" PRIMARY KEY (id);
+
+
+--
+-- Name: point point:unique(id,stream_id); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.point
+    ADD CONSTRAINT "point:unique(id,stream_id)" UNIQUE (id, stream_id);
 
 
 --
@@ -325,7 +342,7 @@ CREATE OR REPLACE VIEW public.point_with_label_list AS
 --
 
 ALTER TABLE ONLY public.label
-    ADD CONSTRAINT "label:foreignKey(parent_id)" FOREIGN KEY (parent_id, user_id) REFERENCES public.label(id, user_id);
+    ADD CONSTRAINT "label:foreignKey(parent_id)" FOREIGN KEY (parent_id, user_id) REFERENCES public.label(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -333,7 +350,7 @@ ALTER TABLE ONLY public.label
 --
 
 ALTER TABLE ONLY public.label
-    ADD CONSTRAINT "label:foreignKey(stream_id)" FOREIGN KEY (stream_id, user_id) REFERENCES public.stream(id, user_id);
+    ADD CONSTRAINT "label:foreignKey(stream_id)" FOREIGN KEY (stream_id, user_id) REFERENCES public.stream(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -341,7 +358,7 @@ ALTER TABLE ONLY public.label
 --
 
 ALTER TABLE ONLY public.label
-    ADD CONSTRAINT "label:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id);
+    ADD CONSTRAINT "label:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -349,7 +366,7 @@ ALTER TABLE ONLY public.label
 --
 
 ALTER TABLE ONLY public.point
-    ADD CONSTRAINT "point:foreignKey(stream_id)" FOREIGN KEY (stream_id, user_id) REFERENCES public.stream(id, user_id);
+    ADD CONSTRAINT "point:foreignKey(stream_id)" FOREIGN KEY (stream_id, user_id) REFERENCES public.stream(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -357,7 +374,7 @@ ALTER TABLE ONLY public.point
 --
 
 ALTER TABLE ONLY public.point
-    ADD CONSTRAINT "point:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id);
+    ADD CONSTRAINT "point:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -365,7 +382,7 @@ ALTER TABLE ONLY public.point
 --
 
 ALTER TABLE ONLY public.point_label
-    ADD CONSTRAINT "point_label:foreignKey(label_id)" FOREIGN KEY (label_id) REFERENCES public.label(id);
+    ADD CONSTRAINT "point_label:foreignKey(label_id)" FOREIGN KEY (label_id, stream_id) REFERENCES public.label(id, stream_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -373,7 +390,15 @@ ALTER TABLE ONLY public.point_label
 --
 
 ALTER TABLE ONLY public.point_label
-    ADD CONSTRAINT "point_label:foreignKey(point_id)" FOREIGN KEY (point_id) REFERENCES public.point(id);
+    ADD CONSTRAINT "point_label:foreignKey(point_id)" FOREIGN KEY (point_id, stream_id) REFERENCES public.point(id, stream_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: point_label point_label:foreignKey(stream_id); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.point_label
+    ADD CONSTRAINT "point_label:foreignKey(stream_id)" FOREIGN KEY (stream_id) REFERENCES public.stream(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -381,7 +406,7 @@ ALTER TABLE ONLY public.point_label
 --
 
 ALTER TABLE ONLY public.replicache_client
-    ADD CONSTRAINT "replicache_client:foreignKey(replicache_client_group_id)" FOREIGN KEY (replicache_client_group_id) REFERENCES public.replicache_client_group(id);
+    ADD CONSTRAINT "replicache_client:foreignKey(replicache_client_group_id)" FOREIGN KEY (replicache_client_group_id) REFERENCES public.replicache_client_group(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -389,7 +414,7 @@ ALTER TABLE ONLY public.replicache_client
 --
 
 ALTER TABLE ONLY public.replicache_client_group
-    ADD CONSTRAINT "replicache_client_group:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id);
+    ADD CONSTRAINT "replicache_client_group:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -397,7 +422,7 @@ ALTER TABLE ONLY public.replicache_client_group
 --
 
 ALTER TABLE ONLY public.stream
-    ADD CONSTRAINT "stream:foreignKey(parent_id)" FOREIGN KEY (parent_id, user_id) REFERENCES public.stream(id, user_id);
+    ADD CONSTRAINT "stream:foreignKey(parent_id)" FOREIGN KEY (parent_id, user_id) REFERENCES public.stream(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -405,7 +430,7 @@ ALTER TABLE ONLY public.stream
 --
 
 ALTER TABLE ONLY public.stream
-    ADD CONSTRAINT "stream:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id);
+    ADD CONSTRAINT "stream:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --
@@ -413,7 +438,7 @@ ALTER TABLE ONLY public.stream
 --
 
 ALTER TABLE ONLY public.user_session
-    ADD CONSTRAINT "user_session:foreignKey(user_id,user)" FOREIGN KEY (user_id) REFERENCES public."user"(id);
+    ADD CONSTRAINT "user_session:foreignKey(user_id,user)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --

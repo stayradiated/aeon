@@ -1,6 +1,6 @@
 import { errorBoundary } from '@stayradiated/error-boundary'
 
-import type { LabelId, UserId } from '#lib/ids.js'
+import type { LabelId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
 import type { Label } from '#lib/server/types.js'
@@ -12,6 +12,7 @@ type GetLabelListOptions = {
   where: Where<{
     userId: UserId
     labelId?: LabelId
+    streamId?: StreamId
   }>
 }
 
@@ -20,24 +21,17 @@ const getLabelList = async (
 ): Promise<Label[] | Error> => {
   const { db, where } = options
 
-  const labelList = await errorBoundary(() => {
+  return errorBoundary(() => {
     let query = db.selectFrom('label').selectAll()
 
     query = extendWhere(query)
       .string('id', where.labelId)
       .string('userId', where.userId)
+      .string('streamId', where.streamId)
       .done()
 
     return query.execute()
   })
-
-  if (labelList instanceof Error) {
-    return new Error('Failed to getPointList', {
-      cause: labelList,
-    })
-  }
-
-  return labelList
 }
 
 export { getLabelList }

@@ -63,7 +63,7 @@ start_server() {
     fi
 
     # Start vite in the background
-    nohup ./node_modules/.bin/vite --host 0.0.0.0 --open --strictPort --port "$VITE_PORT" > "$LOG_FILE" 2>&1 &
+    FORCE_COLOR=1 nohup ./node_modules/.bin/vite --host 0.0.0.0 --open --strictPort --port "$VITE_PORT" > "$LOG_FILE" 2>&1 &
     PID=$!
 
     # Save PID

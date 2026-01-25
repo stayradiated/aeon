@@ -56,6 +56,7 @@ const upsertPoint = async (
       (labelId, index): PointLabel => ({
         pointId: point.id,
         labelId,
+        streamId: where.streamId,
         userId: where.userId,
         sortOrder: index,
         createdAt: now,

@@ -2,7 +2,7 @@ import { errorBoundary } from '@stayradiated/error-boundary'
 
 import type { PointId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
-import type { Point } from '#lib/server/types.js'
+import type { PointWithLabelList } from '#lib/server/types.js'
 
 type GetPoint = {
   db: KyselyDb
@@ -12,16 +12,18 @@ type GetPoint = {
   }
 }
 
-const getPoint = async (options: GetPoint): Promise<Point[] | Error> => {
+const getPoint = async (
+  options: GetPoint,
+): Promise<PointWithLabelList | undefined | Error> => {
   const { db, where } = options
 
   return errorBoundary(() =>
     db
-      .selectFrom('point')
+      .selectFrom('pointWithLabelList')
       .selectAll()
       .where('id', '=', where.pointId)
       .where('userId', '=', where.userId)
-      .execute(),
+      .executeTakeFirst(),
   )
 }
 
