@@ -13,6 +13,7 @@ type GetPointListOptions = {
     userId: UserId
     pointId?: PointId
     streamId?: StreamId
+    startedAt?: number
   }>
   paginate?: {
     pointer: { startedAt: number; id: PointId } | undefined
@@ -32,6 +33,7 @@ const getPointList = async (
       .string('id', where.pointId)
       .string('userId', where.userId)
       .string('streamId', where.streamId)
+      .number('startedAt', where.startedAt)
       .done()
 
     if (paginate) {

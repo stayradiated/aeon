@@ -10,6 +10,7 @@ type GetPointIteratorOptions = {
   where: Where<{
     userId: UserId
     streamId: StreamId
+    startedAt?: number
   }>
   pageSize?: number
 }

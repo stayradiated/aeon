@@ -10,15 +10,10 @@ import { query } from '#lib/utils/query.js'
 
 import PointInput from './PointInput.svelte'
 
-export type StreamState =
-  | {
-      action: 'edit'
-      description: string
-      labelList: readonly ({ id: LabelId } | { name: string })[]
-    }
-  | {
-      action: 'skip'
-    }
+export type StreamState = {
+  description: string
+  labelList: readonly ({ id: LabelId } | { name: string })[]
+}
 
 type Props = {
   store: Store
@@ -26,7 +21,7 @@ type Props = {
   parentLabelIdList: readonly LabelId[] | undefined
   currentTime: number
   state: StreamState | undefined
-  onchange: (state: StreamState) => void
+  onchange: (state: StreamState | undefined) => void
 }
 
 const {
@@ -54,7 +49,6 @@ const { currentPoint, currentParentPoint, labelList } = $derived(
 const handleEdit = (event: MouseEvent) => {
   event.preventDefault()
   onchange({
-    action: 'edit',
     description: currentPoint?.description ?? '',
     labelList:
       currentPoint?.labelIdList.map((labelId) => ({
@@ -64,7 +58,7 @@ const handleEdit = (event: MouseEvent) => {
 }
 </script>
 
-{#if state?.action === 'edit'}
+{#if state}
   <PointInput
     {store}
     {stream}
@@ -72,13 +66,10 @@ const handleEdit = (event: MouseEvent) => {
     description={state.description}
     labelList={state.labelList}
     onchange={(value) => onchange({
-      action: 'edit',
       description: value.description ?? state.description,
       labelList: value.labelList ?? state.labelList,
     })}
-    onreset={() => {
-      onchange({ action: 'skip'})
-    }}
+    onreset={() => { onchange(undefined) }}
   />
 {:else}
   <button class="container" onclick={handleEdit}>

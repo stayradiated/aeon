@@ -17,7 +17,7 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
   const { store, currentTime, formState } = options
 
   for (const [streamId, state] of objectEntries(formState)) {
-    if (state.action === 'skip') {
+    if (!state) {
       return
     }
 
@@ -35,6 +35,8 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
           name: label.name,
           color: undefined,
           icon: undefined,
+          // NOTE: the parentId is updated afterwards to the correc
+          // value
           parentId: undefined,
         })
         return labelId
@@ -52,6 +54,10 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
       throw result
     }
   }
+
+  await store.mutate.migrate_fixupLabelParents({
+    startedAtGTE: currentTime,
+  })
 
   goto('/log')
 }

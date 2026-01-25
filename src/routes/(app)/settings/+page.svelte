@@ -49,7 +49,9 @@ const handleDeleteAllData = async () => {
 }
 
 const handleAssignLabelParent = async () => {
-  await store.mutate.migrate_fixupLabelParents({})
+  await store.mutate.migrate_fixupLabelParents({
+    startedAtGTE: 0,
+  })
 }
 </script>
 

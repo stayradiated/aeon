@@ -57,7 +57,7 @@ const handleNow = (_event: MouseEvent) => {
   <form onsubmit={handleSubmit}>
     {#each streamList as stream (stream.id)}
       {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
-      {@const parentLabelIdList = parentState?.action === 'edit'
+      {@const parentLabelIdList = parentState
         ? parentState.labelList.flatMap((label) => {
           return 'id' in label ? label.id : []
         })

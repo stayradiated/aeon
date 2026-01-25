@@ -65,7 +65,9 @@ type Mutators = {
     startedAt: number
   }>
 
-  migrate_fixupLabelParents: Mutator<Record<string, never>>
+  migrate_fixupLabelParents: Mutator<{
+    startedAtGTE: number
+  }>
 
   danger_deleteAllData: Mutator<{
     userHasConfirmed: boolean
