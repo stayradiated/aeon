@@ -2,9 +2,9 @@
 import * as dateFns from 'date-fns'
 import { formatInTimeZone, toDate, toZonedTime } from 'date-fns-tz'
 
+import type { StreamState } from '#lib/components/Add/StreamStatus.svelte'
 import type { StreamId } from '#lib/ids.js'
 import type { PageProps } from './$types'
-import type { StreamState } from './StreamStatus.svelte'
 
 import { getStreamList } from '#lib/core/select/stream.js'
 import { getTimeZone } from '#lib/core/select/user.js'
@@ -12,7 +12,8 @@ import { getTimeZone } from '#lib/core/select/user.js'
 import { clock } from '#lib/utils/clock.js'
 import { query } from '#lib/utils/query.js'
 
-import StreamStatus from './StreamStatus.svelte'
+import StreamStatus from '#lib/components/Add/StreamStatus.svelte'
+
 import { handleFormSubmit } from './submit.js'
 
 let { data }: PageProps = $props()
@@ -57,16 +58,11 @@ const handleNow = (_event: MouseEvent) => {
   <form onsubmit={handleSubmit}>
     {#each streamList as stream (stream.id)}
       {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
-      {@const parentLabelIdList = parentState?.action === 'edit'
-        ? parentState.labelList.flatMap((label) => {
-          return 'id' in label ? label.id : []
-        })
-        : undefined}
       <StreamStatus
         {store}
         {stream}
-        {parentLabelIdList}
         {currentTime}
+        {parentState}
         state={formState[stream.id]}
         onchange={(state) => {
           formState = { ...formState, [stream.id]: state }

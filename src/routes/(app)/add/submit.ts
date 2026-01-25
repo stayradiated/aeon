@@ -1,6 +1,6 @@
+import type { StreamState } from '#lib/components/Add/StreamStatus.svelte'
 import type { Store } from '#lib/core/replicache/store.js'
-import type { LabelId, StreamId } from '#lib/ids.js'
-import type { StreamState } from './StreamStatus.svelte'
+import type { StreamId } from '#lib/ids.js'
 
 import { goto } from '$app/navigation'
 
@@ -17,27 +17,25 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
   const { store, currentTime, formState } = options
 
   for (const [streamId, state] of objectEntries(formState)) {
-    if (state.action === 'skip') {
+    if (!state) {
       return
     }
 
-    const { description, labelList } = state
+    const { description, labelIdList, createdLabelList } = state
 
-    const labelIdList = await Promise.all(
-      labelList.map(async (label): Promise<LabelId> => {
-        if ('id' in label) {
-          return label.id
-        }
-        const labelId = genId<LabelId>()
+    // create all labels necessary
+    await Promise.all(
+      createdLabelList.map(async (label): Promise<void> => {
         await store.mutate.label_create({
-          labelId,
+          labelId: label.id,
           streamId,
           name: label.name,
           color: undefined,
           icon: undefined,
+          // NOTE: the parentId is updated afterwards to the correc
+          // value
           parentId: undefined,
         })
-        return labelId
       }),
     )
 
@@ -52,6 +50,11 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
       throw result
     }
   }
+
+  // TODO: what's the best way to handle this?
+  await store.mutate.migrate_fixupLabelParents({
+    startedAtGTE: currentTime,
+  })
 
   goto('/log')
 }

@@ -6,8 +6,9 @@ import { fixupLabelParents } from '#lib/server/migrate/fixup-label-parents.js'
 
 const migrateFixuplabelParents: ServerMutator<
   'migrate_fixupLabelParents'
-> = async (context, _options) => {
+> = async (context, options) => {
   const { db, sessionUserId } = context
+  const { startedAtGTE } = options
 
   const streamList = await getStreamList({
     db,
@@ -29,6 +30,7 @@ const migrateFixuplabelParents: ServerMutator<
       streamId: stream.id,
       parentStreamId: stream.parentId,
       userId: sessionUserId,
+      startedAt: startedAtGTE > 0 ? { gte: startedAtGTE } : undefined,
     })
     if (result instanceof Error) {
       console.error('fixupLabelParents error', result)

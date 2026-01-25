@@ -40,7 +40,6 @@ type ExtractTypeFromStringReference<
 type Id<T extends string> =
   | T
   | { eq: T }
-  | { gt: T }
   | { in: ReadonlyArray<T> }
   | { notIn: ReadonlyArray<T> }
   | typeof ANY_ID
@@ -116,9 +115,6 @@ const whereString = (
     if ('eq' in value) {
       return query.where(column, '=', value.eq)
     }
-    if ('gt' in value) {
-      return query.where(column, '>', value.gt)
-    }
     if ('in' in value) {
       if (value.in.length === 0) {
         // special case: in([]) is always false
@@ -168,11 +164,6 @@ const whereEitherString = (
     if ('eq' in value) {
       return query.where((eb) =>
         eb.or([eb(columns[0], '=', value.eq), eb(columns[1], '=', value.eq)]),
-      )
-    }
-    if ('gt' in value) {
-      return query.where((eb) =>
-        eb.or([eb(columns[0], '>', value.gt), eb(columns[1], '>', value.gt)]),
       )
     }
     if ('in' in value) {
