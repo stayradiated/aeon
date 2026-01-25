@@ -25,8 +25,8 @@ const handleFormSubmit = async (options: HandleFormSubmitOptions) => {
 
     const labelIdList = await Promise.all(
       labelList.map(async (label): Promise<LabelId> => {
-        if (typeof label === 'string') {
-          return label
+        if ('id' in label) {
+          return label.id
         }
         const labelId = genId<LabelId>()
         await store.mutate.label_create({

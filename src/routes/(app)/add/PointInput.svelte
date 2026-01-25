@@ -6,30 +6,36 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Stream } from '#lib/types.local.js'
 
-import { getLabelList } from '#lib/core/select/label.js'
+import { getLabelListByParent } from '#lib/core/select/label.js'
 
 import { query } from '#lib/utils/query.js'
 
 import MultiSelect from '#lib/components/MultiSelect/MultiSelect.svelte'
 
-type CreateLabel = { name: string }
-
 type Props = {
   store: Store
   stream: Stream
+  parentLabelIdList: readonly LabelId[]
 
-  labelList: readonly (LabelId | CreateLabel)[]
+  labelList: readonly ({ id: LabelId } | { name: string })[]
   description: string
 
   onreset: () => void
   onchange: (value: {
     description?: string
-    labelList?: readonly (LabelId | CreateLabel)[]
+    labelList?: readonly ({ id: LabelId } | { name: string })[]
   }) => void
 }
 
-let { store, stream, labelList, description, onchange, onreset }: Props =
-  $props()
+let {
+  store,
+  stream,
+  parentLabelIdList,
+  labelList,
+  description,
+  onchange,
+  onreset,
+}: Props = $props()
 
 const uid = $props.id()
 
@@ -44,7 +50,7 @@ onMount(() => {
 
 const { streamLabelList } = $derived(
   query({
-    streamLabelList: getLabelList(store, stream.id),
+    streamLabelList: getLabelListByParent(store, stream.id, parentLabelIdList),
   }),
 )
 
@@ -64,8 +70,8 @@ const optionList = $derived(
 
 const selectedOptionList = $derived(
   labelList.flatMap((labelOrCreate): Option | never[] => {
-    if (typeof labelOrCreate === 'string') {
-      const labelId = labelOrCreate
+    if ('id' in labelOrCreate) {
+      const labelId = labelOrCreate.id
       return (
         optionList.find((option) => {
           return option.value === labelId
@@ -115,20 +121,24 @@ const handleChangeLabel = (data: {
         onchange({ labelList: [...labelList, { name: label }] })
       } else if (typeof data.option?.value === 'string') {
         const labelId = data.option.value
-        onchange({ labelList: [...labelList, labelId] })
+        onchange({ labelList: [...labelList, { id: labelId }] })
       }
       break
     }
     case 'remove': {
       const labelId = data.option?.value
       if (labelId) {
-        onchange({ labelList: labelList.filter((item) => item !== labelId) })
+        onchange({
+          labelList: labelList.filter(
+            (item) => 'id' in item && item.id !== labelId,
+          ),
+        })
       } else {
-        const label = data.option?.label
-        if (label) {
+        const name = data.option?.label
+        if (name) {
           onchange({
             labelList: labelList.filter(
-              (item) => typeof item === 'object' && item.name !== label,
+              (item) => 'name' in item && item.name !== name,
             ),
           })
         }
