@@ -14,7 +14,7 @@ export type StreamState =
   | {
       action: 'edit'
       description: string
-      labelList: readonly (LabelId | { name: string })[]
+      labelList: readonly ({ id: LabelId } | { name: string })[]
     }
   | {
       action: 'skip'
@@ -23,20 +23,31 @@ export type StreamState =
 type Props = {
   store: Store
   stream: Stream
+  parentLabelIdList: readonly LabelId[] | undefined
   currentTime: number
   state: StreamState | undefined
   onchange: (state: StreamState) => void
 }
 
-const { store, stream, currentTime, state, onchange }: Props = $props()
+const {
+  store,
+  stream,
+  parentLabelIdList,
+  currentTime,
+  state,
+  onchange,
+}: Props = $props()
 
-const { currentPoint, labelList } = $derived(
+const { currentPoint, currentParentPoint, labelList } = $derived(
   query(() => {
     const currentPoint = getActivePoint(store, stream.id, currentTime).value
+    const currentParentPoint = stream.parentId
+      ? getActivePoint(store, stream.parentId, currentTime).value
+      : undefined
     const labelList = (currentPoint?.labelIdList ?? []).flatMap((labelId) => {
       return store.label.get(labelId).value ?? []
     })
-    return { currentPoint, labelList }
+    return { currentPoint, currentParentPoint, labelList }
   }),
 )
 
@@ -45,7 +56,10 @@ const handleEdit = (event: MouseEvent) => {
   onchange({
     action: 'edit',
     description: currentPoint?.description ?? '',
-    labelList: currentPoint?.labelIdList ?? [],
+    labelList:
+      currentPoint?.labelIdList.map((labelId) => ({
+        id: labelId,
+      })) ?? [],
   })
 }
 </script>
@@ -54,6 +68,7 @@ const handleEdit = (event: MouseEvent) => {
   <PointInput
     {store}
     {stream}
+    parentLabelIdList={parentLabelIdList ?? currentParentPoint?.labelIdList ?? []}
     description={state.description}
     labelList={state.labelList}
     onchange={(value) => onchange({

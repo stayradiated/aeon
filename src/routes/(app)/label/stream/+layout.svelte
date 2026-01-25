@@ -33,6 +33,7 @@ const activeStreamId = $derived(page.params.streamId as StreamId)
 <style>
 	nav {
 		display: flex;
+    flex-wrap: wrap;
 		gap: var(--size-2);
 
     a {

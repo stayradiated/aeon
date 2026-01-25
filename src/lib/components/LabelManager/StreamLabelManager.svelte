@@ -25,12 +25,35 @@ const { stream, groupedLabelList } = $derived(
 
 <h3>{stream?.name ?? '⚠️ Missing'}</h3>
 
-{#each groupedLabelList as [parentLabel] (parentLabel?.id)}
-  {#if parentLabel}
-    <a href="#label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</a>
-  {/if}
-{/each}
+<nav>
+  {#each groupedLabelList as [parentLabel] (parentLabel?.id)}
+    {#if parentLabel}
+      <a href="#label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</a>
+    {/if}
+  {/each}
+</nav>
 
 {#each groupedLabelList as [parentLabel, labelList] (parentLabel?.id)}
   <LabelList {store} {parentLabel} {labelList} />
 {/each}
+
+<style>
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-2);
+
+    a {
+      display: block;
+      padding: var(--size-2) var(--size-3);
+      border-radius: var(--radius-xs);
+      background-color: var(--theme-background);
+      color: var(--theme-text-main);
+      text-decoration: none;
+
+      &:hover {
+        background-color: var(--theme-background-alt);
+      }
+    }
+  }
+</style>
