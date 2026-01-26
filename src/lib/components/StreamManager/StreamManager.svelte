@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { Store } from '#lib/core/replicache/store.js'
 
-import { getStreamList } from '#lib/core/select/stream.js'
+import { getStreamList } from '#lib/core/select/get-stream-list.js'
 
 import { query } from '#lib/utils/query.js'
 

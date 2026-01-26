@@ -1,22 +1,41 @@
 <script lang="ts">
-import { format } from 'date-fns'
+import * as dateFns from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 
-import type { Slice } from '#lib/core/select/types.js'
-import type { Label, Stream } from '#lib/types.local.js'
+import type { Store } from '#lib/core/replicache/store.js'
+
+import { getSliceList } from '#lib/core/select/get-slice-list.js'
+import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { groupBy } from '#lib/utils/group-by.js'
+import { query } from '#lib/utils/query.js'
+import { startOfDayWithTimeZone } from '#lib/utils/zoned-date.js'
 
 import SliceList from './SliceList.svelte'
 
-interface Props {
-  streamList: Stream[]
-  sliceList: Slice[]
-  timeZone: string
-  labelRecord: Record<string, Label>
+type Props = {
+  store: Store
 }
 
-let { streamList, sliceList, timeZone, labelRecord }: Props = $props()
+const { store }: Props = $props()
+
+const { timeZone, sliceList } = $derived(
+  query(() => {
+    const timeZone = getUserTimeZone(store).value
+
+    const rangeStartDate = startOfDayWithTimeZone({
+      instant: dateFns.subDays(Date.now(), 7).getTime(),
+      timeZone,
+    }).getTime()
+
+    return {
+      timeZone,
+      sliceList: getSliceList(store, {
+        startedAt: { gte: rangeStartDate },
+      }).value.toReversed(),
+    }
+  }),
+)
 
 /* grouping slices by day */
 let sliceListByDay = $derived(
@@ -25,7 +44,7 @@ let sliceListByDay = $derived(
     const startedAt = toZonedTime(startedAtUTC, timeZone)
 
     // Format as Friday 02 June 2023
-    const day = format(startedAt, 'EEEE dd MMMM yyyy')
+    const day = dateFns.format(startedAt, 'EEEE dd MMMM yyyy')
     return day
   }),
 )
@@ -37,7 +56,7 @@ let sliceListByDay = $derived(
   {#each Object.entries(sliceListByDay) as [day, sliceList] (day)}
     <div class="container">
       <h2>{day}</h2>
-      <SliceList {streamList} {sliceList} {timeZone} {labelRecord} />
+      <SliceList {store} {sliceList} />
     </div>
   {/each}
 {/if}

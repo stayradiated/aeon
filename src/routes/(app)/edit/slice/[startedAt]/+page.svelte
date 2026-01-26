@@ -7,8 +7,8 @@ import { goto } from '$app/navigation'
 import { page } from '$app/state'
 
 import { getActivePointRecord } from '#lib/core/select/get-active-point-record.js'
-import { getStreamList } from '#lib/core/select/stream.js'
-import { getTimeZone } from '#lib/core/select/user.js'
+import { getStreamList } from '#lib/core/select/get-stream-list.js'
+import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { query } from '#lib/utils/query.js'
 
@@ -19,7 +19,7 @@ const startedAt = Number.parseInt(page.params.startedAt ?? '-1', 10)
 
 const { timeZone, pointRecord, streamList } = $derived(
   query({
-    timeZone: getTimeZone(store),
+    timeZone: getUserTimeZone(store),
     pointRecord: getActivePointRecord(store, startedAt),
     streamList: getStreamList(store),
   }),

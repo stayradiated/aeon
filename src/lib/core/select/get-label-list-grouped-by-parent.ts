@@ -7,20 +7,7 @@ import type { Label } from '#lib/types.local.js'
 import { groupBy } from '#lib/utils/group-by.js'
 import { createSelector } from '#lib/utils/selector.js'
 
-const getLabelList = createSelector(
-  'getLabelList',
-  (store, streamId: StreamId): Signal<Label[]> => {
-    const $filteredLabelList = store.label.filter((value) => {
-      return value.streamId === streamId
-    })
-
-    return computed('getLabelList', () => {
-      return $filteredLabelList.value.toSorted((a, b) => {
-        return a.name.localeCompare(b.name)
-      })
-    })
-  },
-)
+import { getLabelList } from './get-label-list.js'
 
 const getLabelListGroupedByParent = createSelector(
   'getParentLabelList',
@@ -56,33 +43,4 @@ const getLabelListGroupedByParent = createSelector(
   },
 )
 
-const getLabelListByParent = createSelector(
-  'getLabelListByParent',
-  (
-    store,
-    streamId: StreamId,
-    parentIdList: readonly LabelId[],
-  ): Signal<Label[]> => {
-    const $labelList = getLabelList(store, streamId)
-    const parentIdSet =
-      parentIdList.length > 0 ? new Set(parentIdList) : undefined
-
-    return computed('getLabelListByParent', () => {
-      const labelList = $labelList.value
-
-      if (parentIdSet === undefined) {
-        return labelList.filter((label) => {
-          return label.parentId === undefined
-        })
-      }
-      return labelList.filter((label) => {
-        if (label.parentId === undefined) {
-          return false
-        }
-        return parentIdSet.has(label.parentId)
-      })
-    })
-  },
-)
-
-export { getLabelList, getLabelListGroupedByParent, getLabelListByParent }
+export { getLabelListGroupedByParent }

@@ -1,57 +1,74 @@
 <script lang="ts">
-import type { Slice } from '#lib/core/select/types.js'
-import type { Label, Stream } from '#lib/types.local.js'
+import type { Store } from '#lib/core/replicache/store.js'
+import type { Slice } from '#lib/core/shape/types.js'
+import type { StreamId } from '#lib/ids.js'
 
-import { formatDuration, formatTime } from '#lib/utils/format-duration.js'
+import { getStreamList } from '#lib/core/select/get-stream-list.js'
+import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
-interface Props {
-  streamList: Stream[]
+import { formatTime } from '#lib/utils/format-duration.js'
+import { query } from '#lib/utils/query.js'
+
+import Line from './Line.svelte'
+
+type Props = {
+  store: Store
   sliceList: Slice[]
-  timeZone: string
-  labelRecord: Record<string, Label>
 }
 
-let { streamList, sliceList, timeZone, labelRecord }: Props = $props()
+const { store, sliceList }: Props = $props()
+
+const { timeZone, streamList } = $derived(
+  query(() => {
+    return {
+      timeZone: getUserTimeZone(store).value,
+      streamList: getStreamList(store).value,
+    }
+  }),
+)
+
+// build an index of streamId → column index
+// so we can quickly lookup where to render each cell
+const streamColumnIndex: Record<StreamId, number> = $derived(
+  Object.fromEntries(streamList.map((stream, index) => [stream.id, index])),
+)
 </script>
 
-<table>
-  <thead>
-    <tr>
-      <th>time</th>
-      {#each streamList as stream (stream.id)}
-        <th>{stream.name}</th>
-      {/each}
-    </tr>
-  </thead>
-
-  <tbody>
-    {#each sliceList as slice, index (index)}
-      <tr>
-        <td><a href="/edit/slice/{slice.startedAt}">{formatTime(timeZone, slice.startedAt)}</a></td>
-
-        {#each streamList as stream (stream.id)}
-          {@const line = slice.lineList.find((line) => line.streamId === stream.id)}
-
-          <td>
-            {#if line}
-              {(line.labelIdList ?? [])
-                .map((labelId) => {
-                  const label = labelRecord[labelId];
-                  return (label?.icon ? label?.icon + ' ' : '') + (label?.name ?? '');
-                })
-                .join(', ')}
-              <br />
-              <code>{formatDuration(line.durationMs)}</code>
-            {/if}
-          </td>
-        {/each}
-      </tr>
+<div class="SliceList" style:--num-cols={1 + streamList.length}>
+  <header>
+    <h5>time</h5>
+    {#each streamList as stream (stream.id)}
+      <h5>{stream.name}</h5>
     {/each}
-  </tbody>
-</table>
+  </header>
+
+  {#each sliceList as slice, index (index)}
+    <section>
+      <div class="cell" style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(timeZone, slice.startedAt)}</a></div>
+
+      {#each slice.lineList as line (line.streamId)}
+        <div class="cell" style:--col={2 + (streamColumnIndex[line.streamId] ?? 0)}>
+          {#if line}
+            <Line {store} {line} />
+          {/if}
+        </div>
+      {/each}
+    </section>
+  {/each}
+</div>
 
 <style>
-	td {
+  .SliceList {
+    display: grid;
+    grid-template-columns: repeat(var(--num-cols), minmax(0, 1fr));
+  }
+
+  header, section {
+    display: contents;
+  }
+
+	.cell {
+    grid-column: var(--col);
 		white-space: pre-wrap;
 	}
 </style>

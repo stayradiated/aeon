@@ -5,7 +5,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label, Stream } from '#lib/types.local.js'
 
-import { getLabelListByParent } from '#lib/core/select/label.js'
+import { getFilteredLabelList } from '#lib/core/select/get-filtered-label-list.js'
 
 import { genId } from '#lib/utils/gen-id.js'
 import { query } from '#lib/utils/query.js'
@@ -44,7 +44,7 @@ const uid = $props.id()
 
 const { streamLabelList, outOfParentLabelList } = $derived(
   query(() => ({
-    streamLabelList: getLabelListByParent(store, stream.id, parentLabelIdList)
+    streamLabelList: getFilteredLabelList(store, stream.id, parentLabelIdList)
       .value,
     outOfParentLabelList: labelIdList.flatMap((labelId) => {
       const label = store.label.get(labelId).value
