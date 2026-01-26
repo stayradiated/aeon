@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit'
 
 import type { PageLoad } from './$types'
 
-import { getStreamList } from '#lib/core/select/stream.js'
+import { getStreamList } from '#lib/core/select/get-stream-list.js'
 
 const load = (async (event) => {
   const { parent } = event

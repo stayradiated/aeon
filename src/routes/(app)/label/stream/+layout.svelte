@@ -7,7 +7,7 @@ import { page } from '$app/state'
 const { data, children }: LayoutProps = $props()
 const { store } = $derived(data)
 
-import { getStreamList } from '#lib/core/select/stream.js'
+import { getStreamList } from '#lib/core/select/get-stream-list.js'
 
 import { query } from '#lib/utils/query.js'
 

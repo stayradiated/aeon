@@ -1,14 +1,14 @@
 import type { Signal } from 'signia'
 import { computed } from 'signia'
 
+import type { Slice } from '#lib/core/shape/types.js'
 import type { StreamId } from '#lib/ids.js'
-import type { Slice } from './types.js'
 
 import { MinHeap } from '#lib/utils/min-heap.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
 import { createSelector } from '#lib/utils/selector.js'
 
-import { getAllLineLists } from './line.js'
+import { getAllLineLists } from './get-all-line-lists.js'
 
 type HeapEntry = {
   streamId: StreamId

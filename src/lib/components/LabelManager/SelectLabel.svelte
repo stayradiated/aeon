@@ -4,7 +4,7 @@ import type { ChangeEventHandler } from 'svelte/elements'
 import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
 
-import { getLabelListGroupedByParent } from '#lib/core/select/label.js'
+import { getLabelListGroupedByParent } from '#lib/core/select/get-label-list-grouped-by-parent.js'
 
 import { query } from '#lib/utils/query.js'
 

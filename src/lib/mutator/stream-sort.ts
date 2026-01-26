@@ -21,6 +21,9 @@ const streamSort: LocalMutator<'stream_sort'> = async (context, options) => {
 
   const newIndex = index + delta
   if (newIndex < 0 || newIndex >= streamList.length) {
+    console.warn(
+      `Next index ${newIndex} is out of bounds, Skipping stream sort`,
+    )
     return
   }
 
@@ -37,7 +40,7 @@ const streamSort: LocalMutator<'stream_sort'> = async (context, options) => {
     if (stream.sortOrder === i) {
       continue
     }
-    tx.set(key, {
+    await tx.set(key, {
       ...stream,
       sortOrder: i,
       updatedAt: actionedAt,
