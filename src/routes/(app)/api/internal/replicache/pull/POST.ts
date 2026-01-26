@@ -221,7 +221,9 @@ const POST: RequestHandler = async (event) => {
 
   // 18(i): build patch
   if (prevCVR === undefined) {
-    entities.unshift({ op: 'clear' })
+    entities.unshift(
+      { op: 'clear' },
+    )
   }
 
   // 18(ii): construct cookie

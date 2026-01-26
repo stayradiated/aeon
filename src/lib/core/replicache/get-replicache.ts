@@ -48,6 +48,11 @@ type GetReplicacheOptions = {
   sessionUserId: UserId
 }
 
+const REPLICACHE_CACHE: Record<
+  string,
+  Promise<Replicache<ReplicacheMutatorDefs>>
+> = {}
+
 const getReplicache = memoize(
   async (
     options: GetReplicacheOptions,
@@ -61,7 +66,7 @@ const getReplicache = memoize(
     const context = { sessionUserId }
 
     const replicache = new Replicache<ReplicacheMutatorDefs>({
-      schemaVersion: '2026.01.17/0',
+      schemaVersion: '2026.01.27/0',
       name: sessionUserId,
       pushURL: '/api/internal/replicache/push',
       pullURL: '/api/internal/replicache/pull',
@@ -69,7 +74,6 @@ const getReplicache = memoize(
     })
 
     // Use WebSocket-based poke subscription
-    console.info('[Replicache] Using WebSocket poke subscription')
     const subscription = subscribeToWebSocketPokes({
       onPoke: () => replicache.pull(),
     })
@@ -87,7 +91,20 @@ const getReplicache = memoize(
   },
   {
     cacheKey: ([options]) => options.sessionUserId,
+    cache: REPLICACHE_CACHE,
   },
 )
 
-export { getReplicache, mutators, createReplicacheMutators }
+const resetReplicache = async () => {
+  for (const [key, replicachePromise] of Object.entries(REPLICACHE_CACHE)) {
+    try {
+      const replicache = await replicachePromise
+      await replicache.close()
+    } catch (error) {
+      console.error(error)
+    }
+    delete REPLICACHE_CACHE[key]
+  }
+}
+
+export { getReplicache, resetReplicache, mutators, createReplicacheMutators }

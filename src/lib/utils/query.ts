@@ -214,44 +214,33 @@ const queryFromSignal = <T extends Record<string, unknown>>(
  * property contains the current value of its corresponding signal.
  *
  * @param input - Object where each property is a Signal
- * @returns Proxy object that activates subscriptions on property access
+ * @returns Object with current values that updates when signals change
  */
 const queryFromObject = <T extends Record<string, Signal<unknown>>>(
   input: T,
 ): {
   [K in keyof T]: T[K]['value']
 } => {
-  // Initialize state with current signal values
-  const stateRecord = Object.fromEntries(
-    objectEntries(input).map(([key, signal]) => [key, signal.value]),
-  ) as { [K in keyof T]: T[K]['value'] }
+  // Track state as a computed object
+  const $state = computed(
+    'queryFromObject',
+    () =>
+      Object.fromEntries(
+        objectEntries(input).map(([key, signal]) => [key, signal.value]),
+      ) as { [K in keyof T]: T[K]['value'] },
+  )
 
-  // Create Svelte subscribers for each individual signal
-  const subscriberRecord = Object.fromEntries(
-    objectEntries(input).map(([key, signal]) => {
-      const subscribeFn = createSubscriber((onUpdate) => {
-        const cleanup = react(`queryFromObject:${String(key)}`, () => {
-          const prevValue = stateRecord[key]
-          if (prevValue !== signal.value) {
-            stateRecord[key] = signal.value
-            onUpdate() // Trigger Svelte re-render
-          }
-        })
-        return cleanup
-      })
-      return [key, subscribeFn]
-    }),
-  ) as { [K in keyof T]: () => void }
-
-  // Return a proxy that activates subscriptions lazily when properties are accessed
-  return new Proxy(stateRecord, {
-    get(target, prop) {
-      // Ensure we're subscribed when properties are accessed
-      const subscribeFn = subscriberRecord[prop as keyof T]
-      subscribeFn?.()
-      return target[prop as keyof T]
-    },
+  // Update svelte when any state changes
+  const subscribe = createSubscriber((onUpdate) => {
+    const stop = react('queryFromObject', () => {
+      $state.value
+      onUpdate()
+    })
+    return stop
   })
+  subscribe()
+
+  return $state.value
 }
 
 /**

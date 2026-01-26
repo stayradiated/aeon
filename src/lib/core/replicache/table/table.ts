@@ -60,10 +60,22 @@ class Table<
     )
 
     // memoize all the methods that take arguments
-    this.get = memoize(this.get.bind(this))
-    this.find = memoize(this.find.bind(this))
-    this.filter = memoize(this.filter.bind(this))
-    this.some = memoize(this.some.bind(this))
+    this.get = memoize(this.get.bind(this), {
+      cacheKey: ([key]) =>
+        typeof key === 'string' ? key : `${key[0]}/${key[1]}`,
+    })
+    this.find = memoize(this.find.bind(this), {
+      cacheKey: ([cacheKey]) => cacheKey,
+    })
+    this.filter = memoize(this.filter.bind(this), {
+      cacheKey: ([cacheKey]) => cacheKey,
+    })
+    this.map = memoize(this.map.bind(this), {
+      cacheKey: ([cacheKey]) => cacheKey,
+    })
+    this.some = memoize(this.some.bind(this), {
+      cacheKey: ([cacheKey]) => cacheKey,
+    })
   }
 
   get(key: KeyOutput) {
@@ -79,16 +91,16 @@ class Table<
     return incrementalGet<Value>(this.atom, serializedKey)
   }
 
-  find(predicate: (value: Value) => boolean) {
+  find(_cacheKey: string, predicate: (value: Value) => boolean) {
     return incrementalFind<Value>(this.atom, predicate)
   }
-  filter(predicate: (value: Value) => boolean) {
+  filter(_cacheKey: string, predicate: (value: Value) => boolean) {
     return incrementalFilter<Value>(this.atom, predicate)
   }
-  map<Result>(transform: (value: Value) => Result) {
+  map<Result>(_cacheKey: string, transform: (value: Value) => Result) {
     return incrementalMap<Value, Result>(this.atom, transform)
   }
-  some(predicate: (value: Value) => boolean) {
+  some(_cacheKey: string, predicate: (value: Value) => boolean) {
     return incrementalSome<Value>(this.atom, predicate)
   }
 

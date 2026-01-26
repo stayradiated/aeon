@@ -38,9 +38,14 @@ type LocalStream = {
   updatedAt: number
 }
 
+type LocalMeta = {
+  state: 'LOADING' | 'READY'
+}
+
 export type {
   LocalUser as User,
   LocalLabel as Label,
   LocalPoint as Point,
   LocalStream as Stream,
+  LocalMeta as Meta,
 }

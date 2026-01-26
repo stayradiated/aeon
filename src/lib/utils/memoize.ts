@@ -35,46 +35,31 @@ SOFTWARE.
 ================================================================================
 */
 
-type CacheStorage<KeyType, ValueType> = {
-  has: (key: KeyType) => boolean
-  get: (key: KeyType) => ValueType | undefined
-  set: (key: KeyType, value: ValueType) => void
-  delete: (key: KeyType) => void
-  clear?: () => void
-}
-
 // biome-ignore lint/suspicious/noExplicitAny: required for generic function parameter constraints
 type AnyFunction = (...arguments_: readonly any[]) => unknown
 
-type MemoizeOptions<FunctionToMemoize extends AnyFunction, CacheKeyType> = {
-  readonly cacheKey?: (
-    arguments_: Parameters<FunctionToMemoize>,
-  ) => CacheKeyType
-  readonly cache?: CacheStorage<CacheKeyType, ReturnType<FunctionToMemoize>>
+type MemoizeOptions<FunctionToMemoize extends AnyFunction> = {
+  readonly cacheKey: (arguments_: Parameters<FunctionToMemoize>) => string
+  readonly cache?: Record<string, ReturnType<FunctionToMemoize>>
 }
 
-const memoize = <FunctionToMemoize extends AnyFunction, CacheKeyType>(
+const memoize = <FunctionToMemoize extends AnyFunction>(
   fn: FunctionToMemoize,
-  {
-    cacheKey,
-    cache = new Map(),
-  }: MemoizeOptions<FunctionToMemoize, CacheKeyType> = {},
+  { cacheKey, cache = {} }: MemoizeOptions<FunctionToMemoize>,
 ): FunctionToMemoize => {
   const memoized = ((
-    ...arguments_: Parameters<FunctionToMemoize>
+    ...args: Parameters<FunctionToMemoize>
   ): ReturnType<FunctionToMemoize> => {
-    const key = cacheKey
-      ? cacheKey(arguments_)
-      : (arguments_[0] as CacheKeyType)
-    if (cache.has(key)) {
-      const cached = cache.get(key)
+    const key = cacheKey(args)
+    if (key in cache) {
+      const cached = cache[key]
       if (cached === undefined) {
         throw new Error('Cache corruption: key exists but value is undefined')
       }
       return cached
     }
-    const result = fn(...arguments_) as ReturnType<FunctionToMemoize>
-    cache.set(key, result)
+    const result = fn(...args) as ReturnType<FunctionToMemoize>
+    cache[key] = result
     return result
   }) as FunctionToMemoize
 

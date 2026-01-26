@@ -1,4 +1,5 @@
 import { transact } from 'signia'
+import type { ExperimentalDiffOperation as ReplicacheDiff } from 'replicache'
 
 import type {
   AnonLabel,
@@ -9,7 +10,7 @@ import type {
 } from '#lib/core/replicache/types.js'
 import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
 import type { InternalMutatorInput } from '#lib/mutator/types.js'
-import type { Label, Point, Stream, User } from '#lib/types.local.js'
+import type { Label, Meta, Point, Stream, User } from '#lib/types.local.js'
 
 import * as Key from '#lib/core/replicache/keys.js'
 import { Table } from '#lib/core/replicache/table/table.js'
@@ -25,6 +26,10 @@ type CreateStoreOptions = {
 const createStore = (options: CreateStoreOptions) => {
   const { rep, sessionUserId } = options
 
+  const meta = new Table<string, Meta, Meta>({
+    key: Key.meta,
+    mapValue: (value) => value,
+  })
   const label = new Table<LabelId, AnonLabel, Label>({
     key: Key.label,
     mapValue: (value, id) => ({ id, ...value }),
@@ -44,12 +49,17 @@ const createStore = (options: CreateStoreOptions) => {
 
   // biome-ignore lint/suspicious/noExplicitAny: this is fine
   const tableByName: Record<string, Table<any, any, any>> = {
-    [Key.point.name]: point,
-    [Key.label.name]: label,
-    [Key.stream.name]: stream,
     [Key.user.name]: user,
+    [Key.stream.name]: stream,
+    [Key.label.name]: label,
+    [Key.point.name]: point,
   }
 
+  const setMetaState = (state: 'READY' | 'LOADING') => {
+    meta.pushDiffList([{ op: 'add', key: 'meta/store', newValue: { state } }])
+  }
+
+  setMetaState('LOADING')
   rep.experimentalWatch(
     (diffList) => {
       const record = groupBy(diffList, (diff) => {
@@ -67,6 +77,7 @@ const createStore = (options: CreateStoreOptions) => {
           }
           table.pushDiffList(diffList)
         }
+        setMetaState('READY')
       })
     },
     {
@@ -81,6 +92,7 @@ const createStore = (options: CreateStoreOptions) => {
     sessionUserId,
 
     label,
+    meta,
     point,
     stream,
     user,
