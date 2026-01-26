@@ -1,19 +1,34 @@
 <script lang="ts">
+import { dropAllDatabases } from 'replicache'
+
 import type { LayoutProps } from './$types'
 
 import { enhance } from '$app/forms'
 import { afterNavigate } from '$app/navigation'
+
+import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
 
 import { query } from '#lib/utils/query.js'
 
 const { data, children }: LayoutProps = $props()
 const { store } = $derived(data)
 
-const { sessionUser } = $derived(
+const { metaStore, sessionUser } = $derived(
   query({
+    metaStore: store.meta.get('store'),
     sessionUser: store.user.get(store.sessionUserId),
   }),
 )
+
+const isStoreLoading = $derived(metaStore?.state === 'LOADING')
+
+const startLoadingAt = Date.now()
+$effect(() => {
+  if (!isStoreLoading) {
+    const duration = Date.now() - startLoadingAt
+    console.info(`[Layout] Loaded in ${duration}ms`)
+  }
+})
 
 let isMenuOpen = $state(false)
 const toggleMenuOpen = () => {
@@ -41,14 +56,30 @@ afterNavigate(() => {
   {#if sessionUser}
     <div class="user">
       <span>{sessionUser.email}</span>
-      <form use:enhance action="/?/logout" method="post">
+      <form
+        use:enhance={() => {
+          return async (event) => {
+            await event.update()
+            if (event.result.type === 'redirect') {
+              await resetReplicache()
+              await dropAllDatabases()
+              console.log('dropped all the databases')
+            }
+          }
+        }}
+        action="/?/logout"
+        method="post">
         <button type="submit">Logout</button>
       </form>
     </div>
   {/if}
 </header>
 
-{@render children?.()}
+{#if isStoreLoading}
+  <div class="loading">Loading...</div>
+{:else}
+  {@render children?.()}
+{/if}
 
 <style>
 	:global(html) {
@@ -195,5 +226,12 @@ afterNavigate(() => {
     display: flex;
     align-items: center;
     gap: var(--size-2);
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
 </style>

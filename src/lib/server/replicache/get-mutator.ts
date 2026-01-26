@@ -14,6 +14,9 @@ const getMutator = memoize(
     const mutator = await mutators[mutatorName as MutatorKey]
     return mutator?.default
   },
+  {
+    cacheKey: ([mutatorName]) => mutatorName,
+  },
 )
 
 export { getMutator }

@@ -7,9 +7,12 @@ import { createSelector } from '#lib/utils/selector.js'
 const getPointList = createSelector(
   'getPointList',
   (store, streamId: StreamId) => {
-    const $filteredPointList = store.point.filter((value) => {
-      return value.streamId === streamId
-    })
+    const $filteredPointList = store.point.filter(
+      `streamId:${streamId}`,
+      (value) => {
+        return value.streamId === streamId
+      },
+    )
 
     return computed('getPointList', () => {
       return $filteredPointList.value.toSorted((a, b) => {

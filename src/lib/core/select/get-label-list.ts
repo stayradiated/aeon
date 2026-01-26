@@ -9,9 +9,12 @@ import { createSelector } from '#lib/utils/selector.js'
 const getLabelList = createSelector(
   'getLabelList',
   (store, streamId: StreamId): Signal<Label[]> => {
-    const $filteredLabelList = store.label.filter((value) => {
-      return value.streamId === streamId
-    })
+    const $filteredLabelList = store.label.filter(
+      `streamId:${streamId}`,
+      (value) => {
+        return value.streamId === streamId
+      },
+    )
 
     return computed('getLabelList', () => {
       return $filteredLabelList.value.toSorted((a, b) => {
