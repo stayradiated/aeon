@@ -16,6 +16,7 @@ import { asyncMapRecordValues } from '#lib/utils/record.js'
 import { mutators } from '#lib/mutator/index.js'
 
 import { subscribeToWebSocketPokes } from './poke.js'
+import { SCHEMA_VERSION } from './version.js'
 
 const createReplicacheMutators = async (
   initialContext: Omit<LocalMutatorContext, 'tx' | 'actionedAt'>,
@@ -66,7 +67,7 @@ const getReplicache = memoize(
     const context = { sessionUserId }
 
     const replicache = new Replicache<ReplicacheMutatorDefs>({
-      schemaVersion: '2026.01.27/0',
+      schemaVersion: SCHEMA_VERSION,
       name: sessionUserId,
       pushURL: '/api/internal/replicache/push',
       pullURL: '/api/internal/replicache/pull',

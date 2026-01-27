@@ -32,8 +32,6 @@ const buildLine = <PointLike extends Point>(
     startedAt,
     stoppedAt,
     durationMs,
-    createdAt: Math.max(startPoint.createdAt, stopPoint?.createdAt ?? 0),
-    updatedAt: Math.max(startPoint.updatedAt, stopPoint?.updatedAt ?? 0),
   }
 
   return line

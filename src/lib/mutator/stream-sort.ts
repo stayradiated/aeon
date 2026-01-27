@@ -4,7 +4,7 @@ import type { LocalMutator } from './types.ts'
 import * as Key from '#lib/core/replicache/keys.js'
 
 const streamSort: LocalMutator<'stream_sort'> = async (context, options) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { streamId, delta } = options
 
   const streamList = await tx
@@ -43,7 +43,6 @@ const streamSort: LocalMutator<'stream_sort'> = async (context, options) => {
     await tx.set(key, {
       ...stream,
       sortOrder: i,
-      updatedAt: actionedAt,
     })
   }
 }

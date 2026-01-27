@@ -40,6 +40,8 @@ const POST: RequestHandler = async (event) => {
   }
 
   const db = getDb()
+
+  console.info('[import-snapshot] Importing workspace...')
   const result = await importSnapshot({
     db,
     userId: sessionUserId,
@@ -49,6 +51,7 @@ const POST: RequestHandler = async (event) => {
     console.error(printError(result))
     return new Response(result.message, { status: 500 })
   }
+  console.info('[import-snapshot] Completed import of workspace.')
 
   poke(sessionUserId)
 

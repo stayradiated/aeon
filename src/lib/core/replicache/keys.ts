@@ -1,4 +1,10 @@
-import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
+import type {
+  LabelId,
+  MetaTaskId,
+  PointId,
+  StreamId,
+  UserId,
+} from '#lib/ids.js'
 
 import { createKey } from '#lib/utils/create-key.js'
 
@@ -11,7 +17,8 @@ import { createKey } from '#lib/utils/create-key.js'
  */
 
 export const label = createKey('label')<LabelId>()
+export const meta = createKey('meta')<string>()
+export const metaTask = createKey('metaTask')<MetaTaskId>()
 export const point = createKey('point')<PointId>()
 export const stream = createKey('stream')<StreamId>()
 export const user = createKey('user')<UserId>()
-export const meta = createKey('meta')<string>()

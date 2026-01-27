@@ -1,11 +1,15 @@
-import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
+import type {
+  LabelId,
+  MetaTaskId,
+  PointId,
+  StreamId,
+  UserId,
+} from '#lib/ids.js'
 
 type LocalUser = {
   readonly id: UserId
   email: string
   timeZone: string
-  createdAt: number
-  updatedAt: number
 }
 
 type LocalLabel = {
@@ -15,8 +19,6 @@ type LocalLabel = {
   icon: string | undefined
   color: string | undefined
   parentId: LabelId | undefined
-  createdAt: number
-  updatedAt: number
 }
 
 type LocalPoint = {
@@ -25,8 +27,6 @@ type LocalPoint = {
   labelIdList: readonly LabelId[]
   description: string
   startedAt: number
-  createdAt: number
-  updatedAt: number
 }
 
 type LocalStream = {
@@ -34,8 +34,14 @@ type LocalStream = {
   name: string
   sortOrder: number
   parentId: StreamId | undefined
-  createdAt: number
-  updatedAt: number
+}
+
+type LocalMetaTask = {
+  id: MetaTaskId
+  name: string
+  status: string
+  lastStartedAt: number
+  lastFinishedAt: number | undefined
 }
 
 type LocalMeta = {
@@ -48,4 +54,5 @@ export type {
   LocalPoint as Point,
   LocalStream as Stream,
   LocalMeta as Meta,
+  LocalMetaTask as MetaTask,
 }

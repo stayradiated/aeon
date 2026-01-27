@@ -7,7 +7,7 @@ const labelSetColor: LocalMutator<'label_setColor'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { labelId, color } = options
 
   const key = Key.label.encode(labelId)
@@ -19,7 +19,6 @@ const labelSetColor: LocalMutator<'label_setColor'> = async (
   const value: AnonLabel = {
     ...label,
     color,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

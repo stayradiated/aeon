@@ -7,7 +7,7 @@ const streamRename: LocalMutator<'stream_rename'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { streamId, name } = options
 
   const key = Key.stream.encode(streamId)
@@ -19,7 +19,6 @@ const streamRename: LocalMutator<'stream_rename'> = async (
   const value: AnonStream = {
     ...stream,
     name,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

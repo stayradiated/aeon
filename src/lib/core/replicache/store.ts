@@ -1,16 +1,29 @@
 import { transact } from 'signia'
-import type { ExperimentalDiffOperation as ReplicacheDiff } from 'replicache'
 
 import type {
   AnonLabel,
+  AnonMetaTask,
   AnonPoint,
   AnonStream,
   AnonUser,
   Replicache,
 } from '#lib/core/replicache/types.js'
-import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
+import type {
+  LabelId,
+  MetaTaskId,
+  PointId,
+  StreamId,
+  UserId,
+} from '#lib/ids.js'
 import type { InternalMutatorInput } from '#lib/mutator/types.js'
-import type { Label, Meta, Point, Stream, User } from '#lib/types.local.js'
+import type {
+  Label,
+  Meta,
+  MetaTask,
+  Point,
+  Stream,
+  User,
+} from '#lib/types.local.js'
 
 import * as Key from '#lib/core/replicache/keys.js'
 import { Table } from '#lib/core/replicache/table/table.js'
@@ -29,6 +42,10 @@ const createStore = (options: CreateStoreOptions) => {
   const meta = new Table<string, Meta, Meta>({
     key: Key.meta,
     mapValue: (value) => value,
+  })
+  const metaTask = new Table<MetaTaskId, AnonMetaTask, MetaTask>({
+    key: Key.metaTask,
+    mapValue: (value, id) => ({ id, ...value }),
   })
   const label = new Table<LabelId, AnonLabel, Label>({
     key: Key.label,
@@ -53,6 +70,7 @@ const createStore = (options: CreateStoreOptions) => {
     [Key.stream.name]: stream,
     [Key.label.name]: label,
     [Key.point.name]: point,
+    [Key.metaTask.name]: metaTask,
   }
 
   const setMetaState = (state: 'READY' | 'LOADING') => {
@@ -96,6 +114,7 @@ const createStore = (options: CreateStoreOptions) => {
     point,
     stream,
     user,
+    metaTask,
 
     mutate: mapRecordValues(
       rep.mutate,

@@ -7,7 +7,7 @@ const labelSetIcon: LocalMutator<'label_setIcon'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { labelId, icon } = options
 
   const key = Key.label.encode(labelId)
@@ -19,7 +19,6 @@ const labelSetIcon: LocalMutator<'label_setIcon'> = async (
   const value: AnonLabel = {
     ...label,
     icon,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

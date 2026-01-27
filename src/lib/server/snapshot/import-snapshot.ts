@@ -2,6 +2,8 @@ import type { UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Snapshot } from './schema.js'
 
+import { trackMetaTask } from '#lib/server/meta-task/track-meta-task.js'
+
 import { importLabelList } from './import/label.js'
 import { importPointList } from './import/point.js'
 import { importStreamList } from './import/stream.js'
@@ -17,7 +19,11 @@ const importSnapshot = async (
 ): Promise<void | Error> => {
   const { db, userId, snapshot } = options
 
-  console.info('[import-snapshot] Importing workspace...')
+  await using metaTask = await trackMetaTask({
+    db,
+    userId,
+    name: 'import-snapshot',
+  })
 
   // Note: Order is very important here
 
@@ -51,7 +57,7 @@ const importSnapshot = async (
     return new Error('Could not importPoints', { cause: pointIdMap })
   }
 
-  console.info('[import-snapshot] Completed import of workspace.')
+  await metaTask.complete()
 
   return undefined
 }

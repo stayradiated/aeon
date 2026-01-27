@@ -56,6 +56,23 @@ CREATE TABLE public.label (
 
 
 --
+-- Name: meta_task; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.meta_task (
+    id text NOT NULL,
+    user_id text NOT NULL,
+    name text NOT NULL,
+    status text NOT NULL,
+    last_started_at bigint NOT NULL,
+    last_finished_at bigint,
+    created_at bigint NOT NULL,
+    updated_at bigint NOT NULL,
+    CONSTRAINT "meta_task:check(last_finished_at)" CHECK (((last_finished_at IS NULL) OR (last_finished_at > last_started_at)))
+);
+
+
+--
 -- Name: point; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -134,7 +151,8 @@ CREATE TABLE public.replicache_client_group (
 CREATE TABLE public.replicache_client_view (
     id text NOT NULL,
     record jsonb NOT NULL,
-    created_at bigint NOT NULL
+    created_at bigint NOT NULL,
+    version text NOT NULL
 );
 
 
@@ -213,6 +231,22 @@ ALTER TABLE ONLY public.label
 
 ALTER TABLE ONLY public.label
     ADD CONSTRAINT "label:unique(id,user_id)" UNIQUE (id, user_id);
+
+
+--
+-- Name: meta_task meta_task:primaryKey(id); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meta_task
+    ADD CONSTRAINT "meta_task:primaryKey(id)" PRIMARY KEY (id);
+
+
+--
+-- Name: meta_task meta_task:unique(user_id,name); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meta_task
+    ADD CONSTRAINT "meta_task:unique(user_id,name)" UNIQUE (user_id, name);
 
 
 --
@@ -359,6 +393,14 @@ ALTER TABLE ONLY public.label
 
 ALTER TABLE ONLY public.label
     ADD CONSTRAINT "label:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: meta_task meta_task:foreignKey(user_id,user); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.meta_task
+    ADD CONSTRAINT "meta_task:foreignKey(user_id,user)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --

@@ -4,7 +4,7 @@ import type { LocalMutator } from './types.ts'
 import * as Key from '#lib/core/replicache/keys.js'
 
 const pointSlide: LocalMutator<'point_slide'> = async (context, options) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { pointId, startedAt } = options
 
   const key = Key.point.encode(pointId)
@@ -16,7 +16,6 @@ const pointSlide: LocalMutator<'point_slide'> = async (context, options) => {
   const value: AnonPoint = {
     ...point,
     startedAt,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }
