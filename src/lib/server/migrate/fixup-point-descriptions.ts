@@ -18,12 +18,13 @@ type FixupLabelParentsOptions = {
   streamId: StreamId
   parentStreamId: StreamId
   userId: UserId
+  startedAt?: { gte: number }
 }
 
-const fixupLabelParents = async (
+const fixupPointDescriptions = async (
   options: FixupLabelParentsOptions,
 ): Promise<void | Error> => {
-  const { db, streamId, parentStreamId, userId } = options
+  const { db, streamId, parentStreamId, userId, startedAt } = options
 
   const streamLabelList = await getLabelList({
     db,
@@ -142,7 +143,7 @@ const fixupLabelParents = async (
 
   const pointIterator = getPointIterator({
     db,
-    where: { userId, streamId },
+    where: { userId, streamId, startedAt },
     pageSize: PAGE_SIZE,
   })
 
@@ -225,4 +226,4 @@ const fixupLabelParents = async (
   }
 }
 
-export { fixupLabelParents }
+export { fixupPointDescriptions }

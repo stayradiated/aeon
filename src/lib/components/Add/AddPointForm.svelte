@@ -83,9 +83,9 @@ const handleSubmit = async () => {
   }
 
   // TODO: what's the best way to handle this?
-  await store.mutate.migrate_fixupLabelParents({
-    startedAtGTE: currentTime,
-  })
+  // await store.mutate.migrate_fixupLabelParents({
+  //   startedAtGTE: currentTime,
+  // })
 
   goto('/log')
 }

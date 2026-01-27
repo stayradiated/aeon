@@ -7,7 +7,7 @@ const streamCreate: LocalMutator<'stream_create'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { streamId, name } = options
 
   let maxSortOrder = 0
@@ -25,8 +25,6 @@ const streamCreate: LocalMutator<'stream_create'> = async (
     name,
     parentId: undefined,
     sortOrder: nextSortOrder,
-    createdAt: actionedAt,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

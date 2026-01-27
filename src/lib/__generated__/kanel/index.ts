@@ -7,6 +7,7 @@ export { type ReplicacheClientId, type default as ReplicacheClientTable, type Re
 export { type UserSessionId, type default as UserSessionTable, type UserSession, type NewUserSession, type UserSessionUpdate, userSessionId, userSession, userSessionInitializer, userSessionMutator } from './public/UserSession';
 export { type default as PointLabelTable, type PointLabel, type NewPointLabel, type PointLabelUpdate, pointLabel, pointLabelInitializer, pointLabelMutator } from './public/PointLabel';
 export { type StreamId, type default as StreamTable, type Stream, type NewStream, type StreamUpdate, streamId, stream, streamInitializer, streamMutator } from './public/Stream';
+export { type MetaTaskId, type default as MetaTaskTable, type MetaTask, type NewMetaTask, type MetaTaskUpdate, metaTaskId, metaTask, metaTaskInitializer, metaTaskMutator } from './public/MetaTask';
 export { type PointId, type default as PointTable, type Point, type NewPoint, type PointUpdate, pointId, point, pointInitializer, pointMutator } from './public/Point';
 export { type default as PointWithLabelListTable, type PointWithLabelList, pointWithLabelList } from './public/PointWithLabelList';
 export { type default as PublicSchema } from './public/PublicSchema';

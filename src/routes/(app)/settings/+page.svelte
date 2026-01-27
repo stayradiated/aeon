@@ -3,6 +3,7 @@ import { dropAllDatabases } from 'replicache'
 
 import type { PageProps } from './$types'
 
+import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
 
 const { data }: PageProps = $props()
@@ -49,9 +50,7 @@ const handleDeleteAllData = async () => {
 }
 
 const handleAssignLabelParent = async () => {
-  await store.mutate.migrate_fixupLabelParents({
-    startedAtGTE: 0,
-  })
+  await store.mutate.migrate_fixupLabelParents({})
 }
 </script>
 
@@ -73,6 +72,7 @@ const handleAssignLabelParent = async () => {
     <h2>Assign Parent Labels</h2>
     <p>Scan existing labels and associate them with the correct parent.</p>
     <button onclick={handleAssignLabelParent}>Assign Label Parent</button>
+    <MetaTaskProgress {store} name="fixup-all-label-parents" />
   </section>
 
   <section>
@@ -85,6 +85,7 @@ const handleAssignLabelParent = async () => {
     <h3>Import</h3>
     <p>Import data from a JSON file.</p>
     <button onclick={handleImport}>Import</button>
+    <MetaTaskProgress {store} name="import-snapshot" />
 
     <details class="dangerZone">
       <summary>⚠️ Danger Zone</summary>

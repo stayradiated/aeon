@@ -1,5 +1,6 @@
 import type {
   LabelId,
+  MetaTaskId,
   PointId,
   ReplicacheClientId,
   StreamId,
@@ -8,19 +9,21 @@ import type {
 
 type VersionRecord<Key extends string> = Record<Key, number>
 type CVR = {
-  point: VersionRecord<PointId>
-  stream: VersionRecord<StreamId>
   label: VersionRecord<LabelId>
-  user: VersionRecord<UserId>
+  metaTask: VersionRecord<MetaTaskId>
+  point: VersionRecord<PointId>
   replicacheClient: VersionRecord<ReplicacheClientId>
+  stream: VersionRecord<StreamId>
+  user: VersionRecord<UserId>
 }
 
 const EMPTY_CVR: CVR = {
-  point: {},
-  stream: {},
   label: {},
-  user: {},
+  metaTask: {},
+  point: {},
   replicacheClient: {},
+  stream: {},
+  user: {},
 }
 const CVR_KEY_LIST = Object.keys(EMPTY_CVR) as (keyof CVR)[]
 

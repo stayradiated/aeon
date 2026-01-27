@@ -7,6 +7,7 @@ import type { default as ReplicacheClientTable } from './ReplicacheClient';
 import type { default as UserSessionTable } from './UserSession';
 import type { default as PointLabelTable } from './PointLabel';
 import type { default as StreamTable } from './Stream';
+import type { default as MetaTaskTable } from './MetaTask';
 import type { default as PointTable } from './Point';
 import type { default as PointWithLabelListTable } from './PointWithLabelList';
 
@@ -28,6 +29,8 @@ export default interface PublicSchema {
   pointLabel: PointLabelTable;
 
   stream: StreamTable;
+
+  metaTask: MetaTaskTable;
 
   point: PointTable;
 

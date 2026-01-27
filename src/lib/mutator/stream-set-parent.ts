@@ -7,7 +7,7 @@ const streamSetParent: LocalMutator<'stream_setParent'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { streamId, parentId } = options
 
   const key = Key.stream.encode(streamId)
@@ -19,7 +19,6 @@ const streamSetParent: LocalMutator<'stream_setParent'> = async (
   const value: AnonStream = {
     ...stream,
     parentId,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

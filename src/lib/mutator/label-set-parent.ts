@@ -7,7 +7,7 @@ const labelSetParent: LocalMutator<'label_setParent'> = async (
   context,
   options,
 ) => {
-  const { tx, actionedAt } = context
+  const { tx } = context
   const { labelId, parentId } = options
 
   const key = Key.label.encode(labelId)
@@ -19,7 +19,6 @@ const labelSetParent: LocalMutator<'label_setParent'> = async (
   const value: AnonLabel = {
     ...label,
     parentId,
-    updatedAt: actionedAt,
   }
   await tx.set(key, value)
 }

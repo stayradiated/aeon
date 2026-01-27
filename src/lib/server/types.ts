@@ -4,6 +4,7 @@ import type { DB } from '#lib/server/db/types.js'
 
 export type EmailVerification = Selectable<DB['emailVerification']>
 export type Label = Selectable<DB['label']>
+export type MetaTask = Selectable<DB['metaTask']>
 export type Point = Selectable<DB['point']>
 export type PointLabel = Selectable<DB['pointLabel']>
 export type PointWithLabelList = Selectable<DB['pointWithLabelList']>

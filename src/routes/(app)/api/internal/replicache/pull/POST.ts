@@ -14,13 +14,10 @@ import {
 import { getDb } from '#lib/server/db/get-db.js'
 import { transact } from '#lib/server/db/transact.js'
 
-import { getLabelVersionRecord } from '#lib/server/db/label/get-label-version-record.js'
-import { getPointVersionRecord } from '#lib/server/db/point/get-point-version-record.js'
-import { getReplicacheClientVersionRecord } from '#lib/server/db/replicache-client/get-replicache-client-version-record.js'
 import { getReplicacheClientGroup } from '#lib/server/db/replicache-client-group/get-replicache-client-group.js'
 import { upsertReplicacheClientGroup } from '#lib/server/db/replicache-client-group/upsert-replicache-client-group.js'
-import { getStreamVersionRecord } from '#lib/server/db/stream/get-stream-version-record.js'
-import { getUserVersionRecord } from '#lib/server/db/user/get-user-version-record.js'
+import { getReplicacheClientView } from '#lib/server/db/replicache-client-view/get-replicache-client-view.js'
+import { insertReplicacheClientView } from '#lib/server/db/replicache-client-view/insert-replicache-client-view.js'
 
 import {
   diffCVR,
@@ -28,22 +25,11 @@ import {
   isCVRDiffEmpty,
 } from '#lib/server/replicache/cvr.js'
 
+import { SCHEMA_VERSION } from '#lib/core/replicache/version.js'
+
 import { genId } from '#lib/utils/gen-id.js'
-import { onceGlobal } from '#lib/utils/once-global.js'
-import { promiseAllRecord } from '#lib/utils/promise-all-record.js'
 
-import { getEntities } from './get-entities.js'
-
-// cvrKey -> ClientViewRecord
-const getCVRCache = onceGlobal(Symbol.for('CVR'), () => new Map<string, CVR>())
-const getCVR = (clientViewId: ReplicacheClientViewId): CVR | undefined => {
-  const cache = getCVRCache()
-  return cache.get(clientViewId)
-}
-const setCVR = (clientViewId: ReplicacheClientViewId, cvr: CVR) => {
-  const cache = getCVRCache()
-  cache.set(clientViewId, cvr)
-}
+import { getEntities, getNextCVR } from './get-cvr.js'
 
 const $Cookie = z.object({
   clientViewId: $ReplicacheClientViewId,
@@ -89,7 +75,20 @@ const POST: RequestHandler = async (event) => {
   const prevClientViewId = requestCookie?.clientViewId
 
   // 1: Fetch prevCVR
-  const prevCVR = prevClientViewId ? getCVR(prevClientViewId) : undefined
+  let prevCVR: CVR | undefined
+  if (prevClientViewId) {
+    const cvr = await getReplicacheClientView({
+      db,
+      where: {
+        replicacheClientViewId: prevClientViewId,
+        version: SCHEMA_VERSION,
+      },
+    })
+    if (cvr instanceof Error) {
+      throw error(500, cvr)
+    }
+    prevCVR = cvr?.record as CVR
+  }
 
   // 2: Init baseCVR
   const baseCVR: CVR = prevCVR ?? EMPTY_CVR
@@ -113,22 +112,14 @@ const POST: RequestHandler = async (event) => {
         })
       }
 
+      // 6. Read all id/version pairs from the database that should be in the
+      // client view
+      // 7: Read all clients in Client Group
       // 8: Build nextCVR
-      const nextCVR: CVR | Error = await promiseAllRecord({
-        // 6. Read all id/version pairs from the database that should be in the
-        // client view
-        point: getPointVersionRecord({ db, where: { userId: sessionUserId } }),
-        stream: getStreamVersionRecord({
-          db,
-          where: { userId: sessionUserId },
-        }),
-        label: getLabelVersionRecord({ db, where: { userId: sessionUserId } }),
-        user: getUserVersionRecord({ db, where: { userId: sessionUserId } }),
-        // 7: Read all clients in Client Group
-        replicacheClient: getReplicacheClientVersionRecord({
-          db,
-          where: { replicacheClientGroupId },
-        }),
+      const nextCVR = await getNextCVR({
+        db,
+        sessionUserId,
+        replicacheClientGroupId,
       })
       if (nextCVR instanceof Error) {
         return new Error('Could not get nextCVR', { cause: nextCVR })
@@ -217,13 +208,23 @@ const POST: RequestHandler = async (event) => {
 
   // 16-17: store cvr
   const clientViewId = genId<ReplicacheClientViewId>()
-  setCVR(clientViewId, nextCVR)
+  const insertClientViewResult = await insertReplicacheClientView({
+    db,
+    where: {
+      replicacheClientViewId: clientViewId,
+    },
+    set: {
+      record: nextCVR,
+      version: SCHEMA_VERSION,
+    },
+  })
+  if (insertClientViewResult instanceof Error) {
+    throw error(500, insertClientViewResult)
+  }
 
   // 18(i): build patch
   if (prevCVR === undefined) {
-    entities.unshift(
-      { op: 'clear' },
-    )
+    entities.unshift({ op: 'clear' })
   }
 
   // 18(ii): construct cookie

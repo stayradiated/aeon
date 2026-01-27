@@ -11,6 +11,8 @@ export default interface ReplicacheClientViewTable {
   record: ColumnType<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>>;
 
   createdAt: ColumnType<number, number, number>;
+
+  version: ColumnType<string, string, string>;
 }
 
 export type ReplicacheClientView = Selectable<ReplicacheClientViewTable>;
@@ -25,16 +27,19 @@ export const replicacheClientView = z.object({
   id: replicacheClientViewId,
   record: z.record(z.string(), z.unknown()),
   createdAt: z.number(),
+  version: z.string(),
 });
 
 export const replicacheClientViewInitializer = z.object({
   id: replicacheClientViewId,
   record: z.record(z.string(), z.unknown()),
   createdAt: z.number(),
+  version: z.string(),
 });
 
 export const replicacheClientViewMutator = z.object({
   id: replicacheClientViewId.optional(),
   record: z.record(z.string(), z.unknown()).optional(),
   createdAt: z.number().optional(),
+  version: z.string().optional(),
 });
