@@ -11,5 +11,9 @@ export default defineConfig({
       concurrent: true,
     },
     maxConcurrency: 10,
+    coverage: {
+      reporter: ['html', 'text', 'json-summary', 'json'],
+      reportOnFailure: true,
+    },
   },
 })

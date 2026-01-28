@@ -58,3 +58,6 @@ knip: svelte-sync
 
 test *args:
     vitest {{ args }}
+
+test-coverage:
+    vitest --run --coverage
