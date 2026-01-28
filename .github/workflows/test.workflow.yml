@@ -1,0 +1,86 @@
+name: Test Coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Test Coverage
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/aeon
+      ROOT_DATABASE_URL: postgres://postgres:postgres@localhost:5432/template1
+
+    services:
+      postgres:
+        image: postgres:18.1-trixie
+        env:
+          POSTGRES_DB: aeon
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - # https://github.com/actions/checkout
+        name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+        # https://github.com/extractions/setup-crate
+      - name: Install just
+        uses: extractions/setup-crate@4993624604c307fbca528d28a3c8b60fa5ecc859 # v1.4.0
+        with:
+          owner: casey
+          name: just
+          version: "1.42.4"
+
+      - # https://github.com/pnpm/action-setup
+        name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        with:
+          run_install: false
+
+      - # https://github.com/actions/setup-node
+        name: Install Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version-file: "package.json"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Migrations
+        run: just db reset
+
+      - name: Svelte
+        run: just svelte-sync
+
+      - name: Vitest
+        run: just test-coverage
+
+      - name: Report Coverage
+        # Set `if: always()` to also generate the report if tests are failing
+        if: always()
+        # https://github.com/davelosert/vitest-coverage-report-action
+        uses: davelosert/vitest-coverage-report-action@5b6122e3a819a3be7b27fc961b7faafb3bf00e4d # v2.9.0
