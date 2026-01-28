@@ -15,12 +15,12 @@ const { store, name }: Props = $props()
 let now = $state(Date.now())
 
 onMount(() => {
-  const timer = setTimeout(() => {
+  const timer = setInterval(() => {
     now = Date.now()
   }, 1000)
 
   return () => {
-    clearTimeout(timer)
+    clearInterval(timer)
   }
 })
 
