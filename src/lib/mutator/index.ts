@@ -15,6 +15,7 @@ const mutators: LocalMutatorDefsImportMap = {
 
   point_create: import('./point-create.js'),
   point_slide: import('./point-slide.js'),
+  point_delete: import('./point-delete.js'),
 
   migrate_fixupLabelParents: import('./migrate-fixup-label-parents.js'),
 

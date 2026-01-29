@@ -29,9 +29,8 @@ let timestamp = $derived(
   formatInTimeZone(startedAt, timeZone, 'yyyy-MM-dd HH:mm'),
 )
 
-const handleSubmit = async (event: SubmitEvent) => {
+const handleSlide = async (event: SubmitEvent) => {
   event.preventDefault()
-
   const nextStartedAt = toDate(timestamp, { timeZone }).getTime()
   if (startedAt !== nextStartedAt) {
     for (const point of Object.values(pointRecord)) {
@@ -44,11 +43,26 @@ const handleSubmit = async (event: SubmitEvent) => {
     }
   }
 
-  goto('/log')
+  await goto('/log')
+}
+
+const handleDelete = async () => {
+  const confirm = window.confirm('Are you sure you want to delete this point?')
+  if (!confirm) {
+    return
+  }
+
+  for (const point of Object.values(pointRecord)) {
+    if (point.startedAt === startedAt) {
+      await store.mutate.point_delete({ pointId: point.id })
+    }
+  }
+
+  await goto('/log')
 }
 </script>
 
-<form onsubmit={handleSubmit}>
+<form onsubmit={handleSlide}>
   <input
     type="datetime-local"
     name="startedAtLocal"
@@ -78,6 +92,8 @@ const handleSubmit = async (event: SubmitEvent) => {
     {/if}
   {/each}
 </ul>
+
+<button type="button" onclick={handleDelete}>Delete Points</button>
 
 <style>
   li.stream:not(.isActive) {

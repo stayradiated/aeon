@@ -15,6 +15,7 @@ const mutators: ServerMutatorDefsImportMap = {
 
   point_create: import('./point-create.server.js'),
   point_slide: import('./point-slide.server.js'),
+  point_delete: import('./point-delete.server.js'),
 
   migrate_fixupLabelParents: import('./migrate-fixup-label-parents.server.js'),
 
