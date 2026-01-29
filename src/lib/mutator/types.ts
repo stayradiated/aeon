@@ -64,6 +64,9 @@ type Mutators = {
     pointId: PointId
     startedAt: number
   }>
+  point_delete: Mutator<{
+    pointId: PointId
+  }>
 
   migrate_fixupLabelParents: Mutator<Record<string, never>>
 
