@@ -9,6 +9,8 @@ import type { UserId, UserSessionId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { UserSession } from '#lib/server/types.js'
 
+import { dev as isDev } from '$app/environment'
+
 type SessionValidationResult = { session: UserSession } | { session: undefined }
 
 const SESSION_COOKIE_NAME = 'session'
@@ -107,6 +109,7 @@ const setSessionTokenCookie = (
     sameSite: 'lax',
     expires: new Date(expiresAt),
     path: '/',
+    secure: !isDev,
   })
 }
 
@@ -116,6 +119,7 @@ const deleteSessionTokenCookie = (event: RequestEvent): void => {
     sameSite: 'lax',
     maxAge: 0,
     path: '/',
+    secure: !isDev,
   })
 }
 
