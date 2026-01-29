@@ -43,11 +43,7 @@ const handleFocus = () => {
   isOpen = true
 }
 
-const handleBlur = (event: FocusEvent) => {
-  // if the click happened with the dropdown list, don't close it
-  if (dropdownEl?.contains(event.relatedTarget as Node)) {
-    return
-  }
+const handleBlur = () => {
   isOpen = false
 }
 
@@ -58,6 +54,7 @@ const handleAdd = (value: Value) => {
     return
   }
   onchange?.([...selectedList, value])
+  inputEl?.blur()
 }
 
 const handleCreate = () => {
@@ -139,7 +136,9 @@ const handleRemoveAll = () => {
   {#if isOpen}
     <div class="dropdown" bind:this={dropdownEl}>
       {#each filteredOptionList as option (option.value)}
-        <button type="button" onclick={() => handleAdd(option.value)}>{option.label}</button>
+        <button
+          type="button"
+          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option.value) }}>{option.label}</button>
       {/each}
       {#if searchQuery.length > 0}
         <button type="button" onclick={handleCreate}>Create: {searchQuery}</button>
