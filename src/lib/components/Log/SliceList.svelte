@@ -44,10 +44,10 @@ const streamColumnIndex: Record<StreamId, number> = $derived(
 
   {#each sliceList as slice, index (index)}
     <section>
-      <div class="cell" style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(timeZone, slice.startedAt)}</a></div>
+      <div class="cell" style:--row={index + 2} style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(timeZone, slice.startedAt)}</a></div>
 
       {#each slice.lineList as line (line.streamId)}
-        <div class="cell" style:--col={2 + (streamColumnIndex[line.streamId] ?? 0)}>
+        <div class="cell" style:--row={index + 2} style:--col={2 + (streamColumnIndex[line.streamId] ?? 0)}>
           {#if line}
             <Line {store} {line} />
           {/if}
@@ -69,6 +69,7 @@ const streamColumnIndex: Record<StreamId, number> = $derived(
 
 	.cell {
     grid-column: var(--col);
+    grid-row: var(--row);
 		white-space: pre-wrap;
 	}
 </style>
