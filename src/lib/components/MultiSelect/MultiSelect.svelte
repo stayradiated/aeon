@@ -141,7 +141,9 @@ const handleRemoveAll = () => {
           onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option.value) }}>{option.label}</button>
       {/each}
       {#if searchQuery.length > 0}
-        <button type="button" onclick={handleCreate}>Create: {searchQuery}</button>
+        <button
+          type="button"
+          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleCreate() }}>Create: {searchQuery}</button>
       {/if}
     </div>
   {/if}
