@@ -1,3 +1,5 @@
+import { listOrError } from '@stayradiated/error-boundary'
+
 import type { LabelId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Snapshot } from '#lib/server/snapshot/schema.js'
@@ -6,11 +8,7 @@ import type { IdMap } from '#lib/utils/map-and-resolve-id.js'
 import { insertLabel } from '#lib/server/db/label/insert-label.js'
 
 import { genId } from '#lib/utils/gen-id.js'
-import {
-  createIdMap,
-  maybeResolveId,
-  resolveId,
-} from '#lib/utils/map-and-resolve-id.js'
+import { createIdMap, resolveId } from '#lib/utils/map-and-resolve-id.js'
 
 type ImportLabelOptions = {
   db: KyselyDb
@@ -32,9 +30,11 @@ const importLabelList = async (
       return streamId
     }
 
-    const parentId = maybeResolveId(labelIdMap, label.parentId)
-    if (parentId instanceof Error) {
-      return parentId
+    const parentLabelIdList = listOrError(
+      label.parentLabelIdList.map((labelId) => resolveId(labelIdMap, labelId)),
+    )
+    if (parentLabelIdList instanceof Error) {
+      return parentLabelIdList
     }
 
     const insertedLabel = await insertLabel({
@@ -43,7 +43,7 @@ const importLabelList = async (
         ...label,
         id: genId(),
         userId,
-        parentId,
+        parentLabelIdList,
         streamId,
       },
     })

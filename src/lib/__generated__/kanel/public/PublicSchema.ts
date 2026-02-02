@@ -8,8 +8,10 @@ import type { default as UserSessionTable } from './UserSession';
 import type { default as PointLabelTable } from './PointLabel';
 import type { default as StreamTable } from './Stream';
 import type { default as MetaTaskTable } from './MetaTask';
+import type { default as LabelParentTable } from './LabelParent';
 import type { default as PointTable } from './Point';
 import type { default as PointWithLabelListTable } from './PointWithLabelList';
+import type { default as LabelWithParentListTable } from './LabelWithParentList';
 
 export default interface PublicSchema {
   replicacheClientGroup: ReplicacheClientGroupTable;
@@ -32,7 +34,11 @@ export default interface PublicSchema {
 
   metaTask: MetaTaskTable;
 
+  labelParent: LabelParentTable;
+
   point: PointTable;
 
   pointWithLabelList: PointWithLabelListTable;
+
+  labelWithParentList: LabelWithParentListTable;
 }

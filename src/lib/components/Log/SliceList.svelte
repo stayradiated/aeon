@@ -7,7 +7,7 @@ import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { formatTime } from '#lib/utils/format-duration.js'
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import Line from './Line.svelte'
 
@@ -18,14 +18,8 @@ type Props = {
 
 const { store, sliceList }: Props = $props()
 
-const { timeZone, streamList } = $derived(
-  query(() => {
-    return {
-      timeZone: getUserTimeZone(store).value,
-      streamList: getStreamList(store).value,
-    }
-  }),
-)
+const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const { _: streamList } = $derived(watch(getStreamList(store)))
 
 // build an index of streamId → column index
 // so we can quickly lookup where to render each cell

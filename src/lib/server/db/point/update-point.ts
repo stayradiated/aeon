@@ -20,10 +20,10 @@ type UpdatePointOptions = {
 
 const updatePoint = async (
   options: UpdatePointOptions,
-): Promise<Point[] | Error> => {
+): Promise<void | Error> => {
   const { db, where, set, now = Date.now() } = options
 
-  return errorBoundary(() => {
+  return errorBoundary(async () => {
     let query = db
       .updateTable('point')
       .set({
@@ -38,7 +38,7 @@ const updatePoint = async (
       .string('userId', where.userId)
       .done()
 
-    return query.execute()
+    await query.execute()
   })
 }
 

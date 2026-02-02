@@ -5,7 +5,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { StreamId } from '#lib/ids.js'
 import type { Stream } from '#lib/types.local.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 type Props = {
   store: Store
@@ -14,11 +14,7 @@ type Props = {
 
 const { store, stream }: Props = $props()
 
-const { streamList } = $derived(
-  query(() => ({
-    streamList: store.stream.asList.value,
-  })),
-)
+const { _: streamList } = $derived(watch(store.stream.asList))
 
 const handleSetParentStream: ChangeEventHandler<HTMLSelectElement> = async (
   event,

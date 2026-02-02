@@ -8,21 +8,21 @@ import { afterNavigate } from '$app/navigation'
 
 import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
 
-import { query } from '#lib/utils/query.js'
+import { clock } from '#lib/utils/clock.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 const { data, children }: LayoutProps = $props()
 const { store } = $derived(data)
 
-const { metaStore, sessionUser } = $derived(
-  query({
-    metaStore: store.meta.get('store'),
-    sessionUser: store.user.get(store.sessionUserId),
-  }),
-)
+const { _: sessionUser } = $derived(watch(store.user.get(store.sessionUserId)))
 
+const { _: metaStore } = $derived(watch(store.meta.get('store')))
 const isStoreLoading = $derived(metaStore?.state === 'LOADING')
 
 const startLoadingAt = Date.now()
+const { _: now } = $derived(watch(clock))
+const loadingDuration = $derived(Math.max(0, now - startLoadingAt))
+
 $effect(() => {
   if (!isStoreLoading) {
     const duration = Date.now() - startLoadingAt
@@ -76,7 +76,7 @@ afterNavigate(() => {
 </header>
 
 {#if isStoreLoading}
-  <div class="loading">Loading...</div>
+  <div class="loading">Loading ({loadingDuration}ms)...</div>
 {:else}
   {@render children?.()}
 {/if}

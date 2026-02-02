@@ -1,4 +1,5 @@
 <script lang="ts">
+import { computed } from 'signia'
 import type { ChangeEventHandler } from 'svelte/elements'
 
 import type { Store } from '#lib/core/replicache/store.js'
@@ -8,7 +9,7 @@ import type { Label, Stream } from '#lib/types.local.js'
 import { getFilteredLabelList } from '#lib/core/select/get-filtered-label-list.js'
 
 import { genId } from '#lib/utils/gen-id.js'
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import MultiSelect from '#lib/components/MultiSelect/MultiSelect.svelte'
 
@@ -42,24 +43,8 @@ let {
 
 const uid = $props.id()
 
-const { streamLabelList, outOfParentLabelList } = $derived(
-  query(() => ({
-    streamLabelList: getFilteredLabelList(store, stream.id, parentLabelIdList)
-      .value,
-    outOfParentLabelList: labelIdList.flatMap((labelId) => {
-      const label = store.label.get(labelId).value
-      if (!label) {
-        return []
-      }
-      return parentLabelIdList.length === 0
-        ? label.parentId === undefined
-          ? []
-          : label
-        : label.parentId && parentLabelIdList.includes(label.parentId)
-          ? []
-          : label
-    }),
-  })),
+const { _: streamLabelList } = $derived(
+  watch(getFilteredLabelList(store, stream.id, parentLabelIdList)),
 )
 
 type Option = {
@@ -67,11 +52,37 @@ type Option = {
   label: string
 }
 
+const toOption = (label: Pick<Label, 'id' | 'icon' | 'name'>): Option => ({
+  value: label.id,
+  label: (label.icon ? `${label.icon} ` : '') + label.name,
+})
+
 const optionList = $derived(
-  [...outOfParentLabelList, ...streamLabelList, ...createdLabelList].map(
-    (label): Option => ({
-      value: label.id,
-      label: (label.icon ? `${label.icon} ` : '') + label.name,
+  [...streamLabelList, ...createdLabelList].map((label) => toOption(label)),
+)
+
+// resolve each label in the labelIdList to a label object
+const { _: selectedList } = $derived(
+  watch(
+    computed('selectedList', (): Option[] => {
+      return labelIdList.flatMap((labelId) => {
+        // check if the label is in the createdLabelList
+        const createdLabel = createdLabelList.find(
+          (createdLabel) => createdLabel.id === labelId,
+        )
+        if (createdLabel) {
+          return toOption(createdLabel)
+        }
+
+        const label = store.label.get(labelId).value
+        if (!label) {
+          // (skip any that can't be resolved)
+          return []
+        }
+
+        // transform to `Option` type
+        return toOption(label)
+      })
     }),
   ),
 )
@@ -92,11 +103,18 @@ const handleChangeDescription: ChangeEventHandler<HTMLTextAreaElement> = (
   onchange({ description: event.currentTarget.value })
 }
 
-const handleChangeLabel = (selected: LabelId[]) => {
+const handleChangeLabel = (selected: Option[]) => {
+  const labelIdList = selected.map((option) => option.value)
+
   onchange({
-    labelIdList: selected,
+    labelIdList,
+
+    // Update the `createdLabelList` state to only include labels that are
+    // selected
+    // i.e. previously created labels thate are no longer selected are removed
+    // from the create list.
     createdLabelList: createdLabelList.filter((label) =>
-      selected.includes(label.id),
+      labelIdList.includes(label.id),
     ),
   })
 }
@@ -122,7 +140,7 @@ const handleCreateLabel = (name: string) => {
 
   <MultiSelect
     {optionList}
-    selectedList={labelIdList}
+    {selectedList}
     placeholder="Add label…"
     onchange={handleChangeLabel}
     oncreate={handleCreateLabel}

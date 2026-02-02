@@ -1,1 +1,1 @@
-export const SCHEMA_VERSION = '2026.01.28/0'
+export const SCHEMA_VERSION = '2026.02.04/0'

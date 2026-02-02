@@ -23,15 +23,16 @@ const getFilteredLabelList = createSelector(
       const labelList = $labelList.value
 
       if (parentIdSet === undefined) {
-        return labelList.filter((label) => {
-          return label.parentId === undefined
-        })
+        // return all labels
+        return labelList
       }
       return labelList.filter((label) => {
-        if (label.parentId === undefined) {
-          return false
+        for (const parentLabelId of label.parentLabelIdList) {
+          if (parentIdSet.has(parentLabelId)) {
+            return true
+          }
         }
-        return parentIdSet.has(label.parentId)
+        return false
       })
     })
   },

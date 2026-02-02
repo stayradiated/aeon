@@ -2,7 +2,6 @@ import { assertOk } from '@stayradiated/error-boundary'
 import { test as anyTest } from 'vitest'
 
 import { getLabel } from '#lib/server/db/label/get-label.js'
-import { getPoint } from '#lib/server/db/point/get-point.js'
 
 import { useDb } from '#lib/test/use-db.js'
 import { useCreateLabel } from '#lib/test/use-label.js'
@@ -41,7 +40,6 @@ test('should handle empty stream', async ({
   expect(result).toEqual({
     processedPointCount: 0,
     processedLabelCount: 0,
-    duplicatedLabelCount: 0,
     updatedLabelCount: 0,
   })
 })
@@ -69,7 +67,6 @@ test('should not change point with no parent', async ({
   expect(result).toEqual({
     processedPointCount: 1,
     processedLabelCount: 0,
-    duplicatedLabelCount: 0,
     updatedLabelCount: 0,
   })
 })
@@ -87,7 +84,7 @@ test('should not make any changes when the label is already assigned to the corr
   const parentLabel = await createLabel({ streamId: parentStream.id })
   const label = await createLabel({
     streamId: stream.id,
-    parentId: parentLabel.id,
+    parentLabelIdList: [parentLabel.id],
   })
 
   await createPoint({
@@ -113,7 +110,6 @@ test('should not make any changes when the label is already assigned to the corr
   expect(result).toEqual({
     processedPointCount: 1,
     processedLabelCount: 1,
-    duplicatedLabelCount: 0,
     updatedLabelCount: 0,
   })
 })
@@ -131,7 +127,10 @@ test('should update label parentId to match parent point', async ({
   const parentLabel = await createLabel({ streamId: parentStream.id })
 
   // note that `label` is not linked to the parent label
-  const label = await createLabel({ streamId: stream.id, parentId: null })
+  const label = await createLabel({
+    streamId: stream.id,
+    parentLabelIdList: [],
+  })
 
   await createPoint({
     startedAt: now,
@@ -156,7 +155,6 @@ test('should update label parentId to match parent point', async ({
   expect(result).toEqual({
     processedPointCount: 1,
     processedLabelCount: 1,
-    duplicatedLabelCount: 0,
     updatedLabelCount: 1,
   })
 
@@ -168,11 +166,11 @@ test('should update label parentId to match parent point', async ({
 
   // the label should now have the parentId set to the parent label
   expect(updatedLabel).toMatchObject({
-    parentId: parentLabel.id,
+    parentLabelIdList: [parentLabel.id],
   })
 })
 
-test('should duplicate the label and update the point to use the new label', async ({
+test('should update the label to include the new parent', async ({
   expect,
   now,
   db,
@@ -185,7 +183,7 @@ test('should duplicate the label and update the point to use the new label', asy
   const oldParentLabel = await createLabel({ streamId: parentStream.id })
   const label = await createLabel({
     streamId: stream.id,
-    parentId: oldParentLabel.id,
+    parentLabelIdList: [oldParentLabel.id],
   })
   const newParentLabel = await createLabel({ streamId: parentStream.id })
 
@@ -197,7 +195,7 @@ test('should duplicate the label and update the point to use the new label', asy
   })
 
   // but the child point uses the old parent label
-  const point = await createPoint({
+  await createPoint({
     startedAt: now,
     streamId: stream.id,
     labelIdList: [label.id],
@@ -214,8 +212,7 @@ test('should duplicate the label and update the point to use the new label', asy
   expect(result).toEqual({
     processedPointCount: 1,
     processedLabelCount: 1,
-    duplicatedLabelCount: 1,
-    updatedLabelCount: 0,
+    updatedLabelCount: 1,
   })
 
   const updatedLabel = await getLabel({
@@ -223,44 +220,16 @@ test('should duplicate the label and update the point to use the new label', asy
     where: { userId: user.id, labelId: label.id },
   })
   assertOk(updatedLabel)
-  // the label should not have changed
-  expect(updatedLabel).toStrictEqual(label)
 
-  // but there should be a new label with the new parent label
-  const newLabel = await getLabel({
-    db,
-    where: {
-      userId: user.id,
-      parentId: newParentLabel.id,
-      streamId: stream.id,
-      name: label.name,
-    },
-  })
-  assertOk(newLabel)
-
-  expect(newLabel).toStrictEqual({
+  // the label should now have the new parent label
+  expect(updatedLabel).toStrictEqual({
     ...label,
-
-    parentId: newParentLabel.id,
-
-    id: expect.any(String),
-    createdAt: expect.any(Number),
+    parentLabelIdList: [oldParentLabel.id, newParentLabel.id],
     updatedAt: expect.any(Number),
-  })
-
-  // the point should have been updated to use the new label
-  const updatedPoint = await getPoint({
-    db,
-    where: { userId: user.id, pointId: point.id },
-  })
-  assertOk(updatedPoint)
-
-  expect(updatedPoint).toMatchObject({
-    labelIdList: [newLabel?.id],
   })
 })
 
-test('should not create a new duplicate label if one already exists', async ({
+test('should not add a new label parent if one already exists', async ({
   expect,
   now,
   db,
@@ -271,18 +240,13 @@ test('should not create a new duplicate label if one already exists', async ({
   createLabel,
 }) => {
   const oldParentLabel = await createLabel({ streamId: parentStream.id })
-  const oldLabel = await createLabel({
-    streamId: stream.id,
-    parentId: oldParentLabel.id,
-    name: 'Guitar George',
-  })
   const newParentLabel = await createLabel({ streamId: parentStream.id })
 
-  // this is the label that the point will be updated to use
-  const newLabel = await createLabel({
+  // note that label points to both parent labels
+  const label = await createLabel({
     streamId: stream.id,
-    parentId: newParentLabel.id,
-    name: 'Guitar George', // must match the old label name
+    parentLabelIdList: [oldParentLabel.id, newParentLabel.id],
+    name: 'Guitar George',
   })
 
   // note that the parent point uses the new parent label
@@ -292,11 +256,10 @@ test('should not create a new duplicate label if one already exists', async ({
     labelIdList: [newParentLabel.id],
   })
 
-  // but the child point uses the old parent label
-  const point = await createPoint({
+  await createPoint({
     startedAt: now,
     streamId: stream.id,
-    labelIdList: [oldLabel.id],
+    labelIdList: [label.id],
   })
 
   const result = await fixupLabelParents({
@@ -310,34 +273,15 @@ test('should not create a new duplicate label if one already exists', async ({
   expect(result).toEqual({
     processedPointCount: 1,
     processedLabelCount: 1,
-    duplicatedLabelCount: 1,
     updatedLabelCount: 0,
   })
 
-  const refreshedOldLabel = await getLabel({
+  const refreshedLabel = await getLabel({
     db,
-    where: { userId: user.id, labelId: oldLabel.id },
+    where: { userId: user.id, labelId: label.id },
   })
-  assertOk(refreshedOldLabel)
-  // the label should not have changed
-  expect(refreshedOldLabel).toStrictEqual(oldLabel)
+  assertOk(refreshedLabel)
 
-  // the new label should also not have changed
-  const refreshedNewLabel = await getLabel({
-    db,
-    where: { userId: user.id, labelId: newLabel.id },
-  })
-  assertOk(refreshedNewLabel)
   // the label should not have changed
-  expect(refreshedNewLabel).toStrictEqual(newLabel)
-
-  // the point should have been updated to use the new label
-  const updatedPoint = await getPoint({
-    db,
-    where: { userId: user.id, pointId: point.id },
-  })
-  assertOk(updatedPoint)
-  expect(updatedPoint).toMatchObject({
-    labelIdList: [newLabel.id],
-  })
+  expect(refreshedLabel).toStrictEqual(label)
 })

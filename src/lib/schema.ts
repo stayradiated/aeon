@@ -1,8 +1,8 @@
 export {
-  label as $Label,
   labelId as $LabelId,
+  labelWithParentList as $Label,
   pointId as $PointId,
-  pointWithLabelList as $PointWithLabelList,
+  pointWithLabelList as $Point,
   replicacheClientGroupId as $ReplicacheClientGroupId,
   replicacheClientViewId as $ReplicacheClientViewId,
   stream as $Stream,

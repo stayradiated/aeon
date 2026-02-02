@@ -8,7 +8,7 @@ import { getSliceList } from '#lib/core/select/get-slice-list.js'
 import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { groupBy } from '#lib/utils/group-by.js'
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 import { startOfDayWithTimeZone } from '#lib/utils/zoned-date.js'
 
 import SliceList from './SliceList.svelte'
@@ -19,27 +19,25 @@ type Props = {
 
 const { store }: Props = $props()
 
-const { timeZone, sliceList } = $derived(
-  query(() => {
-    const timeZone = getUserTimeZone(store).value
+const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const rangeStartDate = $derived(
+  startOfDayWithTimeZone({
+    instant: dateFns.subDays(Date.now(), 7).getTime(),
+    timeZone,
+  }).getTime(),
+)
 
-    const rangeStartDate = startOfDayWithTimeZone({
-      instant: dateFns.subDays(Date.now(), 7).getTime(),
-      timeZone,
-    }).getTime()
-
-    return {
-      timeZone,
-      sliceList: getSliceList(store, {
-        startedAt: { gte: rangeStartDate },
-      }).value.toReversed(),
-    }
-  }),
+const { _: sliceList } = $derived(
+  watch(
+    getSliceList(store, {
+      startedAt: { gte: rangeStartDate },
+    }),
+  ),
 )
 
 /* grouping slices by day */
 let sliceListByDay = $derived(
-  groupBy(sliceList, (slice) => {
+  groupBy(sliceList.toReversed(), (slice) => {
     const { startedAt: startedAtUTC } = slice
     const startedAt = toZonedTime(startedAtUTC, timeZone)
 

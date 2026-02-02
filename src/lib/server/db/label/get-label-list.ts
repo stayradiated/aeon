@@ -22,7 +22,7 @@ const getLabelList = async (
   const { db, where } = options
 
   return errorBoundary(() => {
-    let query = db.selectFrom('label').selectAll()
+    let query = db.selectFrom('labelWithParentList').selectAll()
 
     query = extendWhere(query)
       .string('id', where.labelId)

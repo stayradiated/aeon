@@ -4,10 +4,12 @@ import { computed } from 'signia'
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
 
-import { groupBy } from '#lib/utils/group-by.js'
+import { groupByMultiple } from '#lib/utils/group-by.js'
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getLabelList } from './get-label-list.js'
+
+const NO_PARENT_KEY = ''
 
 const getLabelListGroupedByParent = createSelector(
   'getParentLabelList',
@@ -20,13 +22,16 @@ const getLabelListGroupedByParent = createSelector(
     return computed('getParentLabelList', () => {
       const labelList = $labelList.value
 
-      const groupedList = groupBy(labelList, (label) => {
-        return label.parentId ?? ''
+      const groupedList = groupByMultiple(labelList, (label) => {
+        if (label.parentLabelIdList.length === 0) {
+          return [NO_PARENT_KEY]
+        }
+        return label.parentLabelIdList
       })
 
       const parentLabelList = Object.entries(groupedList)
         .map(([parentId, labelList]) => {
-          if (parentId === '') {
+          if (parentId === NO_PARENT_KEY) {
             return [undefined, labelList] as const
           }
           const parentLabel = store.label.get(parentId as LabelId).value

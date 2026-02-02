@@ -6,7 +6,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import Emoji from './Emoji.svelte'
 import EmojiPicker from './EmojiPicker.svelte'
@@ -20,15 +20,12 @@ type Props = {
 
 const { store, labelId, onsubmit }: Props = $props()
 
-const { label, stream } = $derived(
-  query(() => {
-    const label = store.label.get(labelId).value
-    const stream = label ? store.stream.get(label.streamId).value : undefined
-    return { label, stream }
-  }),
+const { _: label } = $derived(watch(store.label.get(labelId)))
+const { _: stream } = $derived(
+  label ? watch(store.stream.get(label.streamId)) : watch.undefined,
 )
 
-let parentId = $state<LabelId>()
+let parentLabelIdList = $state<LabelId[]>([])
 let color = $state<string>()
 let icon = $state<string>()
 let name = $state<string>('')
@@ -36,7 +33,7 @@ let name = $state<string>('')
 let lastInitializedLabelId: LabelId | undefined
 $effect(() => {
   if (label && label.id !== lastInitializedLabelId) {
-    parentId = label.parentId
+    parentLabelIdList = [...label.parentLabelIdList]
     color = label.color
     icon = label.icon
     name = label.name
@@ -47,9 +44,6 @@ const handleSubmit = async () => {
   if (!label) {
     return
   }
-  if (parentId !== label.parentId) {
-    await store.mutate.label_setParent({ labelId, parentId })
-  }
   if (name !== label.name) {
     await store.mutate.label_rename({ labelId, name })
   }
@@ -58,6 +52,16 @@ const handleSubmit = async () => {
   }
   if (icon !== label.icon) {
     await store.mutate.label_setIcon({ labelId, icon })
+  }
+  for (const parentLabelId of label.parentLabelIdList) {
+    if (!parentLabelIdList.includes(parentLabelId)) {
+      await store.mutate.label_removeParentLabel({ labelId, parentLabelId })
+    }
+  }
+  for (const parentLabelId of parentLabelIdList) {
+    if (!label.parentLabelIdList.includes(parentLabelId)) {
+      await store.mutate.label_addParentLabel({ labelId, parentLabelId })
+    }
   }
 
   // by awaiting tick(), the `label` variable will be updated
@@ -74,7 +78,7 @@ const handleSubmit = async () => {
     <div>
       <label>Parent
         {#if stream?.parentId}
-          <SelectLabel {store} streamId={stream.parentId} value={parentId} onchange={(value) => parentId = value} />
+          <SelectLabel {store} streamId={stream.parentId} value={parentLabelIdList} onchange={(value) => parentLabelIdList = value} />
         {:else}
           <p>n/a</p>
         {/if}

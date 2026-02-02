@@ -20,8 +20,6 @@ export default interface LabelTable {
 
   color: ColumnType<string | null, string | null, string | null>;
 
-  parentId: ColumnType<LabelId | null, LabelId | null, LabelId | null>;
-
   createdAt: ColumnType<number, number, number>;
 
   updatedAt: ColumnType<number, number, number>;
@@ -42,7 +40,6 @@ export const label = z.object({
   name: z.string(),
   icon: z.string().nullable().nullable(),
   color: z.string().nullable().nullable(),
-  parentId: labelId.nullable().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -54,7 +51,6 @@ export const labelInitializer = z.object({
   name: z.string(),
   icon: z.string().nullable().optional().nullable(),
   color: z.string().nullable().optional().nullable(),
-  parentId: labelId.nullable().optional().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -66,7 +62,6 @@ export const labelMutator = z.object({
   name: z.string().optional(),
   icon: z.string().nullable().optional().nullable(),
   color: z.string().nullable().optional().nullable(),
-  parentId: labelId.nullable().optional().nullable(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
 });

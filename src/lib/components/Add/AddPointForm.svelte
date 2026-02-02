@@ -4,17 +4,18 @@ import { formatInTimeZone, toDate, toZonedTime } from 'date-fns-tz'
 
 import type { StreamState } from '#lib/components/Add/StreamStatus.svelte'
 import type { Store } from '#lib/core/replicache/store.js'
-import type { StreamId } from '#lib/ids.js'
+import type { LabelId, StreamId } from '#lib/ids.js'
 
 import { goto } from '$app/navigation'
 
+import { getActivePoint } from '#lib/core/select/get-active-point.js'
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { clock } from '#lib/utils/clock.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import StreamStatus from './StreamStatus.svelte'
 
@@ -24,13 +25,9 @@ type Props = {
 
 const { store }: Props = $props()
 
-const { now, timeZone, streamList } = $derived(
-  query({
-    now: clock,
-    timeZone: getUserTimeZone(store),
-    streamList: getStreamList(store),
-  }),
-)
+const { _: now } = $derived(watch(clock))
+const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const { _: streamList } = $derived(watch(getStreamList(store)))
 
 let formState = $state.raw<Record<StreamId, StreamState>>({})
 
@@ -52,23 +49,40 @@ const handleNow = (_event: MouseEvent) => {
 const handleSubmit = async () => {
   for (const [streamId, state] of objectEntries(formState)) {
     if (!state) {
+      // ignore streams that have not been changed
       continue
     }
-
     const { description, labelIdList, createdLabelList } = state
+
+    const stream = streamList.find((stream) => stream.id === streamId)
+    if (!stream) {
+      console.warn(`Could not not find streamId: ${streamId}`)
+      continue
+    }
 
     // create all labels necessary
     await Promise.all(
       createdLabelList.map(async (label): Promise<void> => {
+        let parentLabelIdList: LabelId[] = []
+
+        if (stream.parentId) {
+          const parentPoint = getActivePoint(
+            store,
+            stream.parentId,
+            currentTime,
+          ).value
+          if (parentPoint) {
+            parentLabelIdList = [...parentPoint.labelIdList]
+          }
+        }
+
         await store.mutate.label_create({
           labelId: label.id,
           streamId,
           name: label.name,
           color: undefined,
           icon: undefined,
-          // NOTE: the parentId is updated afterwards to the correc
-          // value
-          parentId: undefined,
+          parentLabelIdList,
         })
       }),
     )
@@ -82,12 +96,7 @@ const handleSubmit = async () => {
     })
   }
 
-  // TODO: what's the best way to handle this?
-  // await store.mutate.migrate_fixupLabelParents({
-  //   startedAtGTE: currentTime,
-  // })
-
-  goto('/log')
+  void goto('/log')
 }
 </script>
 

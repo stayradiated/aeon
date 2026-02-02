@@ -4,6 +4,6 @@ const clock = atom('clock', Date.now())
 
 setInterval(() => {
   clock.set(Date.now())
-}, 5000)
+}, 1000)
 
 export { clock }

@@ -74,10 +74,20 @@ const createStore = (options: CreateStoreOptions) => {
   }
 
   const setMetaState = (state: 'READY' | 'LOADING') => {
-    meta.pushDiffList([{ op: 'add', key: 'meta/store', newValue: { state } }])
+    const key = Key.meta.encode('store')
+
+    if (state === 'LOADING') {
+      meta.pushDiffList([{ op: 'add', key, newValue: { state } }])
+    } else {
+      meta.pushDiffList([
+        { op: 'change', key, newValue: { state }, oldValue: {} },
+      ])
+    }
   }
 
+  let hasInitialLoad = false
   setMetaState('LOADING')
+
   rep.experimentalWatch(
     (diffList) => {
       const record = groupBy(diffList, (diff) => {
@@ -95,7 +105,11 @@ const createStore = (options: CreateStoreOptions) => {
           }
           table.pushDiffList(diffList)
         }
-        setMetaState('READY')
+
+        if (!hasInitialLoad) {
+          setMetaState('READY')
+          hasInitialLoad = true
+        }
       })
     },
     {

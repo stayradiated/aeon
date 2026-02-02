@@ -12,7 +12,6 @@ type GetLabelListOptions = {
   where: Where<{
     userId: UserId
     labelId?: LabelId
-    parentId?: LabelId
     streamId?: StreamId
     name?: string
   }>
@@ -24,13 +23,12 @@ const getLabel = async (
   const { db, where } = options
 
   return errorBoundary(() => {
-    let query = db.selectFrom('label').selectAll()
+    let query = db.selectFrom('labelWithParentList').selectAll()
 
     query = extendWhere(query)
       .string('id', where.labelId)
       .string('userId', where.userId)
       .string('streamId', where.streamId)
-      .string('parentId', where.parentId)
       .string('name', where.name)
       .done()
 

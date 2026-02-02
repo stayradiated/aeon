@@ -143,7 +143,7 @@ const getEntities = async (
         name: entity.name,
         icon: entity.icon ?? undefined,
         color: entity.color ?? undefined,
-        parentId: entity.parentId ?? undefined,
+        parentLabelIdList: entity.parentLabelIdList,
       }),
     ),
     buildPatchList(

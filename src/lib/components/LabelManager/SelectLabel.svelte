@@ -6,31 +6,30 @@ import type { LabelId, StreamId } from '#lib/ids.js'
 
 import { getLabelListGroupedByParent } from '#lib/core/select/get-label-list-grouped-by-parent.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 type Props = {
   store: Store
   streamId: StreamId
-  value?: LabelId | undefined
-  onchange?: (value: LabelId | undefined) => void
+  value: LabelId[]
+  onchange?: (value: LabelId[]) => void
 }
 
 const { store, streamId, value, onchange }: Props = $props()
 
-const { labelListGroupedByParent } = $derived(
-  query({
-    labelListGroupedByParent: getLabelListGroupedByParent(store, streamId),
-  }),
+const { _: labelListGroupedByParent } = $derived(
+  watch(getLabelListGroupedByParent(store, streamId)),
 )
 
 const handleChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
-  const value = event.currentTarget.value
-  onchange?.(value === '' ? undefined : (value as LabelId))
+  const selected = Array.from(event.currentTarget.selectedOptions).map(
+    (option) => option.value as LabelId,
+  )
+  onchange?.(selected)
 }
 </script>
 
-<select {value} onchange={handleChange}>
-  <option value=''>[No Parent]</option>
+<select multiple {value} onchange={handleChange}>
   {#each labelListGroupedByParent as [parentLabel, labelList] (parentLabel?.id)}
     {#if parentLabel}
       <option disabled>{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</option>

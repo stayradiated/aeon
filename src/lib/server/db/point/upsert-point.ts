@@ -1,8 +1,9 @@
 import { errorBoundary } from '@stayradiated/error-boundary'
+import { sql } from 'kysely'
 
 import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
-import type { Point, PointLabel } from '#lib/server/types.js'
+import type { Point, RawPoint, RawPointLabel } from '#lib/server/types.js'
 
 type UpsertPointOptions = {
   db: KyselyDb
@@ -26,7 +27,7 @@ const upsertPoint = async (
 ): Promise<Point | Error> => {
   const { db, where, insert, set, now = Date.now() } = options
 
-  const value: Point = {
+  const value: RawPoint = {
     id: insert.pointId,
     userId: where.userId,
     streamId: where.streamId,
@@ -37,7 +38,7 @@ const upsertPoint = async (
   }
 
   return errorBoundary(async () => {
-    const point = await db
+    const rawPoint = await db
       .insertInto('point')
       .values(value)
       .onConflict((oc) =>
@@ -53,8 +54,8 @@ const upsertPoint = async (
     const labelIdList = [...new Set(set.labelIdList)]
 
     const pointLabelList = labelIdList.map(
-      (labelId, index): PointLabel => ({
-        pointId: point.id,
+      (labelId, index): RawPointLabel => ({
+        pointId: rawPoint.id,
         labelId,
         streamId: where.streamId,
         userId: where.userId,
@@ -64,14 +65,33 @@ const upsertPoint = async (
       }),
     )
 
-    // TODO: make this a single query
-    // TODO: don't delete all pointLabels, just the ones that are being deleted
+    await db
+      .insertInto('pointLabel')
+      .values(pointLabelList)
+      .onConflict((oc) =>
+        oc.columns(['pointId', 'labelId']).doUpdateSet((eb) => ({
+          sortOrder: eb.ref('excluded.sortOrder'),
+          updatedAt: eb.ref('excluded.updatedAt'),
+        })),
+      )
+      .execute()
 
-    await db.deleteFrom('pointLabel').where('pointId', '=', point.id).execute()
-    if (pointLabelList.length > 0) {
-      await db.insertInto('pointLabel').values(pointLabelList).execute()
+    let deletePointLabelQuery = db
+      .deleteFrom('pointLabel')
+      .where('pointId', '=', rawPoint.id)
+
+    if (labelIdList.length > 0) {
+      deletePointLabelQuery = deletePointLabelQuery.where(
+        sql<boolean>`${sql.ref('labelId')} <> all(${sql.val(labelIdList)})`,
+      )
     }
 
+    await deletePointLabelQuery.execute()
+
+    const point: Point = {
+      ...rawPoint,
+      labelIdList,
+    }
     return point
   })
 }

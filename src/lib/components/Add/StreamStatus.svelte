@@ -1,4 +1,6 @@
 <script lang="ts">
+import { computed } from 'signia'
+
 import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label, Stream } from '#lib/types.local.js'
@@ -6,7 +8,7 @@ import type { Label, Stream } from '#lib/types.local.js'
 import { getActivePoint } from '#lib/core/select/get-active-point.js'
 
 import { formatDurationRough } from '#lib/utils/format-duration.js'
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import PointInput from './PointInput.svelte'
 
@@ -28,17 +30,22 @@ type Props = {
 const { store, stream, parentState, currentTime, state, onchange }: Props =
   $props()
 
-const { currentPoint, currentParentPoint, labelList } = $derived(
-  query(() => {
-    const currentPoint = getActivePoint(store, stream.id, currentTime).value
-    const currentParentPoint = stream.parentId
-      ? getActivePoint(store, stream.parentId, currentTime).value
-      : undefined
-    const labelList = (currentPoint?.labelIdList ?? []).flatMap((labelId) => {
-      return store.label.get(labelId).value ?? []
-    })
-    return { currentPoint, currentParentPoint, labelList }
-  }),
+const { _: currentPoint } = $derived(
+  watch(getActivePoint(store, stream.id, currentTime)),
+)
+const { _: currentParentPoint } = $derived(
+  stream.parentId
+    ? watch(getActivePoint(store, stream.parentId, currentTime))
+    : watch.undefined,
+)
+const { _: labelList } = $derived(
+  watch(
+    computed('labelList', () =>
+      (currentPoint?.labelIdList ?? []).flatMap((labelId) => {
+        return store.label.get(labelId).value ?? []
+      }),
+    ),
+  ),
 )
 
 const handleEdit = (event: MouseEvent) => {

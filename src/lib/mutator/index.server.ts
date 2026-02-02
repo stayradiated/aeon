@@ -7,9 +7,10 @@ const mutators: ServerMutatorDefsImportMap = {
   stream_sort: import('./stream-sort.server.js'),
   stream_delete: import('./stream-delete.server.js'),
 
+  label_addParentLabel: import('./label-add-parent-label.server.js'),
   label_create: import('./label-create.server.js'),
+  label_removeParentLabel: import('./label-remove-parent-label.server.js'),
   label_rename: import('./label-rename.server.js'),
-  label_setParent: import('./label-set-parent.server.js'),
   label_setColor: import('./label-set-color.server.js'),
   label_setIcon: import('./label-set-icon.server.js'),
 
