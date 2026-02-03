@@ -8,9 +8,9 @@ type Option = {
 
 type Props = {
   optionList: readonly Option[]
-  selectedList: readonly Value[]
+  selectedList: readonly Option[]
   placeholder?: string
-  onchange?: (selectedList: Value[]) => void
+  onchange?: (selectedList: Option[]) => void
   oncreate?: (label: string) => void
 }
 
@@ -18,14 +18,17 @@ const { optionList, selectedList, placeholder, onchange, oncreate }: Props =
   $props()
 
 let inputEl = $state<HTMLInputElement>()
-let dropdownEl = $state<HTMLDivElement>()
 let searchQuery = $state('')
 let isOpen = $state(false)
+
+const selectedSet = $derived(
+  new Set(selectedList.map((option) => option.value)),
+)
 
 const filteredOptionList = $derived.by(() => {
   const searchQueryLC = searchQuery.trim().toLowerCase()
   return optionList.filter((option) => {
-    if (selectedList.includes(option.value)) {
+    if (selectedSet.has(option.value)) {
       return false
     }
     return searchQueryLC.length === 0
@@ -47,13 +50,13 @@ const handleBlur = () => {
   isOpen = false
 }
 
-const handleAdd = (value: Value) => {
+const handleAdd = (option: Option) => {
   searchQuery = ''
   isOpen = false
-  if (selectedList.includes(value)) {
+  if (selectedSet.has(option.value)) {
     return
   }
-  onchange?.([...selectedList, value])
+  onchange?.([...selectedList, option])
   inputEl?.blur()
 }
 
@@ -82,9 +85,9 @@ const handleKeyDown = (
     case 'Enter': {
       event.preventDefault()
       // select first available option
-      const selectedItem = filteredOptionList[0]?.value
-      if (selectedItem) {
-        handleAdd(selectedItem)
+      const option = filteredOptionList[0]
+      if (option) {
+        handleAdd(option)
       } else if (searchQuery.length > 0) {
         handleCreate()
       }
@@ -92,8 +95,12 @@ const handleKeyDown = (
   }
 }
 
-const handleRemove = (value: Value) => {
-  const index = selectedList.indexOf(value)
+const handleRemove = (option: Option) => {
+  // we intentionally compare options by value
+  // as references may not be the same between `optionList` and `selectedList`
+  const index = selectedList.findIndex(
+    (selectedOption) => selectedOption.value === option.value,
+  )
   if (index === -1) {
     return
   }
@@ -108,13 +115,10 @@ const handleRemoveAll = () => {
 <div class="MultiSelect">
   <div class="selected">
     <div class="itemList">
-      {#each selectedList as value (value)}
-        {@const option = optionList.find((option) => option.value === value)}
-        {#if option}
-          <button type="button" onclick={() => handleRemove(value)}>
-            {option.label}
-          </button>
-        {/if}
+      {#each selectedList as option (option.value)}
+        <button type="button" onclick={() => handleRemove(option)}>
+          {option.label}
+        </button>
       {/each}
     </div>
 
@@ -134,11 +138,11 @@ const handleRemoveAll = () => {
   />
 
   {#if isOpen}
-    <div class="dropdown" bind:this={dropdownEl}>
+    <div class="dropdown">
       {#each filteredOptionList as option (option.value)}
         <button
           type="button"
-          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option.value) }}>{option.label}</button>
+          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option) }}>{option.label}</button>
       {/each}
       {#if searchQuery.length > 0}
         <button

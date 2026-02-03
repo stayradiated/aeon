@@ -1,47 +1,82 @@
-import { errorBoundary } from '@stayradiated/error-boundary'
+import { sql } from 'kysely'
 
-import type { LabelId, StreamId, UserId } from '#lib/ids.js'
+import type { LabelId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
-import type { Where } from '#lib/server/db/where.js'
-import type { Label } from '#lib/server/types.js'
+import type { Label, RawLabelParent } from '#lib/server/types.js'
 
-import { extendWhere } from '#lib/server/db/where.js'
+import { transact } from '#lib/server/db/transact.js'
 
 type UpdateLabelOptions = {
   db: KyselyDb
-  where: Where<{
+  where: {
     userId: UserId
-    labelId?: LabelId
-    streamId?: StreamId
-  }>
-  set: Partial<Pick<Label, 'streamId' | 'name' | 'parentId' | 'color' | 'icon'>>
+    labelId: LabelId
+  }
+  set: Partial<
+    Pick<Label, 'streamId' | 'name' | 'color' | 'icon' | 'parentLabelIdList'>
+  >
   now?: number
 }
 
 const updateLabel = async (
   options: UpdateLabelOptions,
-): Promise<Label[] | Error> => {
+): Promise<void | Error> => {
   const { db, where, set, now = Date.now() } = options
 
-  return errorBoundary(() => {
-    let query = db
+  return transact('updateLabel', db, async () => {
+    /*
+     * note: eevn if there are no properties to update, we still need to
+     * update the timestamps - to ensure that the row is marked as changed
+     * so that the replicache CVR is updated on the next pull
+     */
+    await db
       .updateTable('label')
       .set({
         name: set.name,
-        parentId: set.parentId,
         color: set.color,
         icon: set.icon,
         updatedAt: now,
       })
-      .returningAll()
+      .where('id', '=', where.labelId)
+      .where('userId', '=', where.userId)
+      .execute()
 
-    query = extendWhere(query)
-      .string('id', where.labelId)
-      .string('userId', where.userId)
-      .string('streamId', where.streamId)
-      .done()
+    if (Array.isArray(set.parentLabelIdList)) {
+      // upsert new labelParent rows (if there are any)
+      if (set.parentLabelIdList.length > 0) {
+        const labelParentList = set.parentLabelIdList.map(
+          (parentLabelId): RawLabelParent => ({
+            labelId: where.labelId,
+            parentLabelId,
+            userId: where.userId,
+            createdAt: now,
+            updatedAt: now,
+          }),
+        )
 
-    return query.execute()
+        await db
+          .insertInto('labelParent')
+          .values(labelParentList)
+          .onConflict((oc) =>
+            oc.columns(['labelId', 'parentLabelId']).doNothing(),
+          )
+          .execute()
+      }
+
+      // delete any existing labelParent rows that are not in the new list
+      let deleteLabelParentQuery = db
+        .deleteFrom('labelParent')
+        .where('labelId', '=', where.labelId)
+
+      // only exclude the parent label if there are any
+      if (set.parentLabelIdList.length > 0) {
+        deleteLabelParentQuery = deleteLabelParentQuery.where(
+          sql<boolean>`${sql.ref('parentLabelId')} <> all(${sql.val(set.parentLabelIdList)})`,
+        )
+      }
+
+      await deleteLabelParentQuery.execute()
+    }
   })
 }
 

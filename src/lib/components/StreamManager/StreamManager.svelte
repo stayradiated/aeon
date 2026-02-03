@@ -3,7 +3,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import CreateStream from './CreateStream.svelte'
 import StreamList from './StreamList.svelte'
@@ -14,11 +14,7 @@ type Props = {
 
 const { store }: Props = $props()
 
-const { streamList } = $derived(
-  query({
-    streamList: getStreamList(store),
-  }),
-)
+const { _: streamList } = $derived(watch(getStreamList(store)))
 </script>
 
 <section>

@@ -3,7 +3,7 @@ import { onMount } from 'svelte'
 
 import type { Store } from '#lib/core/replicache/store.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 type Props = {
   store: Store
@@ -24,12 +24,12 @@ onMount(() => {
   }
 })
 
-const { metaTask } = $derived(
-  query({
-    metaTask: store.metaTask.find(`name===${name}`, (metaTask) => {
+const { _: metaTask } = $derived(
+  watch(
+    store.metaTask.find(`name===${name}`, (metaTask) => {
       return metaTask.name === name
     }),
-  }),
+  ),
 )
 
 const durationMs = $derived(

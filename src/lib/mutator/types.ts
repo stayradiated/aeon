@@ -11,7 +11,7 @@ type Mutators = {
   label_create: Mutator<{
     labelId: LabelId
     streamId: StreamId
-    parentId: LabelId | undefined
+    parentLabelIdList: LabelId[]
     name: string
     color: string | undefined
     icon: string | undefined
@@ -20,9 +20,13 @@ type Mutators = {
     labelId: LabelId
     name: string
   }>
-  label_setParent: Mutator<{
+  label_addParentLabel: Mutator<{
     labelId: LabelId
-    parentId: LabelId | undefined
+    parentLabelId: LabelId
+  }>
+  label_removeParentLabel: Mutator<{
+    labelId: LabelId
+    parentLabelId: LabelId
   }>
   label_setColor: Mutator<{
     labelId: LabelId

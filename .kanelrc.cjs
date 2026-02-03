@@ -63,10 +63,7 @@ const supportVerbatimModuleSyntaxHook = (filePath, lines) => {
   return lines
 }
 
-/*
- * strip type brand from personEmail.email key
- */
-const usePointWithLabelListFix = (filePath, lines) => {
+const useTypedViewListsHoook = (filePath, lines) => {
   if (filePath === 'src/lib/__generated__/kanel/public/PointWithLabelList.ts') {
     lines.unshift("import { labelId, type LabelId } from './Label';")
 
@@ -77,6 +74,21 @@ const usePointWithLabelListFix = (filePath, lines) => {
         }
         case 'labelIdList: z.string().array(),': {
           return '  labelIdList: labelId.array(),'
+        }
+      }
+      return line
+    })
+  }
+  if (
+    filePath === 'src/lib/__generated__/kanel/public/LabelWithParentList.ts'
+  ) {
+    return lines.map((line) => {
+      switch (line.trim()) {
+        case 'parentLabelIdList: ColumnType<string[], never, never>;': {
+          return '  parentLabelIdList: ColumnType<LabelId[], never, never>;'
+        }
+        case 'parentLabelIdList: z.string().array(),': {
+          return '  parentLabelIdList: labelId.array(),'
         }
       }
       return line
@@ -114,7 +126,7 @@ module.exports = {
   postRenderHooks: [
     kanelKyselyZodCompatibilityHook,
     supportVerbatimModuleSyntaxHook,
-    usePointWithLabelListFix,
+    useTypedViewListsHoook,
   ],
 
   customTypeMap: getTypeMap('typescript'),

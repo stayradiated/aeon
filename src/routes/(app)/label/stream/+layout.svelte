@@ -9,13 +9,9 @@ const { store } = $derived(data)
 
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
-const { streamList } = $derived(
-  query({
-    streamList: getStreamList(store),
-  }),
-)
+const { _: streamList } = $derived(watch(getStreamList(store)))
 
 const activeStreamId = $derived(page.params.streamId as StreamId)
 </script>

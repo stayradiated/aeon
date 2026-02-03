@@ -49,10 +49,39 @@ CREATE TABLE public.label (
     name text NOT NULL,
     icon text,
     color text,
-    parent_id text,
     created_at bigint NOT NULL,
     updated_at bigint NOT NULL
 );
+
+
+--
+-- Name: label_parent; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.label_parent (
+    label_id text NOT NULL,
+    parent_label_id text NOT NULL,
+    user_id text NOT NULL,
+    created_at bigint NOT NULL,
+    updated_at bigint NOT NULL
+);
+
+
+--
+-- Name: label_with_parent_list; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.label_with_parent_list AS
+SELECT
+    NULL::text AS id,
+    NULL::text AS user_id,
+    NULL::text AS stream_id,
+    NULL::text AS name,
+    NULL::text AS icon,
+    NULL::text AS color,
+    NULL::bigint AS created_at,
+    NULL::bigint AS updated_at,
+    NULL::text[] AS parent_label_id_list;
 
 
 --
@@ -234,6 +263,14 @@ ALTER TABLE ONLY public.label
 
 
 --
+-- Name: label_parent label_parent:primaryKey(label_id,parent_label_id); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.label_parent
+    ADD CONSTRAINT "label_parent:primaryKey(label_id,parent_label_id)" PRIMARY KEY (label_id, parent_label_id);
+
+
+--
 -- Name: meta_task meta_task:primaryKey(id); Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -354,6 +391,25 @@ ALTER TABLE ONLY public.user_session
 
 
 --
+-- Name: label_with_parent_list _RETURN; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE OR REPLACE VIEW public.label_with_parent_list AS
+ SELECT label.id,
+    label.user_id,
+    label.stream_id,
+    label.name,
+    label.icon,
+    label.color,
+    label.created_at,
+    label.updated_at,
+    COALESCE(array_agg(lp.parent_label_id ORDER BY lp.parent_label_id) FILTER (WHERE (lp.parent_label_id IS NOT NULL)), ARRAY[]::text[]) AS parent_label_id_list
+   FROM (public.label
+     LEFT JOIN public.label_parent lp ON ((label.id = lp.label_id)))
+  GROUP BY label.id;
+
+
+--
 -- Name: point_with_label_list _RETURN; Type: RULE; Schema: public; Owner: -
 --
 
@@ -372,14 +428,6 @@ CREATE OR REPLACE VIEW public.point_with_label_list AS
 
 
 --
--- Name: label label:foreignKey(parent_id); Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.label
-    ADD CONSTRAINT "label:foreignKey(parent_id)" FOREIGN KEY (parent_id, user_id) REFERENCES public.label(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
 -- Name: label label:foreignKey(stream_id); Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -393,6 +441,30 @@ ALTER TABLE ONLY public.label
 
 ALTER TABLE ONLY public.label
     ADD CONSTRAINT "label:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: label_parent label_parent:foreignKey(label_id); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.label_parent
+    ADD CONSTRAINT "label_parent:foreignKey(label_id)" FOREIGN KEY (label_id, user_id) REFERENCES public.label(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: label_parent label_parent:foreignKey(parent_label_id); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.label_parent
+    ADD CONSTRAINT "label_parent:foreignKey(parent_label_id)" FOREIGN KEY (parent_label_id, user_id) REFERENCES public.label(id, user_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: label_parent label_parent:foreignKey(user_id); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.label_parent
+    ADD CONSTRAINT "label_parent:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --

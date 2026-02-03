@@ -91,12 +91,14 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
         name: label.name,
         icon: label.icon,
         color: label.color,
-        parentId: label.parentId,
+        parentLabelIdList: label.parentId ? [label.parentId] : [],
         createdAt: label.createdAt,
         updatedAt: label.updatedAt ?? label.createdAt,
       }))
       .sort((a, b) => {
-        return (a.parentId ?? '').localeCompare(b.parentId ?? '')
+        return (a.parentLabelIdList.at(0) ?? '').localeCompare(
+          b.parentLabelIdList.at(0) ?? '',
+        )
       }),
     point: Object.values(legacySnapshot.point).map(
       (point): Snapshot['point'][number] => ({

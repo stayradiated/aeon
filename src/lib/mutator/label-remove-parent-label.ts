@@ -3,12 +3,12 @@ import type { LocalMutator } from './types.ts'
 
 import * as Key from '#lib/core/replicache/keys.js'
 
-const labelSetParent: LocalMutator<'label_setParent'> = async (
+const labelRemoveParentLabel: LocalMutator<'label_removeParentLabel'> = async (
   context,
   options,
 ) => {
   const { tx } = context
-  const { labelId, parentId } = options
+  const { labelId, parentLabelId } = options
 
   const key = Key.label.encode(labelId)
   const label = await tx.get<AnonLabel>(key)
@@ -16,11 +16,20 @@ const labelSetParent: LocalMutator<'label_setParent'> = async (
     return new Error('Label not found')
   }
 
+  const index = label.parentLabelIdList.indexOf(parentLabelId)
+  if (index === -1) {
+    // parent label not found
+    return
+  }
+
+  // remove the parent label from the list
+  const parentLabelIdList = label.parentLabelIdList.toSpliced(index, 1)
+
   const value: AnonLabel = {
     ...label,
-    parentId,
+    parentLabelIdList,
   }
   await tx.set(key, value)
 }
 
-export default labelSetParent
+export default labelRemoveParentLabel

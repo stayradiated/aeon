@@ -4,7 +4,7 @@ import type { StreamId } from '#lib/ids.js'
 
 import { getLabelListGroupedByParent } from '#lib/core/select/get-label-list-grouped-by-parent.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 import LabelList from './LabelList.svelte'
 
@@ -15,11 +15,9 @@ type Props = {
 
 const { store, streamId }: Props = $props()
 
-const { stream, groupedLabelList } = $derived(
-  query({
-    stream: store.stream.get(streamId),
-    groupedLabelList: getLabelListGroupedByParent(store, streamId),
-  }),
+const { _: stream } = $derived(watch(store.stream.get(streamId)))
+const { _: groupedLabelList } = $derived(
+  watch(getLabelListGroupedByParent(store, streamId)),
 )
 </script>
 

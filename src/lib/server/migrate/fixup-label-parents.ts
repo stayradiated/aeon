@@ -1,14 +1,11 @@
-import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
+import type { LabelId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
-import type { Label, PointWithLabelList } from '#lib/server/types.js'
+import type { Label, Point } from '#lib/server/types.js'
 
 import { getLabelList } from '#lib/server/db/label/get-label-list.js'
-import { insertLabel } from '#lib/server/db/label/insert-label.js'
 import { updateLabel } from '#lib/server/db/label/update-label.js'
 import { getPointIterator } from '#lib/server/db/point/get-point-iterator.js'
-import { updatePointLabel } from '#lib/server/db/point/update-point-label.js'
 
-import { genId } from '#lib/utils/gen-id.js'
 import { withPeek } from '#lib/utils/peek.js'
 
 const PAGE_SIZE = 500
@@ -22,7 +19,9 @@ class LabelCache {
     this.#byId = Object.fromEntries(labelList.map((label) => [label.id, label]))
     this.#byProperty = { null: {} }
     for (const label of labelList) {
-      this.setByProperty(label.parentId, label.name, label)
+      for (const parentLabelId of label.parentLabelIdList) {
+        this.setByProperty(parentLabelId, label.name, label)
+      }
     }
   }
 
@@ -49,70 +48,31 @@ class LabelCache {
   }
 }
 
-type DuplicateLabelAndUpdatePointOptions = {
+type AddLabelParentIdOptions = {
   db: KyselyDb
   userId: UserId
   label: Label
-  labelCache: LabelCache
-  pointId: PointId
-  parentLabelId: LabelId | null
+  parentLabelId: LabelId
 }
 
-const duplicateLabelAndUpdatePoint = async (
-  options: DuplicateLabelAndUpdatePointOptions,
-): Promise<void | Error> => {
-  const { db, userId, label, labelCache, pointId, parentLabelId } = options
-
-  let nextLabel = labelCache.getByProperty(parentLabelId, label.name)
-  if (!nextLabel) {
-    const insertedLabel = await insertLabel({
-      db,
-      set: {
-        ...label,
-        id: genId(),
-        parentId: parentLabelId,
-      },
-    })
-    if (insertedLabel instanceof Error) {
-      return insertedLabel
-    }
-    labelCache.setByProperty(parentLabelId, label.name, insertedLabel)
-    nextLabel = insertedLabel
-  }
-
-  const result = await updatePointLabel({
-    db,
-    where: { pointId, labelId: label.id, userId },
-    set: { labelId: nextLabel.id },
-  })
-  if (result instanceof Error) {
-    return result
-  }
-}
-
-type SetLabelParentIdOptions = {
-  db: KyselyDb
-  userId: UserId
-  label: Label
-  parentLabelId: LabelId | null
-}
-
-const setLabelParentId = async (
-  options: SetLabelParentIdOptions,
+const addLabelParentId = async (
+  options: AddLabelParentIdOptions,
 ): Promise<void | Error> => {
   const { db, userId, label, parentLabelId } = options
 
-  if (label.parentId === parentLabelId) {
-    return new Error(`Label "${label.name}" already has a parentId. Skipping.`)
+  if (label.parentLabelIdList.includes(parentLabelId)) {
+    return new Error(
+      `Label "${label.name}" already has this parentId. Skipping.`,
+    )
   }
 
-  // TODO: this is icky
-  label.parentId = parentLabelId ?? null
+  // TODO: mutating the label isn't ideal
+  label.parentLabelIdList.push(parentLabelId)
 
   const updatedLabel = await updateLabel({
     db,
     where: { labelId: label.id, userId },
-    set: { parentId: parentLabelId },
+    set: { parentLabelIdList: label.parentLabelIdList },
   })
   if (updatedLabel instanceof Error) {
     return updatedLabel
@@ -129,7 +89,6 @@ type FixupLabelParentsOptions = {
 type Result = {
   processedPointCount: number
   processedLabelCount: number
-  duplicatedLabelCount: number
   updatedLabelCount: number
 }
 
@@ -154,9 +113,9 @@ const fixupLabelParents = async (
    * for a given stream
    * iterate through each point in that stream, chronologically
    * iterate through each label of that point
-   * compare that label's parentId to the label of the active point in the parent stream
-   * if the label doesn't have a parentId, set it to the parent streams active point's label
-   * if the label already has a parentId, but it's different, duplicate the label and set the new label's parentId to the active point's label and then update the point to use this new label
+   * compare that label's parentId to the label of the active point in the
+   * parent stream
+   * and if the label doesn't have the parentId, we add it to the label
    */
 
   const pointIterator = getPointIterator({
@@ -176,12 +135,11 @@ const fixupLabelParents = async (
   const output: Result = {
     processedPointCount: 0,
     processedLabelCount: 0,
-    duplicatedLabelCount: 0,
     updatedLabelCount: 0,
   }
 
   // holds the the current parent point
-  let parentPoint: PointWithLabelList | undefined
+  let parentPoint: Point | undefined
 
   for await (const point of pointIterator) {
     if (point instanceof Error) {
@@ -218,7 +176,7 @@ const fixupLabelParents = async (
       continue
     }
 
-    const parentLabelId = parentPoint.labelIdList.at(0) ?? null
+    const parentLabelId = parentPoint.labelIdList.at(0)
 
     for (const labelId of point.labelIdList) {
       const label = labelCache.getById(labelId)
@@ -228,36 +186,26 @@ const fixupLabelParents = async (
 
       output.processedLabelCount += 1
 
-      if (label.parentId === parentLabelId) {
+      if (!parentLabelId) {
+        // no parent label, so we don't need to do anything
+        continue
+      }
+
+      if (label.parentLabelIdList.includes(parentLabelId)) {
         // label already has the correct parentId, so we don't need to do anything
         continue
       }
 
-      if (label.parentId) {
-        const error = await duplicateLabelAndUpdatePoint({
-          db,
-          userId,
-          pointId: point.id,
-          parentLabelId,
-          label,
-          labelCache,
-        })
-        if (error instanceof Error) {
-          return error
-        }
-        output.duplicatedLabelCount += 1
-      } else {
-        const error = await setLabelParentId({
-          db,
-          userId,
-          parentLabelId,
-          label,
-        })
-        if (error instanceof Error) {
-          return error
-        }
-        output.updatedLabelCount += 1
+      const error = await addLabelParentId({
+        db,
+        userId,
+        parentLabelId,
+        label,
+      })
+      if (error instanceof Error) {
+        return error
       }
+      output.updatedLabelCount += 1
     }
   }
 

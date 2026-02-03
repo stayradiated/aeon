@@ -7,7 +7,7 @@ const label_create: ServerMutator<'label_create'> = async (
   options,
 ) => {
   const { db, sessionUserId } = context
-  const { labelId, streamId, parentId, name, icon, color } = options
+  const { labelId, streamId, parentLabelIdList, name, icon, color } = options
 
   const label = await insertLabel({
     db,
@@ -16,7 +16,7 @@ const label_create: ServerMutator<'label_create'> = async (
       userId: sessionUserId,
       streamId,
       name,
-      parentId: parentId ?? null,
+      parentLabelIdList,
       icon: icon ?? null,
       color: color ?? null,
     },

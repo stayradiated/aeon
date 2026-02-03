@@ -3,7 +3,7 @@ import { errorBoundary } from '@stayradiated/error-boundary'
 import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
-import type { PointLabel } from '#lib/server/types.js'
+import type { RawPointLabel } from '#lib/server/types.js'
 
 import { extendWhere } from '#lib/server/db/where.js'
 
@@ -16,14 +16,14 @@ type UpdatePointLabelOptions = {
     streamId?: StreamId
   }>
   set: Partial<
-    Pick<PointLabel, 'pointId' | 'labelId' | 'streamId' | 'sortOrder'>
+    Pick<RawPointLabel, 'pointId' | 'labelId' | 'streamId' | 'sortOrder'>
   >
   now?: number
 }
 
 const updatePointLabel = async (
   options: UpdatePointLabelOptions,
-): Promise<PointLabel[] | Error> => {
+): Promise<RawPointLabel[] | Error> => {
   const { db, where, set, now = Date.now() } = options
 
   return errorBoundary(() => {

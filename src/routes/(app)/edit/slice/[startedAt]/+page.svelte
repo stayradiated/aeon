@@ -10,20 +10,18 @@ import { getActivePointRecord } from '#lib/core/select/get-active-point-record.j
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
-import { query } from '#lib/utils/query.js'
+import { watch } from '#lib/utils/watch.svelte.js'
 
 let { data }: PageProps = $props()
 const { store } = $derived(data)
 
 const startedAt = Number.parseInt(page.params.startedAt ?? '-1', 10)
 
-const { timeZone, pointRecord, streamList } = $derived(
-  query({
-    timeZone: getUserTimeZone(store),
-    pointRecord: getActivePointRecord(store, startedAt),
-    streamList: getStreamList(store),
-  }),
+const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const { _: pointRecord } = $derived(
+  watch(getActivePointRecord(store, startedAt)),
 )
+const { _: streamList } = $derived(watch(getStreamList(store)))
 
 let timestamp = $derived(
   formatInTimeZone(startedAt, timeZone, 'yyyy-MM-dd HH:mm'),

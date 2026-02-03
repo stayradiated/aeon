@@ -22,12 +22,12 @@ const labelFactory = createFactory<Label>('Label')
       .type<StreamId>()
       .maybeFrom('stream', ({ stream }) => stream?.id),
     name: f.type<string>().default('Untitled'),
-    parentId: f.type<LabelId | null>().default(null),
+    parentLabelIdList: f.type<LabelId[]>().default([]),
     icon: f.type<string | null>().default(null),
     color: f.type<string | null>().default(null),
   }))
   .fixture(async (attrs, use) => {
-    const { db, userId, name, parentId, streamId, icon, color } = attrs
+    const { db, userId, name, parentLabelIdList, streamId, icon, color } = attrs
 
     const label = await insertLabel({
       db,
@@ -35,7 +35,7 @@ const labelFactory = createFactory<Label>('Label')
         id: genId(),
         userId,
         name,
-        parentId,
+        parentLabelIdList,
         streamId,
         icon,
         color,

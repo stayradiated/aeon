@@ -3,7 +3,7 @@ import { errorBoundary } from '@stayradiated/error-boundary'
 import type { PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
-import type { PointWithLabelList } from '#lib/server/types.js'
+import type { Point } from '#lib/server/types.js'
 
 import { extendWhere } from '#lib/server/db/where.js'
 
@@ -23,7 +23,7 @@ type GetPointListOptions = {
 
 const getPointList = async (
   options: GetPointListOptions,
-): Promise<PointWithLabelList[] | Error> => {
+): Promise<Point[] | Error> => {
   const { db, where, paginate } = options
 
   return errorBoundary(() => {

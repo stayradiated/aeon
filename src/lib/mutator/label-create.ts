@@ -7,7 +7,7 @@ import { deleteUndefinedKeys } from '#lib/utils/delete-undefined-keys.js'
 
 const labelCreate: LocalMutator<'label_create'> = async (context, options) => {
   const { tx } = context
-  const { labelId, streamId, parentId, name, color, icon } = options
+  const { labelId, streamId, parentLabelIdList, name, color, icon } = options
 
   const key = Key.label.encode(labelId)
   const value: AnonLabel = deleteUndefinedKeys({
@@ -15,7 +15,7 @@ const labelCreate: LocalMutator<'label_create'> = async (context, options) => {
     streamId,
     color,
     icon,
-    parentId,
+    parentLabelIdList,
   })
   await tx.set(key, value)
 }
