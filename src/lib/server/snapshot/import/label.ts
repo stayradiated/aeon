@@ -9,6 +9,7 @@ import { insertLabel } from '#lib/server/db/label/insert-label.js'
 
 import { genId } from '#lib/utils/gen-id.js'
 import { createIdMap, resolveId } from '#lib/utils/map-and-resolve-id.js'
+import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first.js'
 
 type ImportLabelOptions = {
   db: KyselyDb
@@ -24,7 +25,21 @@ const importLabelList = async (
 
   const labelIdMap = createIdMap<LabelId>('Label')
 
-  for (const label of snapshot.label) {
+  /*
+   * sort parents first
+   * so we always insert parents before children
+   * and thus children can always resolve their parent IDs
+   */
+  const sortedLabelList = topoSortParentsFirst({
+    items: snapshot.label,
+    getId: (label) => label.id,
+    getParentIdList: (label) => label.parentLabelIdList,
+  })
+  if (sortedLabelList instanceof Error) {
+    return new Error('Could not sort label list', { cause: sortedLabelList })
+  }
+
+  for (const label of sortedLabelList) {
     const streamId = resolveId(streamIdMap, label.streamId)
     if (streamId instanceof Error) {
       return streamId

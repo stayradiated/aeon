@@ -1,9 +1,10 @@
-import { errorBoundary } from '@stayradiated/error-boundary'
 import { sql } from 'kysely'
 
 import type { LabelId, PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Point, RawPoint, RawPointLabel } from '#lib/server/types.js'
+
+import { transact } from '#lib/server/db/transact.js'
 
 type UpsertPointOptions = {
   db: KyselyDb
@@ -37,7 +38,7 @@ const upsertPoint = async (
     updatedAt: now,
   }
 
-  return errorBoundary(async () => {
+  return transact('upsertPoint', db, async ({ db }) => {
     const rawPoint = await db
       .insertInto('point')
       .values(value)
@@ -65,16 +66,18 @@ const upsertPoint = async (
       }),
     )
 
-    await db
-      .insertInto('pointLabel')
-      .values(pointLabelList)
-      .onConflict((oc) =>
-        oc.columns(['pointId', 'labelId']).doUpdateSet((eb) => ({
-          sortOrder: eb.ref('excluded.sortOrder'),
-          updatedAt: eb.ref('excluded.updatedAt'),
-        })),
-      )
-      .execute()
+    if (pointLabelList.length > 0) {
+      await db
+        .insertInto('pointLabel')
+        .values(pointLabelList)
+        .onConflict((oc) =>
+          oc.columns(['pointId', 'labelId']).doUpdateSet((eb) => ({
+            sortOrder: eb.ref('excluded.sortOrder'),
+            updatedAt: eb.ref('excluded.updatedAt'),
+          })),
+        )
+        .execute()
+    }
 
     let deletePointLabelQuery = db
       .deleteFrom('pointLabel')

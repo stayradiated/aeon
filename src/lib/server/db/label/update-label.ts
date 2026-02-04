@@ -23,7 +23,7 @@ const updateLabel = async (
 ): Promise<void | Error> => {
   const { db, where, set, now = Date.now() } = options
 
-  return transact('updateLabel', db, async () => {
+  return transact('updateLabel', db, async ({ db }) => {
     /*
      * note: eevn if there are no properties to update, we still need to
      * update the timestamps - to ensure that the row is marked as changed

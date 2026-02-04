@@ -84,8 +84,8 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
         updatedAt: stream.updatedAt ?? stream.createdAt,
       }),
     ),
-    label: Object.values(legacySnapshot.label)
-      .map((label): Snapshot['label'][number] => ({
+    label: Object.values(legacySnapshot.label).map(
+      (label): Snapshot['label'][number] => ({
         id: label.id,
         streamId: label.streamId,
         name: label.name,
@@ -94,12 +94,8 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
         parentLabelIdList: label.parentId ? [label.parentId] : [],
         createdAt: label.createdAt,
         updatedAt: label.updatedAt ?? label.createdAt,
-      }))
-      .sort((a, b) => {
-        return (a.parentLabelIdList.at(0) ?? '').localeCompare(
-          b.parentLabelIdList.at(0) ?? '',
-        )
       }),
+    ),
     point: Object.values(legacySnapshot.point).map(
       (point): Snapshot['point'][number] => ({
         id: point.id,
