@@ -13,6 +13,7 @@ const mutators: ServerMutatorDefsImportMap = {
   label_rename: import('./label-rename.server.js'),
   label_setColor: import('./label-set-color.server.js'),
   label_setIcon: import('./label-set-icon.server.js'),
+  label_squash: import('./label-squash.server.js'),
 
   point_create: import('./point-create.server.js'),
   point_slide: import('./point-slide.server.js'),

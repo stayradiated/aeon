@@ -13,6 +13,7 @@ const mutators: LocalMutatorDefsImportMap = {
   label_rename: import('./label-rename.js'),
   label_setColor: import('./label-set-color.js'),
   label_setIcon: import('./label-set-icon.js'),
+  label_squash: import('./label-squash.js'),
 
   point_create: import('./point-create.js'),
   point_slide: import('./point-slide.js'),
