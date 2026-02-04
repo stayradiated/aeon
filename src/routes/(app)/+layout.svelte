@@ -8,7 +8,6 @@ import { afterNavigate } from '$app/navigation'
 
 import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
 
-import { clock } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 const { data, children }: LayoutProps = $props()
@@ -19,9 +18,24 @@ const { _: sessionUser } = $derived(watch(store.user.get(store.sessionUserId)))
 const { _: metaStore } = $derived(watch(store.meta.get('store')))
 const isStoreLoading = $derived(metaStore?.state === 'LOADING')
 
+// track loading time
 const startLoadingAt = Date.now()
-const { _: now } = $derived(watch(clock))
+let now = $state(startLoadingAt)
 const loadingDuration = $derived(Math.max(0, now - startLoadingAt))
+
+$effect(() => {
+  if (!isStoreLoading) {
+    return
+  }
+
+  const interval = setInterval(() => {
+    now = Date.now()
+  }, 50)
+
+  return () => {
+    clearInterval(interval)
+  }
+})
 
 $effect(() => {
   if (!isStoreLoading) {

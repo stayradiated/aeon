@@ -55,12 +55,11 @@ const upsertPoint = async (
     const labelIdList = [...new Set(set.labelIdList)]
 
     const pointLabelList = labelIdList.map(
-      (labelId, index): RawPointLabel => ({
+      (labelId): RawPointLabel => ({
         pointId: rawPoint.id,
         labelId,
         streamId: where.streamId,
         userId: where.userId,
-        sortOrder: index,
         createdAt: now,
         updatedAt: now,
       }),
@@ -70,12 +69,7 @@ const upsertPoint = async (
       await db
         .insertInto('pointLabel')
         .values(pointLabelList)
-        .onConflict((oc) =>
-          oc.columns(['pointId', 'labelId']).doUpdateSet((eb) => ({
-            sortOrder: eb.ref('excluded.sortOrder'),
-            updatedAt: eb.ref('excluded.updatedAt'),
-          })),
-        )
+        .onConflict((oc) => oc.columns(['pointId', 'labelId']).doNothing())
         .execute()
     }
 

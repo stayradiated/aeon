@@ -124,7 +124,6 @@ CREATE TABLE public.point_label (
     point_id text NOT NULL,
     label_id text NOT NULL,
     user_id text NOT NULL,
-    sort_order integer NOT NULL,
     created_at bigint NOT NULL,
     updated_at bigint NOT NULL,
     stream_id text NOT NULL
@@ -421,7 +420,7 @@ CREATE OR REPLACE VIEW public.point_with_label_list AS
     p.started_at,
     p.created_at,
     p.updated_at,
-    COALESCE(array_agg(pl.label_id ORDER BY pl.sort_order, pl.label_id) FILTER (WHERE (pl.label_id IS NOT NULL)), ARRAY[]::text[]) AS label_id_list
+    COALESCE(array_agg(pl.label_id ORDER BY pl.label_id) FILTER (WHERE (pl.label_id IS NOT NULL)), ARRAY[]::text[]) AS label_id_list
    FROM (public.point p
      LEFT JOIN public.point_label pl ON ((p.id = pl.point_id)))
   GROUP BY p.id;

@@ -36,6 +36,12 @@ type Mutators = {
     labelId: LabelId
     icon: string | undefined
   }>
+  label_squash: Mutator<{
+    // these labels will be removed
+    sourceLabelIdList: LabelId[]
+    // this label will be updated with the source label's parents
+    destinationLabelId: LabelId
+  }>
 
   stream_create: Mutator<{
     streamId: StreamId

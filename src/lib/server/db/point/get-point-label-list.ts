@@ -7,7 +7,7 @@ import type { RawPointLabel } from '#lib/server/types.js'
 
 import { extendWhere } from '#lib/server/db/where.js'
 
-type UpdatePointLabelOptions = {
+type GetPointLabelListOptions = {
   db: KyselyDb
   where: Where<{
     userId: UserId
@@ -15,32 +15,19 @@ type UpdatePointLabelOptions = {
     labelId?: LabelId
     streamId?: StreamId
   }>
-  set: Partial<
-    Pick<RawPointLabel, 'pointId' | 'labelId' | 'streamId' | 'sortOrder'>
-  >
-  now?: number
 }
 
-const updatePointLabel = async (
-  options: UpdatePointLabelOptions,
+const getPointLabelList = async (
+  options: GetPointLabelListOptions,
 ): Promise<RawPointLabel[] | Error> => {
-  const { db, where, set, now = Date.now() } = options
+  const { db, where } = options
 
   return errorBoundary(() => {
-    let query = db
-      .updateTable('pointLabel')
-      .set({
-        pointId: set.pointId,
-        labelId: set.labelId,
-        streamId: set.streamId,
-        sortOrder: set.sortOrder,
-        updatedAt: now,
-      })
-      .returningAll()
+    let query = db.selectFrom('pointLabel').selectAll()
 
     query = extendWhere(query)
-      .string('pointId', where.pointId)
       .string('userId', where.userId)
+      .string('pointId', where.pointId)
       .string('labelId', where.labelId)
       .string('streamId', where.streamId)
       .done()
@@ -49,4 +36,4 @@ const updatePointLabel = async (
   })
 }
 
-export { updatePointLabel }
+export { getPointLabelList }

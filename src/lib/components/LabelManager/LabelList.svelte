@@ -72,6 +72,13 @@ const handleToggleAll: ChangeEventHandler<HTMLInputElement> = (event) => {
     gap: var(--size-2);
   }
 
+  h4 {
+    position: sticky;
+    top: 0;
+    background: var(--theme-background);
+    padding: var(--size-2) var(--size-3);
+  }
+
   label {
     border-radius: var(--radius-sm);
     background: color-mix(in lch, var(--local-color), transparent 80%);

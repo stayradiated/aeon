@@ -6,6 +6,7 @@ import { getLabelListGroupedByParent } from '#lib/core/select/get-label-list-gro
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
+import DuplicateLabelList from './DuplicateLabelList.svelte'
 import LabelList from './LabelList.svelte'
 
 type Props = {
@@ -21,24 +22,39 @@ const { _: groupedLabelList } = $derived(
 )
 </script>
 
-<h3>{stream?.name ?? '⚠️ Missing'}</h3>
+<div class="StreamLabelManager">
+  {#if stream?.parentId}
+    <nav>
+      {#each groupedLabelList as [parentLabel] (parentLabel?.id)}
+        {#if parentLabel}
+          <a href="#label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</a>
+        {/if}
+      {/each}
+    </nav>
+  {/if}
 
-<nav>
-  {#each groupedLabelList as [parentLabel] (parentLabel?.id)}
-    {#if parentLabel}
-      <a href="#label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</a>
-    {/if}
-  {/each}
-</nav>
+  <main>
+    <h3>{stream?.name ?? '⚠️ Missing'}</h3>
 
-{#each groupedLabelList as [parentLabel, labelList] (parentLabel?.id)}
-  <LabelList {store} {parentLabel} {labelList} />
-{/each}
+    <DuplicateLabelList {store} {streamId} />
+
+    {#each groupedLabelList as [parentLabel, labelList] (parentLabel?.id)}
+      <LabelList {store} {parentLabel} {labelList} />
+    {/each}
+  </main>
+</div>
 
 <style>
-  nav {
+  .StreamLabelManager {
     display: flex;
-    flex-wrap: wrap;
+    padding: var(--size-4);
+    gap: var(--size-4);
+  }
+
+  nav {
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
     gap: var(--size-2);
 
     a {
@@ -53,5 +69,9 @@ const { _: groupedLabelList } = $derived(
         background-color: var(--theme-background-alt);
       }
     }
+  }
+
+  main {
+    flex: 1;
   }
 </style>

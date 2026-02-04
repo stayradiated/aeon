@@ -12,8 +12,6 @@ export default interface PointLabelTable {
 
   userId: ColumnType<string, string, string>;
 
-  sortOrder: ColumnType<number, number, number>;
-
   createdAt: ColumnType<number, number, number>;
 
   updatedAt: ColumnType<number, number, number>;
@@ -31,7 +29,6 @@ export const pointLabel = z.object({
   pointId: pointId,
   labelId: labelId,
   userId: z.string(),
-  sortOrder: z.number(),
   createdAt: z.number(),
   updatedAt: z.number(),
   streamId: streamId,
@@ -41,7 +38,6 @@ export const pointLabelInitializer = z.object({
   pointId: pointId,
   labelId: labelId,
   userId: z.string(),
-  sortOrder: z.number(),
   createdAt: z.number(),
   updatedAt: z.number(),
   streamId: streamId,
@@ -51,7 +47,6 @@ export const pointLabelMutator = z.object({
   pointId: pointId.optional(),
   labelId: labelId.optional(),
   userId: z.string().optional(),
-  sortOrder: z.number().optional(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
   streamId: streamId.optional(),
