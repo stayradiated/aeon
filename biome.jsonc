@@ -174,16 +174,13 @@
           },
           "style": {
             "useConst": "off",
-            "useImportType": "off",
-
-            // TODO: refactor components to avoid using null assertions
-            "noNonNullAssertion": "off"
+            "useImportType": "off"
           }
         }
       }
     },
     {
-      "includes": ["**/*.stories.svelte"],
+      "includes": ["**/*.test.ts", "**/*.stories.svelte"],
       "linter": {
         "rules": {
           "style": {

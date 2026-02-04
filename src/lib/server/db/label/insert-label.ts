@@ -36,7 +36,7 @@ const insertLabel = async (
     }),
   )
 
-  return transact('insertLabel', db, async () => {
+  return transact('insertLabel', db, async ({ db }) => {
     await db
       .insertInto('label')
       .values(value)
