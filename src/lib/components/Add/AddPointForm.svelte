@@ -15,6 +15,7 @@ import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 import { clock } from '#lib/utils/clock.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
+import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import StreamStatus from './StreamStatus.svelte'
@@ -29,7 +30,7 @@ const { _: now } = $derived(watch(clock))
 const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
 const { _: streamList } = $derived(watch(getStreamList(store)))
 
-let formState = $state.raw<Record<StreamId, StreamState>>({})
+let formState = $state.raw<Record<StreamId, StreamState | undefined>>({})
 
 let [nowDate, nowTime] = $derived(
   formatInTimeZone(clock.value, timeZone, "yyyy-MM-dd'T'HH:mm").split('T'),
@@ -47,35 +48,49 @@ const handleNow = (_event: MouseEvent) => {
 }
 
 const handleSubmit = async () => {
-  for (const [streamId, state] of objectEntries(formState)) {
-    if (!state) {
+  const unsortedFormStateEntryList = objectEntries(formState).flatMap(
+    ([streamId, state]) => {
       // ignore streams that have not been changed
-      continue
-    }
+      if (typeof state === 'undefined') {
+        return []
+      }
+
+      const stream = streamList.find((stream) => stream.id === streamId)
+      if (!stream) {
+        throw new Error(`Could not not find streamId: ${streamId}`)
+      }
+
+      return [[streamId, { state, stream }]] as const
+    },
+  )
+
+  // sort streams so that parents are listed before children
+  // this ensures we always update the parent points before children
+  const formStateEntryList = topoSortParentsFirst({
+    items: unsortedFormStateEntryList,
+    getId: ([streamId]) => streamId,
+    getParentIdList: ([_streamId, { stream }]) =>
+      stream.parentId ? [stream.parentId] : [],
+  })
+  if (formStateEntryList instanceof Error) {
+    console.error(formStateEntryList)
+    return
+  }
+
+  for (const [streamId, { state, stream }] of formStateEntryList) {
     const { description, labelIdList, createdLabelList } = state
 
-    const stream = streamList.find((stream) => stream.id === streamId)
-    if (!stream) {
-      console.warn(`Could not not find streamId: ${streamId}`)
-      continue
-    }
+    // lookup the parent point if it exists
+    const parentPoint = stream.parentId
+      ? getActivePoint(store, stream.parentId, currentTime).value
+      : undefined
+    const parentLabelIdList: LabelId[] = parentPoint
+      ? [...parentPoint.labelIdList]
+      : []
 
     // create all labels necessary
     await Promise.all(
       createdLabelList.map(async (label): Promise<void> => {
-        let parentLabelIdList: LabelId[] = []
-
-        if (stream.parentId) {
-          const parentPoint = getActivePoint(
-            store,
-            stream.parentId,
-            currentTime,
-          ).value
-          if (parentPoint) {
-            parentLabelIdList = [...parentPoint.labelIdList]
-          }
-        }
-
         await store.mutate.label_create({
           labelId: label.id,
           streamId,
@@ -86,6 +101,23 @@ const handleSubmit = async () => {
         })
       }),
     )
+
+    // update existing labels to use new labelIds
+    for (const labelId of labelIdList) {
+      const label = store.label.get(labelId).value
+      if (!label) {
+        console.warn(`Could not find labelId: ${labelId}`)
+        continue
+      }
+      for (const parentLabelId of parentLabelIdList) {
+        if (!label.parentLabelIdList.includes(parentLabelId)) {
+          await store.mutate.label_addParentLabel({
+            labelId,
+            parentLabelId,
+          })
+        }
+      }
+    }
 
     await store.mutate.point_create({
       pointId: genId(),

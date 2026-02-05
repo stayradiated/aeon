@@ -28,7 +28,7 @@ ${JSON.stringify(options, null, 2)}
   const result = await resend.emails.send({
     from: 'support@aeon.party',
     to: [userEmail],
-    subject: `Your Aeon verification code is ${verificationCode}`,
+    subject: `Your AEON verification code is ${verificationCode}`,
     html: render(VerifySignupTemplate, {
       props: {
         verificationCode,

@@ -6,4 +6,9 @@ import '#lib/normalize.css'
 
 const { children }: LayoutProps = $props()
 </script>
+
+<svelte:head>
+  <title>ΛΣӨП</title>
+</svelte:head>
+
 {@render children?.()}

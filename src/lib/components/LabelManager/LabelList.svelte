@@ -5,7 +5,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
 
-import Emoji from './Emoji.svelte'
+import Emoji from '#lib/components/Emoji/Emoji.svelte'
 
 type Props = {
   store: Store

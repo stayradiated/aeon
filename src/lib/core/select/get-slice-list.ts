@@ -67,7 +67,17 @@ const getSliceList = createSelector(
               `No line at index ${entry.index} for stream ${entry.streamId}`,
             )
           }
-          slice.lineList.push(currentLine)
+
+          // check if there is already a streamId in the slice
+          const existingIndex = slice.lineList.findIndex(
+            (line) => line.streamId === currentLine.streamId,
+          )
+          if (existingIndex >= 0) {
+            console.warn(`Duplicate streamId ${currentLine.streamId} detected`)
+            slice.lineList[existingIndex] = currentLine
+          } else {
+            slice.lineList.push(currentLine)
+          }
 
           // advance within the same stream
           const nextLineIndex = entry.index + 1

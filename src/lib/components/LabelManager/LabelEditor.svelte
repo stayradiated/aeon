@@ -8,8 +8,9 @@ import type { Label } from '#lib/types.local.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
-import Emoji from './Emoji.svelte'
-import EmojiPicker from './EmojiPicker.svelte'
+import Emoji from '#lib/components/Emoji/Emoji.svelte'
+import EmojiPicker from '#lib/components/Emoji/EmojiPicker.svelte'
+
 import SelectLabel from './SelectLabel.svelte'
 
 type Props = {

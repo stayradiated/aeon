@@ -55,7 +55,7 @@ afterNavigate(() => {
 </script>
 
 <header>
-  <h1>Aeon</h1>
+  <h1>ΛΣӨП</h1>
 
   <nav class:isMenuOpen>
     <div class="menuContainer">

@@ -35,7 +35,8 @@ const topoSortParentsFirst = <T, Id extends string>(
     const childId = getId(child)
     for (const parentId of getParentIdList(child)) {
       if (!(parentId in byId)) {
-        return new Error(`Missing parent: ${parentId}`)
+        console.warn(`[topoSortParentsFirst] Missing parent: ${parentId}`)
+        continue
       }
       childrenByParent[parentId].push(childId)
       inDegree[childId] += 1
