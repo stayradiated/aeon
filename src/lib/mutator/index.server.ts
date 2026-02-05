@@ -19,6 +19,8 @@ const mutators: ServerMutatorDefsImportMap = {
   point_slide: import('./point-slide.server.js'),
   point_delete: import('./point-delete.server.js'),
 
+  user_setTimeZone: import('./user-set-time-zone.server.js'),
+
   migrate_fixupLabelParents: import('./migrate-fixup-label-parents.server.js'),
 
   danger_deleteAllData: import('./danger-delete-all-data.server.js'),
