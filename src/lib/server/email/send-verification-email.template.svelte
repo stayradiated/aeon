@@ -64,7 +64,7 @@ const footer = {
     <Container style={container}>
       <Text style={paragraph}>Hi there</Text>
       <Text style={title}>Here's the verification code to continue your signup</Text>
-      <Text style={paragraph}>To log into for Aeon, enter this verification code when prompted:</Text>
+      <Text style={paragraph}>To log into ΛΣӨП, enter this verification code when prompted:</Text>
       <Text style={code}>{verificationCode}</Text>
       <Hr style={hr} />
       <Link href="https://aeon.party" style={footer}>aeon.party</Link>

@@ -2,7 +2,7 @@
   "version": "1.0.0",
   "manifest_version": 3,
   "name": "AEON",
-  "short_name": "AEON",
+  "short_name": "ΛΣӨП",
   "start_url": "/add",
   "display": "standalone",
   "background_color": "#000",
