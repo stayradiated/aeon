@@ -1,3 +1,4 @@
+import { assertError, assertOk } from '@stayradiated/error-boundary'
 import { test } from 'vitest'
 
 import { topoSortParentsFirst } from './topo-sort-parents-first.js'
@@ -47,7 +48,7 @@ test('returns items in the same order when there are no parents', ({
   ]
 
   const out = run(items)
-  expect(out).not.toBeInstanceOf(Error)
+  assertOk(out)
   expect(ids(out)).toEqual(['a', 'b', 'c'])
 })
 
@@ -59,7 +60,7 @@ test('sorts a simple chain: a -> b -> c (parent first)', ({ expect }) => {
   ]
 
   const out = run(items)
-  expect(out).not.toBeInstanceOf(Error)
+  assertOk(out)
   expect(ids(out)).toEqual(['a', 'b', 'c'])
 })
 
@@ -73,7 +74,7 @@ test('sorts a branching tree (parent first for all edges)', ({ expect }) => {
   ]
 
   const out = run(items)
-  expect(out).not.toBeInstanceOf(Error)
+  assertOk(out)
 
   const sorted = out as Item[]
   expect(sorted).toHaveLength(items.length)
@@ -93,7 +94,7 @@ test('supports multiple parents per item', ({ expect }) => {
   ]
 
   const out = run(items)
-  expect(out).not.toBeInstanceOf(Error)
+  assertOk(out)
 
   const sorted = out as Item[]
   assertParentsBeforeChildren(sorted)
@@ -111,8 +112,17 @@ test('keeps relative order among independent roots (stable-ish with this impleme
   ]
 
   const out = run(items)
-  expect(out).not.toBeInstanceOf(Error)
+  assertOk(out)
   expect(ids(out)).toEqual(['root1', 'root2', 'child'])
+})
+
+test('ignores missing parent', ({ expect }) => {
+  const items: Item[] = [{ id: 'child', parents: ['missing'] }]
+
+  const out = run(items)
+  assertOk(out)
+
+  expect(ids(out)).toEqual(['child'])
 })
 
 test('returns Error for duplicate IDs', ({ expect }) => {
@@ -122,16 +132,9 @@ test('returns Error for duplicate IDs', ({ expect }) => {
   ]
 
   const out = run(items)
+  assertError(out)
   expect(out).toBeInstanceOf(Error)
   expect((out as Error).message).toMatch(/Duplicate ID: a/)
-})
-
-test('returns Error for missing parent', ({ expect }) => {
-  const items: Item[] = [{ id: 'child', parents: ['missing'] }]
-
-  const out = run(items)
-  expect(out).toBeInstanceOf(Error)
-  expect((out as Error).message).toMatch(/Missing parent: missing/)
 })
 
 test('returns Error for a simple cycle (a <-> b)', ({ expect }) => {
@@ -141,6 +144,7 @@ test('returns Error for a simple cycle (a <-> b)', ({ expect }) => {
   ]
 
   const out = run(items)
+  assertError(out)
   expect(out).toBeInstanceOf(Error)
   expect((out as Error).message).toBe('Cycle detected')
 })
@@ -153,6 +157,7 @@ test('returns Error for a longer cycle (a -> b -> c -> a)', ({ expect }) => {
   ]
 
   const out = run(items)
+  assertError(out)
   expect(out).toBeInstanceOf(Error)
   expect((out as Error).message).toBe('Cycle detected')
 })
@@ -171,6 +176,7 @@ test('handles a mix: one acyclic component plus one cycle (should error)', ({
   ]
 
   const out = run(items)
+  assertError(out)
   expect(out).toBeInstanceOf(Error)
   expect((out as Error).message).toBe('Cycle detected')
 })
@@ -183,7 +189,7 @@ test('does not mutate the input items array or item objects', ({ expect }) => {
 
   const snapshot = structuredClone(items)
   const out = run(items)
+  assertOk(out)
 
-  expect(out).not.toBeInstanceOf(Error)
   expect(items).toEqual(snapshot)
 })
