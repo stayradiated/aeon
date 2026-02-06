@@ -10,6 +10,10 @@ import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
+import ServiceWorker from '#lib/components/ServiceWorker.svelte'
+
+import { PUBLIC_APP_VERSION } from '$env/static/public'
+
 const { data, children }: LayoutProps = $props()
 const { store } = $derived(data)
 
@@ -56,6 +60,7 @@ afterNavigate(() => {
 
 <header>
   <h1>ΛΣӨП</h1>
+  <span class="version">{PUBLIC_APP_VERSION}</span>
 
   <nav class:isMenuOpen>
     <div class="menuContainer">
@@ -94,6 +99,8 @@ afterNavigate(() => {
 {:else}
   {@render children?.()}
 {/if}
+
+<ServiceWorker />
 
 <style>
 	:global(html) {

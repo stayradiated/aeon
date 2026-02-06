@@ -24,11 +24,7 @@ const ASSETS = [
 
   '/',
   '/add',
-  '/edit/slice/[startedAt]',
   '/label',
-  '/label/edit/[labelId]',
-  '/label/stream',
-  '/label/stream/[streamId]',
   '/log',
   '/settings',
 ]
@@ -43,6 +39,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(addFilesToCache())
 })
 
+self.addEventListener('message', (event) => {
+  // This lets the page tell the waiting worker to activate now (after the user
+  // clicks “Update”).
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
 self.addEventListener('activate', (event) => {
   // Remove previous cached data from disk
   async function deleteOldCaches() {
@@ -51,6 +55,10 @@ self.addEventListener('activate', (event) => {
         await caches.delete(key)
       }
     }
+
+    // claim clients immediately after activation (so the new SW controls open
+    // pages without requiring a second reload/navigation):
+    await self.clients.claim()
   }
 
   event.waitUntil(deleteOldCaches())

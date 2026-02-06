@@ -17,6 +17,10 @@ RUN pnpm install --frozen-lockfile
 
 COPY . ./
 
+# Inject the PUBLIC_APP_VERSION env var
+ARG APP_VERSION=v0.0.0
+ENV PUBLIC_APP_VERSION=$APP_VERSION
+
 # build the application
 RUN NODE_OPTIONS=--max_old_space_size=4096 just build
 

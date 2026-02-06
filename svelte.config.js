@@ -17,6 +17,12 @@ const config = {
       '#routes': './src/routes',
       '#routes/*': './src/routes/*',
     },
+
+    serviceWorker: {
+      // we manually register the service worker ourselves
+      // see src/service-worker.init.ts
+      register: false,
+    },
   },
 }
 
