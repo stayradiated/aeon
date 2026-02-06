@@ -16,6 +16,10 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
 
+    env:
+      # required to keep typescript happy happy
+      PUBLIC_APP_VERSION: 0.0.0
+
     steps:
       - # https://github.com/actions/checkout
         name: Checkout
