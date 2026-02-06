@@ -139,4 +139,4 @@ const printError = (error: Error, options: ErrorToObjectOptions = {}): void => {
   )
 }
 
-export { formatErrorAsJSON, printError }
+export { printError }

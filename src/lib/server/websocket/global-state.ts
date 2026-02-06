@@ -16,10 +16,5 @@ type ConfigureServer = (httpServer: HttpServer) => void
 const [getConfigureServer, setConfigureServer] =
   defineGlobalVariable<ConfigureServer>(GlobalThisConfigureServer)
 
-// Export for backwards compatibility
-type ExtendedGlobal = typeof globalThis & {
-  [GlobalThisConfigureServer]: ConfigureServer | undefined
-}
-
 export { setConfigureServer, getConfigureServer }
-export type { ExtendedGlobal, ConfigureServer }
+export type { ConfigureServer }

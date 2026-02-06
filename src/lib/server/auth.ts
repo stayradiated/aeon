@@ -89,16 +89,6 @@ const invalidateSession = async (
     .execute()
 }
 
-const invalidateAllSessions = async (
-  db: KyselyDb,
-  userId: UserId,
-): Promise<void> => {
-  await db
-    .deleteFrom('userSession')
-    .where('userSession.userId', '=', userId)
-    .execute()
-}
-
 const setSessionTokenCookie = (
   event: RequestEvent,
   token: string,
@@ -127,7 +117,6 @@ export {
   SESSION_COOKIE_NAME,
   validateSessionToken,
   invalidateSession,
-  invalidateAllSessions,
   generateSessionToken,
   createSession,
   setSessionTokenCookie,

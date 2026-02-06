@@ -40,4 +40,9 @@ const asyncMapRecordValues = async <Key extends string, InValue, OutValue>(
   return Object.fromEntries(results) as Record<Key, OutValue>
 }
 
-export { inverseRecord, mapRecordValues, asyncMapRecordValues }
+export {
+  /** @knipignore **/
+  inverseRecord,
+  mapRecordValues,
+  asyncMapRecordValues,
+}

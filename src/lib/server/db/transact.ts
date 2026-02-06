@@ -284,5 +284,5 @@ const transact = async <T>(
   return startTopLevelTransaction(debugName, db, fn, options)
 }
 
-export { calculateBackoffDelay, isDeadlockError, transact }
+export { transact }
 export type { TransactOptions }

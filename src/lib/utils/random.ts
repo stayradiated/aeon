@@ -12,10 +12,6 @@ function* createRNG(seed: number): RNG {
   }
 }
 
-const boolean = (rng: RNG): boolean => {
-  return rng.next().value > 0.5
-}
-
 const integer = (rng: RNG, min = 0, max = 100): number => {
   if (min > max) {
     throw new Error(`integer(rng, ${min}, ${max}) is invalid: min > max`)
@@ -23,7 +19,7 @@ const integer = (rng: RNG, min = 0, max = 100): number => {
   return Math.floor(rng.next().value * (max - min + 1)) + min
 }
 
-const float = (rng: RNG, min = 0, max = 1): number => {
+const _float = (rng: RNG, min = 0, max = 1): number => {
   return rng.next().value * (max - min) + min
 }
 
@@ -74,5 +70,5 @@ const arrayElements = <T>(rng: RNG, arr: T[], count: number): T[] => {
   return shuffled.slice(0, count)
 }
 
-export { createRNG, boolean, integer, float, arrayElement, arrayElements }
+export { createRNG, integer, arrayElement, arrayElements }
 export type { RNG }

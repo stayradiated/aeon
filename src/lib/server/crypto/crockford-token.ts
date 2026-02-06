@@ -38,4 +38,4 @@ const sanitizeCrockfordToken = (input: string): string => {
   return token
 }
 
-export { genCrockfordToken, sanitizeCrockfordToken, Entropy }
+export { genCrockfordToken, sanitizeCrockfordToken }

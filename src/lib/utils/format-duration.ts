@@ -32,19 +32,6 @@ const formatDuration = (ms: number): string => {
   )
 }
 
-const formatDurationHMS = (durationMs: number): string => {
-  const hours = Math.floor(durationMs / 1000 / 60 / 60)
-    .toString()
-    .padStart(2, '0')
-  const minutes = Math.floor((durationMs / 1000 / 60) % 60)
-    .toString()
-    .padStart(2, '0')
-  const seconds = Math.round((durationMs / 1000) % 60)
-    .toString()
-    .padStart(2, '0')
-  return `${hours}:${minutes}:${seconds}`
-}
-
 const formatDurationRough = (durationMs: number): string => {
   // Over 48 hours, show number of days to 1 decimal place
   // over 1 hour, show hours and minutes
@@ -74,4 +61,4 @@ const formatDurationRough = (durationMs: number): string => {
   return '<1m'
 }
 
-export { formatTime, formatDuration, formatDurationHMS, formatDurationRough }
+export { formatTime, formatDuration, formatDurationRough }

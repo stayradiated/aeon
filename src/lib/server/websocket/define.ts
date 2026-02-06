@@ -69,5 +69,5 @@ const defineWebsocketHandler = (
   }
 }
 
-export { defineWebsocketHandler, createMatchFn }
+export { defineWebsocketHandler }
 export type { WebsocketHandler, WebsocketHandlerFn }

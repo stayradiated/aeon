@@ -72,47 +72,6 @@ const applyReplicacheDiff = <InValue, OutValue>(
   source.set(nextValue, nextDiffList)
 }
 
-const applyRecordDiffList = <Value>(
-  source: Atom<Record<string, Value>, DiffList<Value>>,
-  diffList: DiffList<Value>,
-): void => {
-  if (diffList.length === 0) {
-    // nothing to do
-    return
-  }
-
-  const prev = source.__unsafe__getWithoutCapture()
-  const nextValue = { ...prev }
-
-  for (const diff of diffList) {
-    switch (diff.op) {
-      case 'add': {
-        const key = diff.key
-        const value = diff.value
-        nextValue[key] = value
-        break
-      }
-      case 'replace': {
-        const key = diff.key
-        const value = diff.value
-        nextValue[key] = value
-        break
-      }
-      case 'remove': {
-        const key = diff.key
-        delete nextValue[key]
-        break
-      }
-      default: {
-        diff satisfies never
-        throw new Error(`Unhandled diff op: ${JSON.stringify(diff)}`)
-      }
-    }
-  }
-
-  source.set(nextValue, diffList)
-}
-
 const squashDiffListList = <T>(diffListList: DiffList<T>[]): DiffList<T> => {
   const seenKeys = new Set<string>()
   const squashedDiffList: DiffList<T> = []
@@ -135,5 +94,5 @@ const squashDiffListList = <T>(diffListList: DiffList<T>[]): DiffList<T> => {
   return squashedDiffList
 }
 
-export { applyReplicacheDiff, applyRecordDiffList, squashDiffListList }
+export { applyReplicacheDiff, squashDiffListList }
 export type { Diff, DiffList }

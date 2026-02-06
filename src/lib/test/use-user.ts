@@ -41,4 +41,8 @@ const userFactory = createFactory<User>('User')
 const useCreateUser = userFactory.useCreateValue
 const useUser = userFactory.useValue
 
-export { useCreateUser, useUser }
+export {
+  /** @knipignore **/
+  useCreateUser,
+  useUser,
+}

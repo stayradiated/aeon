@@ -25,8 +25,6 @@ type Key<Name extends string, Input extends unknown[], Output> = {
   decodeWithoutPrefix: (serialized: PlainString) => Output
 }
 
-type UnknownKey = Key<string, unknown[], unknown>
-
 /** Replicache key helper
  *
  * example:
@@ -124,5 +122,9 @@ const createCompositeKey = <Name extends string>(name: Name) => {
   }
 }
 
-export { createKey, createCompositeKey }
-export type { Key, UnknownKey, KeyValue }
+export {
+  createKey,
+  /** @knipignore **/
+  createCompositeKey,
+}
+export type { Key, KeyValue }

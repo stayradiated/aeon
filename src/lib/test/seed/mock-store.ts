@@ -5,7 +5,6 @@ import type { ScenarioName } from './scenario.js'
 import { createStore } from '#lib/core/replicache/store.js'
 
 import { genId } from '#lib/utils/gen-id.js'
-import { memoize } from '#lib/utils/memoize.js'
 
 import { getFaker } from './faker.js'
 import { mockReplicache } from './mock-replicache.js'
@@ -41,13 +40,4 @@ const createMockStore = async (
   return store
 }
 
-const getMockStore = memoize(
-  (options: CreateMockStoreOptions) => {
-    return createMockStore(options)
-  },
-  {
-    cacheKey: ([options]) => `${options.scenario}•${options.seed ?? ''}`,
-  },
-)
-
-export { createMockStore, getMockStore }
+export { createMockStore }

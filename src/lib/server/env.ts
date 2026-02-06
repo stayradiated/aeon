@@ -4,7 +4,6 @@ import { createEnvGetter } from '#lib/utils/create-env-getter.js'
 
 import { env as privateEnv } from '$env/dynamic/private'
 
-const getOrigin = createEnvGetter(privateEnv, 'ORIGIN', z.string())
 const getDatabaseUrl = createEnvGetter(privateEnv, 'DATABASE_URL', z.url())
 const getResendApiKey = createEnvGetter(
   privateEnv,
@@ -12,4 +11,4 @@ const getResendApiKey = createEnvGetter(
   z.string(),
 )
 
-export { getOrigin, getDatabaseUrl, getResendApiKey }
+export { getDatabaseUrl, getResendApiKey }

@@ -55,5 +55,5 @@ jobs:
       - name: Typescript
         run: just check
 
-      # - name: Knip
-      #   run: just knip
+      - name: Knip
+        run: just knip

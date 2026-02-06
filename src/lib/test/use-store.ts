@@ -13,9 +13,7 @@ const repFactory = createFactory<Store>('Store')
   .fixture(async (attrs, use) => {
     const { scenario, seed } = attrs
 
-    // note: we intentionally use `createMockStore` instead of `getMockStore`
-    // because we need a fresh store for each test
-    // (while `getMockStore` will share the same store for the same seed)
+    // we need a fresh store for each test
     const store = await createMockStore({ scenario, seed })
 
     await use(store)
