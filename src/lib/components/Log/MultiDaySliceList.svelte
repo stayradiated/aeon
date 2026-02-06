@@ -1,6 +1,6 @@
 <script lang="ts">
+import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
 
 import type { Store } from '#lib/core/replicache/store.js'
 
@@ -9,7 +9,6 @@ import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
 
 import { groupBy } from '#lib/utils/group-by.js'
 import { watch } from '#lib/utils/watch.svelte.js'
-import { startOfDayWithTimeZone } from '#lib/utils/zoned-date.js'
 
 import SliceList from './SliceList.svelte'
 
@@ -21,10 +20,9 @@ const { store }: Props = $props()
 
 const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
 const rangeStartDate = $derived(
-  startOfDayWithTimeZone({
-    instant: dateFns.subDays(Date.now(), 7).getTime(),
-    timeZone,
-  }).getTime(),
+  dateFns
+    .startOfDay(dateFns.subDays(Date.now(), 7), { in: tz(timeZone) })
+    .getTime(),
 )
 
 const { _: sliceList } = $derived(
@@ -38,11 +36,12 @@ const { _: sliceList } = $derived(
 /* grouping slices by day */
 let sliceListByDay = $derived(
   groupBy(sliceList.toReversed(), (slice) => {
-    const { startedAt: startedAtUTC } = slice
-    const startedAt = toZonedTime(startedAtUTC, timeZone)
+    const { startedAt } = slice
 
     // Format as Friday 02 June 2023
-    const day = dateFns.format(startedAt, 'EEEE dd MMMM yyyy')
+    const day = dateFns.format(startedAt, 'EEEE dd MMMM yyyy', {
+      in: tz(timeZone),
+    })
     return day
   }),
 )

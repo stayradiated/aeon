@@ -1,6 +1,6 @@
 <script lang="ts">
+import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
-import { formatInTimeZone, toDate, toZonedTime } from 'date-fns-tz'
 
 import type { StreamState } from '#lib/components/Add/StreamStatus.svelte'
 import type { Store } from '#lib/core/replicache/store.js'
@@ -33,18 +33,26 @@ const { _: streamList } = $derived(watch(getStreamList(store)))
 let formState = $state.raw<Record<StreamId, StreamState | undefined>>({})
 
 let [nowDate, nowTime] = $derived(
-  formatInTimeZone(clock.value, timeZone, "yyyy-MM-dd'T'HH:mm").split('T'),
+  dateFns
+    .format(clock.value, "yyyy-MM-dd'T'HH:mm", {
+      in: tz(timeZone),
+    })
+    .split('T'),
 )
 const currentTime = $derived(
-  toZonedTime(toDate(`${nowDate}T${nowTime}:00`), timeZone).getTime(),
+  dateFns
+    .parse(`${nowDate} ${nowTime}`, 'yyyy-MM-dd HH:mm', new Date(), {
+      in: tz(timeZone),
+    })
+    .getTime(),
 )
 
 const handleNow = (_event: MouseEvent) => {
-  ;[nowDate, nowTime] = formatInTimeZone(
-    clock.value,
-    timeZone,
-    "yyyy-MM-dd'T'HH:mm",
-  ).split('T')
+  ;[nowDate, nowTime] = dateFns
+    .format(clock.value, "yyyy-MM-dd'T'HH:mm", {
+      in: tz(timeZone),
+    })
+    .split('T')
 }
 
 const handleSubmit = async () => {
