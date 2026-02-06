@@ -67,4 +67,4 @@ const scheduleFixupLabelParents = async (options: { userId: UserId }) => {
   await boss.send(FIXUP_LABEL_PARENTS, { userId })
 }
 
-export { getBoss, initBoss, scheduleFixupLabelParents }
+export { initBoss, scheduleFixupLabelParents }

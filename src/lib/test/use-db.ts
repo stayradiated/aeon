@@ -19,4 +19,8 @@ const dbFactory = createFactory<KyselyDb>('Db').fixture(async (_attrs, use) => {
 const useDb = dbFactory.useValue
 const useCreateDb = dbFactory.useCreateValue
 
-export { useDb, useCreateDb }
+export {
+  useDb,
+  /** @knipignore **/
+  useCreateDb,
+}

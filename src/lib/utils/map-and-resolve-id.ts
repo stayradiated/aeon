@@ -57,5 +57,5 @@ const maybeResolveId = <Id extends string>(
   return null
 }
 
-export { newIdMap, createIdMap, resolveId, maybeResolveId }
+export { createIdMap, resolveId, maybeResolveId }
 export type { IdMap }
