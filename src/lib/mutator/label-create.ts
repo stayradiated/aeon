@@ -16,6 +16,7 @@ const labelCreate: LocalMutator<'label_create'> = async (context, options) => {
     color,
     icon,
     parentLabelIdList,
+    usage: 0,
   })
   await tx.set(key, value)
 }

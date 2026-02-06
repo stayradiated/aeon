@@ -54,11 +54,17 @@ type Option = {
 
 const toOption = (label: Pick<Label, 'id' | 'icon' | 'name'>): Option => ({
   value: label.id,
-  label: (label.icon ? `${label.icon} ` : '') + label.name,
+  label: `${label.icon ? `${label.icon} ` : ''}${label.name}`,
 })
 
 const optionList = $derived(
-  [...streamLabelList, ...createdLabelList].map((label) => toOption(label)),
+  [
+    ...streamLabelList.toSorted((a, b) => {
+      // sort by usage
+      return b.usage - a.usage
+    }),
+    ...createdLabelList,
+  ].map((label) => toOption(label)),
 )
 
 // resolve each label in the labelIdList to a label object

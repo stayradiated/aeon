@@ -18,6 +18,7 @@ type LocalLabel = {
   name: string
   icon: string | undefined
   color: string | undefined
+  usage: number
   parentLabelIdList: readonly LabelId[]
 }
 
