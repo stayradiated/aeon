@@ -16,6 +16,9 @@ importers:
 
   .:
     dependencies:
+      '@date-fns/tz':
+        specifier: 1.4.1
+        version: 1.4.1
       '@emoji-mart/data':
         specifier: 1.2.1
         version: 1.2.1
@@ -46,9 +49,6 @@ importers:
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
-      date-fns-tz:
-        specifier: 3.2.0
-        version: 3.2.0(date-fns@4.1.0)
       emoji-mart:
         specifier: 5.6.0
         version: 5.6.0
@@ -244,6 +244,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@date-fns/tz@1.4.1':
+    resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
 
   '@electric-sql/pglite@0.3.15':
     resolution: {integrity: sha512-Cj++n1Mekf9ETfdc16TlDi+cDDQF0W7EcbyRHYOAeZdsAe8M/FJg18itDTSwyHfar2WIezawM9o0EKaRGVKygQ==}
@@ -1282,11 +1285,6 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
-
-  date-fns-tz@3.2.0:
-    resolution: {integrity: sha512-sg8HqoTEulcbbbVXeg84u5UnlsQa8GS5QXMqjjYIhS4abEVVKIUwe0/l/UhrZdKaL/W5eWZNlbTeEIiOXTcsBQ==}
-    peerDependencies:
-      date-fns: ^3.0.0 || ^4.0.0
 
   date-fns@4.1.0:
     resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
@@ -2731,6 +2729,8 @@ snapshots:
   '@biomejs/cli-win32-x64@2.3.14':
     optional: true
 
+  '@date-fns/tz@1.4.1': {}
+
   '@electric-sql/pglite@0.3.15': {}
 
   '@emnapi/core@1.8.1':
@@ -3669,10 +3669,6 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  date-fns-tz@3.2.0(date-fns@4.1.0):
-    dependencies:
-      date-fns: 4.1.0
-
   date-fns@4.1.0: {}
 
   debug@4.3.4:
@@ -3872,7 +3868,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.3.15):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.3.15)(knex@3.1.0(pg@8.17.2))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.3.15)(knex@3.1.0(pg@8.18.0))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -4173,7 +4169,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.3.15)(knex@3.1.0(pg@8.17.2)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.3.15)(knex@3.1.0(pg@8.18.0)):
     dependencies:
       '@electric-sql/pglite': 0.3.15
       knex: 3.1.0(pg@8.17.2)

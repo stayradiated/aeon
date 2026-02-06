@@ -1,5 +1,5 @@
+import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
 
 const formatDistanceLocale: Record<string, string> = {
   xSeconds: '{{count}}s',
@@ -18,9 +18,8 @@ const durationLocale = {
   },
 }
 
-const formatTime = (timeZone: string, utc: number): string => {
-  const time = toZonedTime(utc, timeZone)
-  return dateFns.format(time, 'HH:mm')
+const formatTime = (timeZone: string, instant: number): string => {
+  return dateFns.format(instant, 'HH:mm', { in: tz(timeZone) })
 }
 
 const formatDuration = (ms: number): string => {

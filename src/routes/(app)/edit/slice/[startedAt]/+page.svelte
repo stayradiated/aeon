@@ -1,5 +1,6 @@
 <script lang="ts">
-import { formatInTimeZone, toDate } from 'date-fns-tz'
+import { tz } from '@date-fns/tz'
+import * as dateFns from 'date-fns'
 
 import type { PageProps } from './$types'
 
@@ -23,13 +24,23 @@ const { _: pointRecord } = $derived(
 )
 const { _: streamList } = $derived(watch(getStreamList(store)))
 
+const DATE_FORMAT = `yyyy-MM-dd'T'HH:mm`
+
 let timestamp = $derived(
-  formatInTimeZone(startedAt, timeZone, 'yyyy-MM-dd HH:mm'),
+  dateFns.format(startedAt, DATE_FORMAT, {
+    in: tz(timeZone),
+  }),
 )
 
 const handleSlide = async (event: SubmitEvent) => {
   event.preventDefault()
-  const nextStartedAt = toDate(timestamp, { timeZone }).getTime()
+
+  const nextStartedAt = dateFns
+    .parse(timestamp, DATE_FORMAT, new Date(), {
+      in: tz(timeZone),
+    })
+    .getTime()
+
   if (startedAt !== nextStartedAt) {
     for (const point of Object.values(pointRecord)) {
       if (point.startedAt === startedAt) {
