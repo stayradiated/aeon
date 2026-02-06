@@ -1,3 +1,4 @@
+import * as dateFns from 'date-fns'
 import type { PatchOperation, ReadonlyJSONValue } from 'replicache'
 
 import type {
@@ -13,6 +14,7 @@ import type { CVR, CVRDiff } from '#lib/server/replicache/cvr.js'
 import type { Key as GenericKey } from '#lib/utils/create-key.js'
 
 import { getLabelList } from '#lib/server/db/label/get-label-list.js'
+import { getLabelUsageList } from '#lib/server/db/label/get-label-usage-list.js'
 import { getLabelVersionRecord } from '#lib/server/db/label/get-label-version-record.js'
 import { getMetaTaskList } from '#lib/server/db/meta-task/get-meta-task-list.js'
 import { getMetaTaskVersionRecord } from '#lib/server/db/meta-task/get-meta-task-version-record.js'
@@ -101,6 +103,19 @@ const getEntities = async (
       db,
       where: { userId: sessionUserId, labelId: { in: diff.label.puts } },
     }),
+    labelUsage: getLabelUsageList({
+      db,
+      where: {
+        userId: sessionUserId,
+        labelId: { in: diff.label.puts },
+        point: {
+          startedAt: {
+            gte: dateFns.subDays(Date.now(), 7).getTime(),
+            lte: Date.now(),
+          },
+        },
+      },
+    }),
     stream: getStreamList({
       db,
       where: { userId: sessionUserId, streamId: { in: diff.stream.puts } },
@@ -121,6 +136,10 @@ const getEntities = async (
     console.error(entities)
     return new Error('Could not get entities.', { cause: entities })
   }
+
+  const labelUsageRecord: Record<LabelId, number> = Object.fromEntries(
+    entities.labelUsage.map((usage) => [usage.id, usage.count]),
+  )
 
   return Array.from<PatchOperation>({ length: 0 }).concat(
     buildPatchList(
@@ -144,6 +163,7 @@ const getEntities = async (
         icon: entity.icon ?? undefined,
         color: entity.color ?? undefined,
         parentLabelIdList: entity.parentLabelIdList,
+        usage: labelUsageRecord[entity.id] ?? 0,
       }),
     ),
     buildPatchList(
