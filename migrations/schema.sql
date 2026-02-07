@@ -205,7 +205,6 @@ CREATE TABLE public.stream (
 
 CREATE TABLE public."user" (
     id text NOT NULL,
-    time_zone text NOT NULL,
     strava_client_id text,
     strava_client_secret text,
     strava_session jsonb,

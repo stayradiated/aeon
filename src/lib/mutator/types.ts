@@ -78,10 +78,6 @@ type Mutators = {
     pointId: PointId
   }>
 
-  user_setTimeZone: Mutator<{
-    timeZone: string
-  }>
-
   migrate_fixupLabelParents: Mutator<Record<string, never>>
 
   danger_deleteAllData: Mutator<{

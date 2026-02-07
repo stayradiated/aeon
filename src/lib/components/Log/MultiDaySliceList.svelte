@@ -1,13 +1,13 @@
 <script lang="ts">
-import { tz } from '@date-fns/tz'
+import { tz, tzOffset } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
 import type { Store } from '#lib/core/replicache/store.js'
+import type { Slice } from '#lib/core/shape/types.js'
 
 import { getSliceList } from '#lib/core/select/get-slice-list.js'
-import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
+import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
-import { groupBy } from '#lib/utils/group-by.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import SliceList from './SliceList.svelte'
@@ -18,13 +18,9 @@ type Props = {
 
 const { store }: Props = $props()
 
-const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
-const rangeStartDate = $derived(
-  dateFns
-    .startOfDay(dateFns.subDays(Date.now(), 7), { in: tz(timeZone) })
-    .getTime(),
-)
+const rangeStartDate = $derived(dateFns.subDays(Date.now(), 7).getTime())
 
+const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 const { _: sliceList } = $derived(
   watch(
     getSliceList(store, {
@@ -33,30 +29,85 @@ const { _: sliceList } = $derived(
   ),
 )
 
-/* grouping slices by day */
-let sliceListByDay = $derived(
-  groupBy(sliceList.toReversed(), (slice) => {
-    const { startedAt } = slice
+type ZonedSliceList = {
+  date: string
+  startedAt: number
+  timeZone: string
+  sliceList: Slice[]
+}
 
-    // Format as Friday 02 June 2023
-    const day = dateFns.format(startedAt, 'EEEE dd MMMM yyyy', {
+/*
+ * grouping slices by day
+ * the sliceList is sorted by startedAt ascending
+ * (i.e. oldest first)
+ * this is important, as we need to track the current time zone as we progress
+ * through the slices
+ * however, for displaying the log, we want to show the most recent entries first
+ * so after grouping, we reverse each list
+ */
+let multiDaySliceList = $derived.by(() => {
+  let timeZone = 'UTC'
+  let multiDaySliceList: ZonedSliceList[] = []
+  let currentZSL: ZonedSliceList | undefined
+
+  for (const slice of sliceList) {
+    const { startedAt, lineList } = slice
+
+    if (timeZoneStream) {
+      for (const line of lineList) {
+        if (line.streamId === timeZoneStream.id) {
+          timeZone = line.description
+          // start a new sliceList
+          currentZSL = undefined
+        }
+      }
+    }
+
+    // serialize as calendar date so we can compare days
+    const date = dateFns.format(startedAt, 'yyyy-MM-dd', {
       in: tz(timeZone),
     })
-    return day
-  }),
-)
+
+    if (currentZSL?.date !== date) {
+      currentZSL = {
+        date,
+        startedAt,
+        timeZone,
+        sliceList: [],
+      }
+      multiDaySliceList.push(currentZSL)
+    }
+
+    currentZSL.sliceList.push(slice)
+  }
+
+  for (const zonedSliceList of multiDaySliceList) {
+    zonedSliceList.sliceList.reverse()
+  }
+
+  return multiDaySliceList.reverse()
+})
 </script>
 
-{#if Object.keys(sliceListByDay).length === 0}
-  <p>No entries found.</p>
+{#each multiDaySliceList as { date, startedAt, timeZone, sliceList }, index (index)}
+  {@const prevTimeZone = multiDaySliceList[index + 1]?.timeZone}
+  <div class="container">
+    <h2>{date}</h2>
+    <SliceList {store} {timeZone} {sliceList} />
+  </div>
+  {#if timeZone !== prevTimeZone}
+    {@const offset = tzOffset(timeZone, new Date(startedAt))}
+    {#if typeof prevTimeZone === 'undefined'}
+      <div class="timeZoneChange">{timeZone} (UTC{#if offset > 0}+{/if}{offset / 60})</div>
+    {:else}
+      {@const prevOffset = tzOffset(prevTimeZone, new Date(startedAt))}
+      {@const diff = (prevOffset - offset)/60}
+      <div class="timeZoneChange">Time zone changed to {timeZone} ({#if diff > 0}+{/if}{diff} hours)</div>
+    {/if}
+  {/if}
 {:else}
-  {#each Object.entries(sliceListByDay) as [day, sliceList] (day)}
-    <div class="container">
-      <h2>{day}</h2>
-      <SliceList {store} {sliceList} />
-    </div>
-  {/each}
-{/if}
+  <p>No entries found.</p>
+{/each}
 
 <style>
 	.container {
@@ -64,4 +115,11 @@ let sliceListByDay = $derived(
 		flex-direction: column;
 		margin-bottom: 1rem;
 	}
+
+  .timeZoneChange {
+    margin-top: var(--size-4);
+    padding: var(--size-2);
+    background-color: var(--color-yellow-300);
+    border-radius: var(--radius-sm);
+  }
 </style>

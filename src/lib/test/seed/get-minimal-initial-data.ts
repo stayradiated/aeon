@@ -21,7 +21,6 @@ const getMinimalInitialData = (
   return {
     [`user/${sessionUserId}`]: {
       email: 'test@example.com',
-      timeZone: 'UTC',
     } satisfies AnonUser,
   }
 }

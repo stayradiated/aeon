@@ -17,17 +17,15 @@ const userFactory = createFactory<User>('User')
     email: f
       .type<string>()
       .default(() => `test.${genId().toLowerCase()}@example.com`),
-    timeZone: f.type<string>().default(() => 'UTC'),
   }))
   .fixture(async (attrs, use) => {
-    const { db, email, timeZone } = attrs
+    const { db, email } = attrs
 
     const user = await insertUser({
       db,
       set: {
         id: genId(),
         email,
-        timeZone,
         stravaClientId: null,
         stravaClientSecret: null,
         stravaSession: null,

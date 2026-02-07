@@ -1,52 +1,68 @@
 <script lang="ts">
-import type { Store } from '#lib/core/replicache/store.js'
-
-import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
-
-import { watch } from '#lib/utils/watch.svelte.js'
+import type { ChangeEventHandler } from 'svelte/elements'
 
 import Emoji from '#lib/components/Emoji/Emoji.svelte'
 
 type Props = {
-  store: Store
+  timeZone: string
+  onChange: (timeZone: string) => void
 }
 
-const { store }: Props = $props()
-
-const { _: userTimeZone } = $derived(watch(getUserTimeZone(store)))
+const { timeZone, onChange }: Props = $props()
 
 let browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-let selectedTimeZone = $derived(userTimeZone)
 const supportedTimeZoneList = Intl.supportedValuesOf('timeZone')
 
-const handleChangeTimeZone = async () => {
-  if (selectedTimeZone !== userTimeZone) {
-    await store.mutate.user_setTimeZone({ timeZone: selectedTimeZone })
+const handleChangeTimeZone: ChangeEventHandler<HTMLSelectElement> = async (
+  event,
+) => {
+  const selectedTimeZone = event.currentTarget.value
+  if (selectedTimeZone !== timeZone) {
+    onChange(selectedTimeZone)
   }
 }
 
 const handleUseBrowserTimeZone = async () => {
-  if (browserTimeZone !== userTimeZone) {
-    await store.mutate.user_setTimeZone({ timeZone: browserTimeZone })
+  if (browserTimeZone !== timeZone) {
+    onChange(browserTimeZone)
   }
 }
 </script>
 
-<p>Select a time zone to use for displaying dates.</p>
+<div class="TimeZoneManager">
+  <div class="label">Time Zone</div>
 
-{#if userTimeZone !== browserTimeZone}
-  <p class="info">
-    <Emoji native="ℹ️" /> Your browser is using the time zone <code>{browserTimeZone}</code>. <button onclick={handleUseBrowserTimeZone}>Switch?</button>
-  </p>
-{/if}
+  {#if timeZone !== browserTimeZone}
+    <p class="info">
+      <Emoji native="ℹ️" /> Your browser is using the time zone <code>{browserTimeZone}</code>. <button onclick={handleUseBrowserTimeZone}>Switch?</button>
+    </p>
+  {/if}
 
-<select bind:value={selectedTimeZone} onchange={handleChangeTimeZone}>
-  {#each supportedTimeZoneList as timeZone (timeZone)}
-    <option value={timeZone}>{timeZone}</option>
-  {/each}
-</select>
+  <select value={timeZone} onchange={handleChangeTimeZone}>
+    {#each supportedTimeZoneList as timeZone (timeZone)}
+      <option value={timeZone}>{timeZone}</option>
+    {/each}
+  </select>
+</div>
 
 <style>
+	.TimeZoneManager {
+		padding: 0 var(--size-3);
+		background: var(--theme-background);
+		border: none;
+		color: var(--theme-text-main);
+		border-radius: var(--radius-xs);
+		cursor: pointer;
+		justify-content: space-between;
+		line-height: var(--line-xl);
+		border-bottom: 1px solid var(--theme-border);
+	}
+
+	.label {
+		font-weight: var(--weight-bold);
+		font-size: var(--scale-1);
+	}
+
   .info {
     background: var(--color-yellow-300);
     padding: var(--size-2);

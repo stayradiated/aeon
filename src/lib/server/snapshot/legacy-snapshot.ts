@@ -66,7 +66,6 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
   return {
     user: Object.values(legacySnapshot.user).map(
       (user): Snapshot['user'][number] => ({
-        timeZone: user.timeZone,
         stravaClientId: user.stravaClientId ?? null,
         stravaClientSecret: user.stravaClientSecret ?? null,
         stravaSession: user.stravaSession ?? null,

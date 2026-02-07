@@ -5,7 +5,6 @@ import type { PageProps } from './$types'
 
 import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
-import TimeZoneManager from '#lib/components/TimeZoneManager/TimeZoneManager.svelte'
 
 const { data }: PageProps = $props()
 const { store } = $derived(data)
@@ -62,11 +61,6 @@ const handleAssignLabelParent = async () => {
     <h2>Debug</h2>
     <p>Reset the local state of the replicache store. You may lose unsynced changes.</p>
     <button onclick={handleResetReplicache}>Reset Local State</button>
-  </section>
-
-  <section>
-    <h2>Time Zone</h2>
-    <TimeZoneManager {store} />
   </section>
 
   <section>
