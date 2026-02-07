@@ -34,6 +34,7 @@ let name = $state<string>('')
 let lastInitializedLabelId: LabelId | undefined
 $effect(() => {
   if (label && label.id !== lastInitializedLabelId) {
+    lastInitializedLabelId = label.id
     parentLabelIdList = [...label.parentLabelIdList]
     color = label.color
     icon = label.icon
