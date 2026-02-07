@@ -182,7 +182,6 @@ const getEntities = async (
       entities.user,
       (entity): AnonUser => ({
         email: entity.email,
-        timeZone: entity.timeZone,
       }),
     ),
     buildPatchList(

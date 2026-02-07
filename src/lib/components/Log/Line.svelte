@@ -7,6 +7,8 @@ import type { Line } from '#lib/core/shape/types.js'
 import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
+import Emoji from '#lib/components/Emoji/Emoji.svelte'
+
 type Props = {
   store: Store
   line: Line
@@ -26,10 +28,31 @@ const { _: labelList } = $derived(
 )
 </script>
 
-{labelList.map((label) =>
-  (label.icon ? label.icon + ' ' : '') + label.name
-).join(', ')}
+{#if labelList.length > 0}
+  {#each labelList as label (label.id)}
+    <span class="label" style:--color={label.color}>
+      {#if label.icon}
+        <Emoji native={label.icon} />
+      {/if}
+      {label.name}
+    </span>
+  {/each}
+  <br />
+{/if}
 
-<br />
+{#if line.description}
+  <em>{line.description}</em>
+  <br />
+{/if}
 
 <code>{formatDuration(line.durationMs)}</code>
+
+<style>
+  .label {
+    --color: var(--color-grey-100);
+    background-color: var(--color);
+    color: contrast-color(var(--color));
+    padding-inline: var(--size-2);
+    border-radius: var(--radius-xs);
+  }
+</style>

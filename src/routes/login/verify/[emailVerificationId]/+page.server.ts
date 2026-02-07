@@ -55,13 +55,9 @@ const actions = {
 
     const formData = await request.formData()
     const token = formData.get('token')
-    const timeZone = formData.get('timeZone')
 
     if (typeof token !== 'string' || token.trim().length === 0) {
       return fail(400, { error: 'Token is required' })
-    }
-    if (typeof timeZone !== 'string' || timeZone.trim().length === 0) {
-      return fail(400, { error: 'Time zone is required' })
     }
 
     const db = getDb()
@@ -108,7 +104,6 @@ const actions = {
         db,
         set: {
           id: genId(),
-          timeZone,
           email: emailVerification.email,
           stravaClientId: null,
           stravaClientSecret: null,

@@ -35,7 +35,6 @@ const topoSortParentsFirst = <T, Id extends string>(
     const childId = getId(child)
     for (const parentId of getParentIdList(child)) {
       if (!(parentId in byId)) {
-        console.warn(`[topoSortParentsFirst] Missing parent: ${parentId}`)
         continue
       }
       childrenByParent[parentId].push(childId)

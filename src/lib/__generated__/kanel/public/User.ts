@@ -8,8 +8,6 @@ export type UserId = string & { __brand: 'public.user' };
 export default interface UserTable {
   id: ColumnType<UserId, UserId, UserId>;
 
-  timeZone: ColumnType<string, string, string>;
-
   stravaClientId: ColumnType<string | null, string | null, string | null>;
 
   stravaClientSecret: ColumnType<string | null, string | null, string | null>;
@@ -33,7 +31,6 @@ export const userId = z.string() as unknown as z.Schema<UserId>;
 
 export const user = z.object({
   id: userId,
-  timeZone: z.string(),
   stravaClientId: z.string().nullable().nullable(),
   stravaClientSecret: z.string().nullable().nullable(),
   stravaSession: z.record(z.string(), z.unknown()).nullable().nullable(),
@@ -44,7 +41,6 @@ export const user = z.object({
 
 export const userInitializer = z.object({
   id: userId,
-  timeZone: z.string(),
   stravaClientId: z.string().nullable().optional().nullable(),
   stravaClientSecret: z.string().nullable().optional().nullable(),
   stravaSession: z.record(z.string(), z.unknown()).nullable().optional().nullable(),
@@ -55,7 +51,6 @@ export const userInitializer = z.object({
 
 export const userMutator = z.object({
   id: userId.optional(),
-  timeZone: z.string().optional(),
   stravaClientId: z.string().nullable().optional().nullable(),
   stravaClientSecret: z.string().nullable().optional().nullable(),
   stravaSession: z.record(z.string(), z.unknown()).nullable().optional().nullable(),

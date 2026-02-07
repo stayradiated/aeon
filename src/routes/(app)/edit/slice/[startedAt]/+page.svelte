@@ -9,7 +9,7 @@ import { page } from '$app/state'
 
 import { getActivePointRecord } from '#lib/core/select/get-active-point-record.js'
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
-import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
+import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
@@ -18,7 +18,7 @@ const { store } = $derived(data)
 
 const startedAt = Number.parseInt(page.params.startedAt ?? '-1', 10)
 
-const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const { _: timeZone } = $derived(watch(getTimeZone(store, startedAt)))
 const { _: pointRecord } = $derived(
   watch(getActivePointRecord(store, startedAt)),
 )
@@ -70,6 +70,8 @@ const handleDelete = async () => {
   await goto('/log')
 }
 </script>
+
+<div>Time Zone: <em>{timeZone}</em></div>
 
 <form onsubmit={handleSlide}>
   <input

@@ -10,13 +10,16 @@ import { goto } from '$app/navigation'
 
 import { getActivePoint } from '#lib/core/select/get-active-point.js'
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
-import { getUserTimeZone } from '#lib/core/select/get-user-time-zone.js'
+import { getTimeZone } from '#lib/core/select/get-time-zone.js'
+import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
 import { clock } from '#lib/utils/clock.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
 import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first'
 import { watch } from '#lib/utils/watch.svelte.js'
+
+import TimeZoneManager from '#lib/components/TimeZoneManager/TimeZoneManager.svelte'
 
 import StreamStatus from './StreamStatus.svelte'
 
@@ -27,21 +30,24 @@ type Props = {
 const { store }: Props = $props()
 
 const { _: now } = $derived(watch(clock))
-const { _: timeZone } = $derived(watch(getUserTimeZone(store)))
+const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
 const { _: streamList } = $derived(watch(getStreamList(store)))
+const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 
 let formState = $state.raw<Record<StreamId, StreamState | undefined>>({})
 
+const DATE_FORMAT = "yyyy-MM-dd'T'HH:mm"
+
 let [nowDate, nowTime] = $derived(
   dateFns
-    .format(clock.value, "yyyy-MM-dd'T'HH:mm", {
+    .format(clock.value, DATE_FORMAT, {
       in: tz(timeZone),
     })
     .split('T'),
 )
 const currentTime = $derived(
   dateFns
-    .parse(`${nowDate} ${nowTime}`, 'yyyy-MM-dd HH:mm', new Date(), {
+    .parse(`${nowDate}T${nowTime}`, DATE_FORMAT, new Date(), {
       in: tz(timeZone),
     })
     .getTime(),
@@ -49,7 +55,7 @@ const currentTime = $derived(
 
 const handleNow = (_event: MouseEvent) => {
   ;[nowDate, nowTime] = dateFns
-    .format(clock.value, "yyyy-MM-dd'T'HH:mm", {
+    .format(clock.value, DATE_FORMAT, {
       in: tz(timeZone),
     })
     .split('T')
@@ -138,21 +144,40 @@ const handleSubmit = async () => {
 
   void goto('/log')
 }
+
+const handleChangeTimeZone = (timeZone: string) => {
+  if (!timeZoneStream) {
+    return
+  }
+  formState = {
+    ...formState,
+    [timeZoneStream.id]: {
+      description: timeZone,
+      labelIdList: [],
+      createdLabelList: [],
+    },
+  }
+}
 </script>
 
 <main>
   {#each streamList as stream (stream.id)}
-    {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
-    <StreamStatus
-      {store}
-      {stream}
-      {currentTime}
-      {parentState}
-      state={formState[stream.id]}
-      onchange={(state) => {
-        formState = { ...formState, [stream.id]: state }
-      }}
-    />
+    {#if stream.id === timeZoneStream?.id}
+      {@const selectedTimeZone = formState[stream.id]?.description ?? timeZone}
+      <TimeZoneManager timeZone={selectedTimeZone} onChange={handleChangeTimeZone} />
+    {:else}
+      {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
+      <StreamStatus
+        {store}
+        {stream}
+        {currentTime}
+        {parentState}
+        state={formState[stream.id]}
+        onchange={(state) => {
+          formState = { ...formState, [stream.id]: state }
+        }}
+      />
+    {/if}
   {/each}
 
   <div class="datetime-row">

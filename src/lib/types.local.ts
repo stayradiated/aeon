@@ -9,7 +9,6 @@ import type {
 type LocalUser = {
   readonly id: UserId
   email: string
-  timeZone: string
 }
 
 type LocalLabel = {
