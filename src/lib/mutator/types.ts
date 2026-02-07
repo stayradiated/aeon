@@ -70,9 +70,17 @@ type Mutators = {
     description: string
     startedAt: number
   }>
-  point_slide: Mutator<{
+  point_setDescription: Mutator<{
+    pointId: PointId
+    description: string
+  }>
+  point_setStartedAt: Mutator<{
     pointId: PointId
     startedAt: number
+  }>
+  point_setLabelIdList: Mutator<{
+    pointId: PointId
+    labelIdList: readonly LabelId[]
   }>
   point_delete: Mutator<{
     pointId: PointId

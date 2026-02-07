@@ -46,22 +46,22 @@ const handleUseBrowserTimeZone = async () => {
 </div>
 
 <style>
-	.TimeZoneManager {
-		padding: 0 var(--size-3);
-		background: var(--theme-background);
-		border: none;
-		color: var(--theme-text-main);
-		border-radius: var(--radius-xs);
-		cursor: pointer;
-		justify-content: space-between;
-		line-height: var(--line-xl);
-		border-bottom: 1px solid var(--theme-border);
-	}
+  .TimeZoneManager {
+    padding: 0 var(--size-3);
+    background: var(--theme-background);
+    border: none;
+    color: var(--theme-text-main);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    justify-content: space-between;
+    line-height: var(--line-xl);
+    border-bottom: 1px solid var(--theme-border);
+  }
 
-	.label {
-		font-weight: var(--weight-bold);
-		font-size: var(--scale-1);
-	}
+  .label {
+    font-weight: var(--weight-bold);
+    font-size: var(--scale-1);
+  }
 
   .info {
     background: var(--color-yellow-300);

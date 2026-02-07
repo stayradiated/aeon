@@ -52,7 +52,6 @@ const { _: labelList } = $derived(
     --color: var(--color-grey-100);
     background-color: var(--color);
     color: contrast-color(var(--color));
-    padding-inline: var(--size-2);
     border-radius: var(--radius-xs);
   }
 </style>

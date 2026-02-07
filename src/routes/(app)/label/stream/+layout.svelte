@@ -27,10 +27,10 @@ const activeStreamId = $derived(page.params.streamId as StreamId)
 {@render children?.()}
 
 <style>
-	nav {
-		display: flex;
+  nav {
+    display: flex;
     flex-wrap: wrap;
-		gap: var(--size-2);
+    gap: var(--size-2);
 
     a {
       display: block;
@@ -53,5 +53,5 @@ const activeStreamId = $derived(page.params.streamId as StreamId)
         }
       }
     }
-	}
+  }
 </style>

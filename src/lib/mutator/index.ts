@@ -16,8 +16,10 @@ const mutators: LocalMutatorDefsImportMap = {
   label_squash: import('./label-squash.js'),
 
   point_create: import('./point-create.js'),
-  point_slide: import('./point-slide.js'),
   point_delete: import('./point-delete.js'),
+  point_setDescription: import('./point-set-description.js'),
+  point_setLabelIdList: import('./point-set-label-id-list.js'),
+  point_setStartedAt: import('./point-set-started-at.js'),
 
   migrate_fixupLabelParents: import('./migrate-fixup-label-parents.js'),
 

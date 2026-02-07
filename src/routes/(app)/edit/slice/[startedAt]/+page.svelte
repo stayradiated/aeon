@@ -8,10 +8,11 @@ import { goto } from '$app/navigation'
 import { page } from '$app/state'
 
 import { getActivePointRecord } from '#lib/core/select/get-active-point-record.js'
-import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
+
+import PointManager from '#lib/components/PointManager/PointManager.svelte'
 
 let { data }: PageProps = $props()
 const { store } = $derived(data)
@@ -22,8 +23,6 @@ const { _: timeZone } = $derived(watch(getTimeZone(store, startedAt)))
 const { _: pointRecord } = $derived(
   watch(getActivePointRecord(store, startedAt)),
 )
-const { _: streamList } = $derived(watch(getStreamList(store)))
-
 const DATE_FORMAT = `yyyy-MM-dd'T'HH:mm`
 
 let timestamp = $derived(
@@ -32,21 +31,23 @@ let timestamp = $derived(
   }),
 )
 
-const handleSlide = async (event: SubmitEvent) => {
-  event.preventDefault()
-
-  const nextStartedAt = dateFns
+const userStartedAt = $derived(
+  dateFns
     .parse(timestamp, DATE_FORMAT, new Date(), {
       in: tz(timeZone),
     })
-    .getTime()
+    .getTime(),
+)
 
-  if (startedAt !== nextStartedAt) {
+const handleSlide = async (event: SubmitEvent) => {
+  event.preventDefault()
+
+  if (startedAt !== userStartedAt) {
     for (const point of Object.values(pointRecord)) {
       if (point.startedAt === startedAt) {
-        await store.mutate.point_slide({
+        await store.mutate.point_setStartedAt({
           pointId: point.id,
-          startedAt: nextStartedAt,
+          startedAt: userStartedAt,
         })
       }
     }
@@ -54,63 +55,61 @@ const handleSlide = async (event: SubmitEvent) => {
 
   await goto('/log')
 }
-
-const handleDelete = async () => {
-  const confirm = window.confirm('Are you sure you want to delete this point?')
-  if (!confirm) {
-    return
-  }
-
-  for (const point of Object.values(pointRecord)) {
-    if (point.startedAt === startedAt) {
-      await store.mutate.point_delete({ pointId: point.id })
-    }
-  }
-
-  await goto('/log')
-}
 </script>
 
-<div>Time Zone: <em>{timeZone}</em></div>
+<main>
+  <h3>Edit</h3>
 
-<form onsubmit={handleSlide}>
-  <input
-    type="datetime-local"
-    name="startedAtLocal"
-    bind:value={timestamp}
-  />
-  <button type="submit">Update</button>
-</form>
+  <form class="slide" onsubmit={handleSlide}>
+    <fieldset>
+      <input
+        type="datetime-local"
+        name="startedAtLocal"
+        bind:value={timestamp}
+      />
+      <button type="submit" disabled={userStartedAt === startedAt}>Adjust Time</button>
+    </fieldset>
+  </form>
 
-<ul>
-  {#each streamList as stream (stream.id)}
-    {@const point = pointRecord[stream.id]}
-    {#if point}
-      {@const isActive = point.startedAt === startedAt}
-      <li class="stream" class:isActive>
-        <strong>{stream.name}:</strong><code>{point.description}</code>
-        <ul>
-          {#each point.labelIdList as labelId (labelId)}
-            {@const label = store.label.get(labelId).value}
-            {#if label}
-              <li>
-                {label.icon} {label.name}
-              </li>
-            {/if}
-          {/each}
-        </ul>
-      </li>
-    {/if}
-  {/each}
-</ul>
-
-<button type="button" onclick={handleDelete}>Delete Points</button>
+  <PointManager {store} initialStartedAt={startedAt} />
+</main>
 
 <style>
-  li.stream:not(.isActive) {
-    opacity: 0.8;
+  main {
+    max-width: var(--width-md);
+    margin: 0 auto;
   }
-  li.isActive > strong {
-    background: var(--color-yellow-300);
+
+  form.slide {
+    fieldset {
+      display: flex;
+      gap: var(--size-2);
+      padding: var(--size-2);
+      border: var(--size-px) solid var(--theme-border);
+      border-radius: var(--radius-xs);
+    }
+
+    input {
+      flex: 1;
+      background: var(--theme-background);
+      color: var(--theme-text-main);
+      border: none;
+      border-radius: var(--radius-xs);
+      line-height: var(--line-xl);
+    }
+
+    button {
+      background: var(--theme-button-base);
+      border-radius: var(--radius-sm);
+      padding-inline: var(--size-2);
+      border: none;
+
+      &:hover {
+        background-color: var(--theme-button-hover);
+      }
+      &:disabled {
+        background: var(--theme-background-alt);
+      }
+    }
   }
 </style>

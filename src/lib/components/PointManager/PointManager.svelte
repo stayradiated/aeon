@@ -2,9 +2,10 @@
 import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
-import type { StreamState } from '#lib/components/Add/StreamStatus.svelte'
 import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
+import type { PointInputValue } from './PointInput.svelte'
+import type { StreamState } from './StreamStatus.svelte'
 
 import { goto } from '$app/navigation'
 
@@ -15,46 +16,54 @@ import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
 import { clock } from '#lib/utils/clock.js'
 import { genId } from '#lib/utils/gen-id.js'
+import { isSetEqual } from '#lib/utils/is-set-equal.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
 import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import TimeZoneManager from '#lib/components/TimeZoneManager/TimeZoneManager.svelte'
 
+import PointInput from './PointInput.svelte'
 import StreamStatus from './StreamStatus.svelte'
-
-type Props = {
-  store: Store
-}
-
-const { store }: Props = $props()
-
-const { _: now } = $derived(watch(clock))
-const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
-const { _: streamList } = $derived(watch(getStreamList(store)))
-const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
-
-let formState = $state.raw<Record<StreamId, StreamState | undefined>>({})
 
 const DATE_FORMAT = "yyyy-MM-dd'T'HH:mm"
 
-let [nowDate, nowTime] = $derived(
+type Props = {
+  store: Store
+  initialStartedAt: number
+  canEditClock?: boolean
+}
+
+const { store, initialStartedAt, canEditClock }: Props = $props()
+
+const { _: now } = $derived(watch(clock))
+const { _: streamList } = $derived(watch(getStreamList(store)))
+const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
+const { _: initialTimeZone } = $derived(
+  watch(getTimeZone(store, initialStartedAt)),
+)
+
+let formState = $state.raw<Record<StreamId, StreamState | undefined>>({})
+let timeZone = $derived(initialTimeZone)
+
+let [initialDate, initialTime] = $derived(
   dateFns
-    .format(clock.value, DATE_FORMAT, {
-      in: tz(timeZone),
-    })
+    .format(initialStartedAt, DATE_FORMAT, { in: tz(timeZone) })
     .split('T'),
 )
-const currentTime = $derived(
+
+// timestamp derived from the user clock
+const visibleTimestamp = $derived(
   dateFns
-    .parse(`${nowDate}T${nowTime}`, DATE_FORMAT, new Date(), {
+    .parse(`${initialDate}T${initialTime}`, DATE_FORMAT, new Date(), {
       in: tz(timeZone),
     })
     .getTime(),
 )
 
-const handleNow = (_event: MouseEvent) => {
-  ;[nowDate, nowTime] = dateFns
+// adjust the user clock to the current time
+const handleSetNow = (_event: MouseEvent) => {
+  ;[initialDate, initialTime] = dateFns
     .format(clock.value, DATE_FORMAT, {
       in: tz(timeZone),
     })
@@ -92,11 +101,22 @@ const handleSubmit = async () => {
   }
 
   for (const [streamId, { state, stream }] of formStateEntryList) {
+    const activePoint = getActivePoint(store, stream.id, visibleTimestamp).value
+
+    if (state?.type === 'delete') {
+      // delete the point
+      if (activePoint) {
+        await store.mutate.point_delete({ pointId: activePoint.id })
+      }
+      continue
+    }
+
+    // assume state.type === 'edit'
     const { description, labelIdList, createdLabelList } = state
 
     // lookup the parent point if it exists
     const parentPoint = stream.parentId
-      ? getActivePoint(store, stream.parentId, currentTime).value
+      ? getActivePoint(store, stream.parentId, visibleTimestamp).value
       : undefined
     const parentLabelIdList: LabelId[] = parentPoint
       ? [...parentPoint.labelIdList]
@@ -133,50 +153,109 @@ const handleSubmit = async () => {
       }
     }
 
+    if (activePoint?.startedAt === visibleTimestamp) {
+      // edit existing point
+      if (description !== activePoint.description) {
+        await store.mutate.point_setDescription({
+          pointId: activePoint.id,
+          description,
+        })
+      }
+      if (!isSetEqual(labelIdList, activePoint.labelIdList)) {
+        await store.mutate.point_setLabelIdList({
+          pointId: activePoint.id,
+          labelIdList,
+        })
+      }
+    } else {
+      // create new point
+      await store.mutate.point_create({
+        pointId: genId(),
+        streamId,
+        description,
+        labelIdList,
+        startedAt: visibleTimestamp,
+      })
+    }
+  }
+
+  if (timeZone !== initialTimeZone && timeZoneStream) {
     await store.mutate.point_create({
       pointId: genId(),
-      streamId,
-      description,
-      labelIdList,
-      startedAt: currentTime,
+      streamId: timeZoneStream.id,
+      description: timeZone,
+      labelIdList: [],
+      startedAt: visibleTimestamp,
     })
   }
 
   void goto('/log')
 }
 
-const handleChangeTimeZone = (timeZone: string) => {
+const handleChangeTimeZone = (nextTimeZone: string) => {
   if (!timeZoneStream) {
     return
   }
+  timeZone = nextTimeZone
+}
+
+const handlePointInputChange = (streamId: StreamId, value: PointInputValue) => {
+  const prevState = formState[streamId]
+  if (prevState?.type === 'edit') {
+    formState = {
+      ...formState,
+      [streamId]: {
+        type: 'edit',
+        description: value.description ?? prevState.description,
+        labelIdList: value.labelIdList ?? prevState.labelIdList,
+        createdLabelList: value.createdLabelList ?? prevState.createdLabelList,
+      },
+    }
+  }
+}
+
+const handleReset = (streamId: StreamId) => {
   formState = {
     ...formState,
-    [timeZoneStream.id]: {
-      description: timeZone,
-      labelIdList: [],
-      createdLabelList: [],
-    },
+    [streamId]: undefined,
   }
 }
 </script>
 
-<main>
+<div class="PointManager">
   {#each streamList as stream (stream.id)}
     {#if stream.id === timeZoneStream?.id}
-      {@const selectedTimeZone = formState[stream.id]?.description ?? timeZone}
-      <TimeZoneManager timeZone={selectedTimeZone} onChange={handleChangeTimeZone} />
-    {:else}
-      {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
-      <StreamStatus
-        {store}
-        {stream}
-        {currentTime}
-        {parentState}
-        state={formState[stream.id]}
-        onchange={(state) => {
-          formState = { ...formState, [stream.id]: state }
-        }}
+      <TimeZoneManager
+        {timeZone}
+        onChange={handleChangeTimeZone}
       />
+    {:else}
+      {@const state = formState[stream.id]}
+      {#if state?.type === 'edit'}
+        {@const parentState = stream.parentId ? formState[stream.parentId] : undefined}
+        <PointInput
+          autofocus
+          {store}
+          {stream}
+          currentTime={visibleTimestamp}
+          parentLabelIdList={parentState?.type === 'edit' ? parentState.labelIdList : undefined}
+          description={state.description}
+          labelIdList={state.labelIdList}
+          createdLabelList={state.createdLabelList}
+          onchange={(value) => handlePointInputChange(stream.id, value)}
+          onreset={() => handleReset(stream.id)}
+        />
+      {:else}
+        <StreamStatus
+          {store}
+          {stream}
+          {state}
+          currentTime={visibleTimestamp}
+          onchange={(state) => {
+            formState = { ...formState, [stream.id]: state }
+          }}
+        />
+      {/if}
     {/if}
   {/each}
 
@@ -186,30 +265,29 @@ const handleChangeTimeZone = (timeZone: string) => {
       type="date"
       class="date-input"
       name="startedAtDate"
-      bind:value={nowDate}
+      bind:value={initialDate}
+      disabled={!canEditClock}
     />
     <input
       required
       type="time"
       class="time-input"
       name="startedAtTime"
-      bind:value={nowTime}
+      bind:value={initialTime}
+      disabled={!canEditClock}
     />
 
     <p class="datetime-relative">
-      {dateFns.formatDistance(currentTime, now, { includeSeconds: true, addSuffix: true })}
+      {dateFns.formatDistance(visibleTimestamp, now, { includeSeconds: true, addSuffix: true })}
     </p>
-    <button type="button" class="now-button" onclick={handleNow}>Now</button>
+    <button type="button" class="now-button" onclick={handleSetNow} disabled={!canEditClock}>Now</button>
   </div>
 
   <button type="button" onclick={handleSubmit} class="save-button">Save</button>
-</main>
+</div>
 
 <style>
-  main {
-    max-width: var(--width-md);
-    margin: 0 auto;
-
+  .PointManager {
     display: flex;
     flex-direction: column;
     padding: var(--size-3);
@@ -268,8 +346,14 @@ const handleChangeTimeZone = (timeZone: string) => {
     font-size: var(--scale-000);
     color: var(--theme-text-muted);
     font-weight: var(--weight-bold);
-  }
-  .now-button:hover {
-    color: var(--theme-text-main);
+
+    &:hover {
+      color: var(--theme-text-main);
+    }
+    &:disabled {
+      color: var(--color-grey-400);
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
   }
 </style>
