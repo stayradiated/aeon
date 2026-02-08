@@ -3,6 +3,12 @@ import { dropAllDatabases } from 'replicache'
 
 import type { PageProps } from './$types'
 
+import { enhance } from '$app/forms'
+
+import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
+
+import { watch } from '#lib/utils/watch.svelte.js'
+
 import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
 
@@ -10,6 +16,8 @@ const { data }: PageProps = $props()
 const { store } = $derived(data)
 
 import { openFilePicker } from '#lib/utils/open-file-picker.js'
+
+const { _: sessionUser } = $derived(watch(store.user.get(store.sessionUserId)))
 
 const handleResetReplicache = async () => {
   await dropAllDatabases()
@@ -56,6 +64,29 @@ const handleAssignLabelParent = async () => {
 
 <main>
   <h1>Settings</h1>
+
+  <section>
+    <div class="user">
+      {#if sessionUser}
+        <span>Logged in as {sessionUser.email}</span>
+      {/if}
+      <form
+        use:enhance={() => {
+          return async (event) => {
+            await event.update()
+            if (event.result.type === 'redirect') {
+              await resetReplicache()
+              await dropAllDatabases()
+              console.log('dropped all the databases')
+            }
+          }
+        }}
+        action="/?/logout"
+        method="post">
+        <button type="submit">Logout</button>
+      </form>
+    </div>
+  </section>
 
   <section>
     <h2>Debug</h2>

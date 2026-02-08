@@ -7,6 +7,7 @@ type Option = {
 }
 
 type Props = {
+  autofocus?: boolean
   optionList: readonly Option[]
   selectedList: readonly Option[]
   placeholder?: string
@@ -14,8 +15,14 @@ type Props = {
   oncreate?: (label: string) => void
 }
 
-const { optionList, selectedList, placeholder, onchange, oncreate }: Props =
-  $props()
+const {
+  autofocus,
+  optionList,
+  selectedList,
+  placeholder,
+  onchange,
+  oncreate,
+}: Props = $props()
 
 let inputEl = $state<HTMLInputElement>()
 let searchQuery = $state('')
@@ -38,8 +45,10 @@ const filteredOptionList = $derived.by(() => {
 })
 
 onMount(() => {
-  // auto-focus the input on mount
-  inputEl?.focus()
+  if (autofocus) {
+    // auto-focus the input on mount
+    inputEl?.focus()
+  }
 })
 
 const handleFocus = () => {

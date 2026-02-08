@@ -89,10 +89,10 @@ let multiDaySliceList = $derived.by(() => {
 })
 </script>
 
-{#each multiDaySliceList as { date, startedAt, timeZone, sliceList }, index (index)}
+{#each multiDaySliceList as { startedAt, timeZone, sliceList }, index (index)}
   {@const prevTimeZone = multiDaySliceList[index + 1]?.timeZone}
   <div class="container">
-    <h2>{date}</h2>
+    <h2>{dateFns.format(startedAt, 'PPPP', { in: tz(timeZone) })}</h2>
     <SliceList {store} {timeZone} {sliceList} />
   </div>
   {#if timeZone !== prevTimeZone}
@@ -110,11 +110,11 @@ let multiDaySliceList = $derived.by(() => {
 {/each}
 
 <style>
-	.container {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 1rem;
-	}
+  .container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
 
   .timeZoneChange {
     margin-top: var(--size-4);

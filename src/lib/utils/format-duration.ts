@@ -31,33 +31,39 @@ const formatDuration = (ms: number): string => {
   )
 }
 
-const formatDurationRough = (durationMs: number): string => {
-  // Over 48 hours, show number of days to 1 decimal place
-  // over 1 hour, show hours and minutes
-  // over 1 minute, show minutes
-  // otherwise, show "< 1 min"
+const formatDurationRough = (input: number): string => {
+  if (input === 0) {
+    return '0m'
+  }
 
+  const prefix = input < 0 ? '-' : ''
+  const durationMs = Math.abs(input)
+
+  // Over 48 hours, show number of days to 1 decimal place
   const days = durationMs / 1000 / 60 / 60 / 24
   if (days > 2) {
     const daysRounded = Math.round(days * 10) / 10
-    return `${daysRounded}d`
+    return `${prefix}${daysRounded}d`
   }
 
   const hours = Math.floor(durationMs / 1000 / 60 / 60)
   const minutes = Math.floor((durationMs / 1000 / 60) % 60)
+  // over 1 hour, show hours and minutes
   if (hours >= 1) {
     if (minutes === 0) {
-      return `${hours}h`
+      return `${prefix}${hours}h`
     }
 
-    return `${hours}h ${minutes}m`
+    return `${prefix}${hours}h ${minutes}m`
   }
 
+  // over 1 minute, show minutes
   if (minutes >= 1) {
-    return `${minutes}m`
+    return `${prefix}${minutes}m`
   }
 
-  return '<1m'
+  // otherwise, show "<1m"
+  return `<${prefix}1m`
 }
 
 export { formatTime, formatDuration, formatDurationRough }

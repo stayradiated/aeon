@@ -2,7 +2,10 @@ import type { ServerMutator } from './types.ts'
 
 import { updatePoint } from '#lib/server/db/point/update-point.js'
 
-const pointSlide: ServerMutator<'point_slide'> = async (context, options) => {
+const pointSetStartedAt: ServerMutator<'point_setStartedAt'> = async (
+  context,
+  options,
+) => {
   const { db } = context
   const { pointId, startedAt } = options
 
@@ -21,4 +24,4 @@ const pointSlide: ServerMutator<'point_slide'> = async (context, options) => {
   }
 }
 
-export default pointSlide
+export default pointSetStartedAt

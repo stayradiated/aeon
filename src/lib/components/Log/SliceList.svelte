@@ -71,9 +71,9 @@ const streamColumnIndexRecord: Record<StreamId, number> = $derived(
     display: contents;
   }
 
-	.cell {
+  .cell {
     grid-column: var(--col);
     grid-row: var(--row);
-		white-space: pre-wrap;
-	}
+    white-space: pre-wrap;
+  }
 </style>

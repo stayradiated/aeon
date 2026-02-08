@@ -6,6 +6,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label, Stream } from '#lib/types.local.js'
 
+import { getActivePoint } from '#lib/core/select/get-active-point.js'
 import { getFilteredLabelList } from '#lib/core/select/get-filtered-label-list.js'
 
 import { genId } from '#lib/utils/gen-id.js'
@@ -13,33 +14,50 @@ import { watch } from '#lib/utils/watch.svelte.js'
 
 import MultiSelect from '#lib/components/MultiSelect/MultiSelect.svelte'
 
+export type PointInputValue = {
+  description?: string
+  labelIdList?: readonly LabelId[]
+  createdLabelList?: readonly Pick<Label, 'id' | 'icon' | 'name'>[]
+}
+
 type Props = {
   store: Store
   stream: Stream
-  parentLabelIdList: readonly LabelId[]
+  parentLabelIdList?: readonly LabelId[]
+  currentTime: number
+
+  autofocus?: boolean
 
   description: string
   labelIdList: readonly LabelId[]
   createdLabelList: readonly Pick<Label, 'id' | 'icon' | 'name'>[]
 
   onreset: () => void
-  onchange: (value: {
-    description?: string
-    labelIdList?: readonly LabelId[]
-    createdLabelList?: readonly Pick<Label, 'id' | 'icon' | 'name'>[]
-  }) => void
+  onchange: (value: PointInputValue) => void
 }
 
 let {
   store,
   stream,
-  parentLabelIdList,
+  currentTime,
+  parentLabelIdList: maybeParentLabelIdList,
+  autofocus,
   description,
   labelIdList,
   createdLabelList,
   onchange,
   onreset,
 }: Props = $props()
+
+const { _: currentParentPoint } = $derived(
+  stream.parentId
+    ? watch(getActivePoint(store, stream.parentId, currentTime))
+    : watch.undefined,
+)
+
+const parentLabelIdList = $derived(
+  maybeParentLabelIdList ?? currentParentPoint?.labelIdList ?? [],
+)
 
 const uid = $props.id()
 
@@ -145,6 +163,7 @@ const handleCreateLabel = (name: string) => {
   </div>
 
   <MultiSelect
+    {autofocus}
     {optionList}
     {selectedList}
     placeholder="Add label…"
@@ -166,67 +185,67 @@ const handleCreateLabel = (name: string) => {
 </div>
 
 <style>
-	.container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding-bottom: 1rem;
-	}
+  .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1rem;
+  }
 
-	.row {
-		display: flex;
-		justify-content: space-between;
-	}
+  .row {
+    display: flex;
+    justify-content: space-between;
+  }
 
-	label {
-		font-weight: bold;
-		line-height: 2rem;
-		color: var(--theme-text-main);
-	}
+  label {
+    font-weight: bold;
+    line-height: 2rem;
+    color: var(--theme-text-main);
+  }
 
-	.textarea-container {
-		display: flex;
-		gap: var(--size-2);
-		padding-top: var(--size-2);
-	}
+  .textarea-container {
+    display: flex;
+    gap: var(--size-2);
+    padding-top: var(--size-2);
+  }
 
-	textarea {
-		flex: 1;
-		background: var(--theme-background);
-		color: var(--theme-text-main);
-		border: none;
-		border-radius: var(--radius-xs);
-		line-height: var(--line-xl);
-		resize: none;
-		padding: var(--size-1) var(--size-3);
-	}
-	textarea:focus {
-		outline: var(--size-px) solid var(--theme-focus);
-	}
+  textarea {
+    flex: 1;
+    background: var(--theme-background);
+    color: var(--theme-text-main);
+    border: none;
+    border-radius: var(--radius-xs);
+    line-height: var(--line-xl);
+    resize: none;
+    padding: var(--size-1) var(--size-3);
+  }
+  textarea:focus {
+    outline: var(--size-px) solid var(--theme-focus);
+  }
 
-	.clear-value-button {
-		border: none;
-		background: none;
-		cursor: pointer;
-		width: var(--size-10);
-		font-weight: var(--weight-bold);
-		background: var(--theme-background);
-		border-radius: var(--radius-xs);
-	}
-	.clear-value-button:hover {
-		background: var(--theme-background-alt);
-	}
+  .clear-value-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: var(--size-10);
+    font-weight: var(--weight-bold);
+    background: var(--theme-background);
+    border-radius: var(--radius-xs);
+  }
+  .clear-value-button:hover {
+    background: var(--theme-background-alt);
+  }
 
-	.reset-button {
-		border: none;
-		background: none;
-		text-transform: uppercase;
-		font-size: var(--scale-000);
-		cursor: pointer;
-		color: var(--theme-text-muted);
-		font-weight: var(--weight-bold);
-	}
-	.reset-button:hover {
-		color: var(--theme-text-main);
-	}
+  .reset-button {
+    border: none;
+    background: none;
+    text-transform: uppercase;
+    font-size: var(--scale-000);
+    cursor: pointer;
+    color: var(--theme-text-muted);
+    font-weight: var(--weight-bold);
+  }
+  .reset-button:hover {
+    color: var(--theme-text-main);
+  }
 </style>
