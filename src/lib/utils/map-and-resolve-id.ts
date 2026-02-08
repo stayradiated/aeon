@@ -46,6 +46,13 @@ const resolveId = <Id extends string>(map: IdMap<Id>, id: Id): Id | Error => {
   }
   return mappedId
 }
+const mustResolveId = <Id extends string>(map: IdMap<Id>, id: Id): Id => {
+  const mappedId = resolveId(map, id)
+  if (mappedId instanceof Error) {
+    throw mappedId
+  }
+  return mappedId
+}
 
 const maybeResolveId = <Id extends string>(
   map: IdMap<Id>,
@@ -57,5 +64,5 @@ const maybeResolveId = <Id extends string>(
   return null
 }
 
-export { createIdMap, resolveId, maybeResolveId }
+export { createIdMap, resolveId, mustResolveId, maybeResolveId }
 export type { IdMap }

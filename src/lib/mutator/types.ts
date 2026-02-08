@@ -37,9 +37,7 @@ type Mutators = {
     icon: string | undefined
   }>
   label_squash: Mutator<{
-    // these labels will be removed
     sourceLabelIdList: LabelId[]
-    // this label will be updated with the source label's parents
     destinationLabelId: LabelId
   }>
 
@@ -61,6 +59,10 @@ type Mutators = {
   }>
   stream_delete: Mutator<{
     streamId: StreamId
+  }>
+  stream_squash: Mutator<{
+    sourceStreamIdList: StreamId[]
+    destinationStreamId: StreamId
   }>
 
   point_create: Mutator<{

@@ -79,7 +79,8 @@ const upsertPoint = async (
 
     if (labelIdList.length > 0) {
       deletePointLabelQuery = deletePointLabelQuery.where(
-        sql<boolean>`${sql.ref('labelId')} <> all(${sql.val(labelIdList)})`,
+        (eb) =>
+          sql<boolean>`${eb.ref('labelId')} <> all(${eb.val(labelIdList)})`,
       )
     }
 
