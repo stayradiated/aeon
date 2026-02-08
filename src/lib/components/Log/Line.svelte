@@ -28,30 +28,36 @@ const { _: labelList } = $derived(
 )
 </script>
 
-{#if labelList.length > 0}
-  {#each labelList as label (label.id)}
-    <span class="label" style:--color={label.color}>
-      {#if label.icon}
-        <Emoji native={label.icon} />
-      {/if}
-      {label.name}
-    </span>
-  {/each}
-  <br />
-{/if}
+<div class="Line">
+  {#if labelList.length > 0}
+    {#each labelList as label (label.id)}
+      <span class="label" style:--color={label.color}>
+        {#if label.icon}
+          <Emoji native={label.icon} />
+        {/if}
+        {label.name}
+      </span>
+    {/each}
+  {/if}
 
-{#if line.description}
-  <em>{line.description}</em>
-  <br />
-{/if}
+  {#if line.description}
+    <em>{line.description}</em>
+  {/if}
 
-<code>{formatDuration(line.durationMs)}</code>
+  <code>{formatDuration(line.durationMs)}</code>
+</div>
 
 <style>
+  .Line {
+    display: flex;
+    flex-direction: column;
+  }
+
   .label {
     --color: var(--color-grey-100);
     background-color: var(--color);
     color: contrast-color(var(--color));
     border-radius: var(--radius-xs);
+    padding: var(--size-1);
   }
 </style>

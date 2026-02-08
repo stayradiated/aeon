@@ -65,6 +65,7 @@ const streamColumnIndexRecord: Record<StreamId, number> = $derived(
   .SliceList {
     display: grid;
     grid-template-columns: repeat(var(--num-cols), minmax(0, 1fr));
+    gap: var(--size-1);
   }
 
   header, section {
@@ -75,5 +76,10 @@ const streamColumnIndexRecord: Record<StreamId, number> = $derived(
     grid-column: var(--col);
     grid-row: var(--row);
     white-space: pre-wrap;
+  }
+
+  a {
+    text-decoration: none;
+    font-family: var(--font-mono);
   }
 </style>
