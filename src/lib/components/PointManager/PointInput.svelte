@@ -163,6 +163,7 @@ const handleCreateLabel = (name: string) => {
   </div>
 
   <MultiSelect
+    isCreatable
     {autofocus}
     {optionList}
     {selectedList}

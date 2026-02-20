@@ -31,12 +31,12 @@ const { _: labelList } = $derived(
 <div class="Line">
   {#if labelList.length > 0}
     {#each labelList as label (label.id)}
-      <span class="label" style:--color={label.color}>
+      <a class="label" style:--color={label.color} href="/label/edit/{label.id}">
         {#if label.icon}
           <Emoji native={label.icon} />
         {/if}
         {label.name}
-      </span>
+      </a>
     {/each}
   {/if}
 
@@ -59,5 +59,10 @@ const { _: labelList } = $derived(
     color: contrast-color(var(--color));
     border-radius: var(--radius-xs);
     padding: var(--size-1);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 </style>
