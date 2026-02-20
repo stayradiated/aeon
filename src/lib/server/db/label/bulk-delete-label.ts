@@ -2,7 +2,7 @@ import { errorBoundary } from '@stayradiated/error-boundary'
 import type { DeleteResult } from 'kysely'
 import { sql } from 'kysely'
 
-import type { LabelId, UserId } from '#lib/ids.js'
+import type { LabelId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
 
@@ -13,6 +13,7 @@ type BulkDeleteLabelOptions = {
   where: Where<{
     userId: UserId
     labelId?: LabelId
+    streamId?: StreamId
   }>
 }
 
@@ -27,6 +28,7 @@ const bulkDeleteLabel = async (
     query = extendWhere(query)
       .string('id', where.labelId)
       .string('userId', where.userId)
+      .string('streamId', where.streamId)
       .done()
 
     const list = await query.execute()

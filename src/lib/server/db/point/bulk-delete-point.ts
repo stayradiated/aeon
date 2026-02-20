@@ -2,7 +2,7 @@ import { errorBoundary } from '@stayradiated/error-boundary'
 import type { DeleteResult } from 'kysely'
 import { sql } from 'kysely'
 
-import type { PointId, UserId } from '#lib/ids.js'
+import type { PointId, StreamId, UserId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { Where } from '#lib/server/db/where.js'
 
@@ -13,6 +13,7 @@ type BulkDeletePointOptions = {
   where: Where<{
     userId: UserId
     pointId?: PointId
+    streamId?: StreamId
   }>
 }
 
@@ -27,6 +28,7 @@ const bulkDeletePoint = async (
     query = extendWhere(query)
       .string('id', where.pointId)
       .string('userId', where.userId)
+      .string('streamId', where.streamId)
       .done()
 
     const list = await query.execute()
