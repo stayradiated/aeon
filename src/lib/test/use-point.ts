@@ -12,6 +12,7 @@ import { genId } from '#lib/utils/gen-id.js'
 const pointFactory = createFactory<Point>('Point')
   .withContext<{
     db: KyselyDb
+    now?: number
     user?: Pick<User, 'id'>
     stream?: Pick<Stream, 'id'>
   }>()
@@ -21,7 +22,10 @@ const pointFactory = createFactory<Point>('Point')
     streamId: f
       .type<StreamId>()
       .maybeFrom('stream', ({ stream }) => stream?.id),
-    startedAt: f.type<number>().default(() => Date.now()),
+    startedAt: f
+      .type<number>()
+      .maybeFrom('now', ({ now }) => now)
+      .default(() => Date.now()),
     description: f.type<string>().default(''),
     labelIdList: f.type<LabelId[]>().default([]),
   }))

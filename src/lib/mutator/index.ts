@@ -2,10 +2,11 @@ import type { LocalMutatorDefsImportMap } from './types.js'
 
 const mutators: LocalMutatorDefsImportMap = {
   stream_create: import('./stream-create.js'),
-  stream_setParent: import('./stream-set-parent.js'),
-  stream_rename: import('./stream-rename.js'),
-  stream_sort: import('./stream-sort.js'),
   stream_delete: import('./stream-delete.js'),
+  stream_rename: import('./stream-rename.js'),
+  stream_setParent: import('./stream-set-parent.js'),
+  stream_sort: import('./stream-sort.js'),
+  stream_squash: import('./stream-squash.js'),
 
   label_addParentLabel: import('./label-add-parent-label.js'),
   label_create: import('./label-create.js'),
