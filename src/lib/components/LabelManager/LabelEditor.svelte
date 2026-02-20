@@ -20,6 +20,7 @@ type Props = {
 }
 
 const { store, labelId, onsubmit }: Props = $props()
+const uid = $props.id()
 
 const { _: label } = $derived(watch(store.label.get(labelId)))
 const { _: stream } = $derived(
@@ -78,13 +79,8 @@ const handleSubmit = async () => {
 {#if label}
   <div class="LabelEditor">
     <div>
-      <label>Parent
-        {#if stream?.parentId}
-          <SelectLabel {store} streamId={stream.parentId} value={parentLabelIdList} onchange={(value) => parentLabelIdList = value} />
-        {:else}
-          <p>n/a</p>
-        {/if}
-      </label>
+      <label>Name
+        <input type="text" name="name" bind:value={name} /></label>
     </div>
 
     <div>
@@ -101,11 +97,6 @@ const handleSubmit = async () => {
     </div>
 
     <div>
-      <label>Name
-        <input type="text" name="name" bind:value={name} /></label>
-    </div>
-
-    <div>
       <label>
         Color
         {#if color}
@@ -115,6 +106,21 @@ const handleSubmit = async () => {
           <button type="button" onclick={() => color =('#fff')}>Set Color</button>
         {/if}
       </label>
+    </div>
+
+    <div>
+      <label for="parent-{uid}">Parent</label>
+      {#if stream?.parentId}
+        <SelectLabel
+          id="parent-{uid}"
+          {store}
+          streamId={stream.parentId}
+          value={parentLabelIdList}
+          onchange={(value) => parentLabelIdList = value}
+        />
+      {:else}
+        <p>n/a</p>
+      {/if}
     </div>
 
     <button onclick={handleSubmit}>Save</button>

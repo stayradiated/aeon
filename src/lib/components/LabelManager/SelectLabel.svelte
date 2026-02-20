@@ -1,48 +1,50 @@
 <script lang="ts">
-import type { ChangeEventHandler } from 'svelte/elements'
-
 import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
 
-import { getLabelListGroupedByParent } from '#lib/core/select/get-label-list-grouped-by-parent.js'
+import { getLabelList } from '#lib/core/select/get-label-list.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
+import MultiSelect from '#lib/components/MultiSelect/MultiSelect.svelte'
+
 type Props = {
+  id?: string
   store: Store
   streamId: StreamId
   value: LabelId[]
   onchange?: (value: LabelId[]) => void
 }
 
-const { store, streamId, value, onchange }: Props = $props()
+const { id, store, streamId, value, onchange }: Props = $props()
 
-const { _: labelListGroupedByParent } = $derived(
-  watch(getLabelListGroupedByParent(store, streamId)),
+const { _: labelList } = $derived(watch(getLabelList(store, streamId)))
+
+const optionList = $derived(
+  labelList.map((label) => ({
+    value: label.id,
+    label: label.name,
+  })),
 )
 
-const handleChange: ChangeEventHandler<HTMLSelectElement> = (event) => {
-  const selected = Array.from(event.currentTarget.selectedOptions).map(
-    (option) => option.value as LabelId,
-  )
-  onchange?.(selected)
+const selectedList = $derived(
+  value.map((labelId) => ({
+    value: labelId,
+    label: labelList.find((label) => label.id === labelId)?.name ?? '',
+  })),
+)
+
+const handleChange = (
+  selectedList: Array<{ value: LabelId; label: string }>,
+) => {
+  onchange?.(selectedList.map(({ value }) => value))
 }
 </script>
 
-<select multiple {value} onchange={handleChange}>
-  {#each labelListGroupedByParent as [parentLabel, labelList] (parentLabel?.id)}
-    {#if parentLabel}
-      <option disabled>{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</option>
-    {/if}
-    {#each labelList as label (label.id)}
-      <option value={label.id}>{label.name}</option>
-    {/each}
-  {/each}
-</select>
-
-<style>
-  select {
-    display: block;
-    width: 100%;
-  }
-</style>
+<MultiSelect
+  {id}
+  {optionList}
+  {selectedList}
+  placeholder="Parent Labels"
+  onchange={handleChange}
+/>

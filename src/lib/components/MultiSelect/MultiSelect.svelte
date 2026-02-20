@@ -7,6 +7,8 @@ type Option = {
 }
 
 type Props = {
+  id?: string
+  isCreatable?: boolean
   autofocus?: boolean
   optionList: readonly Option[]
   selectedList: readonly Option[]
@@ -16,6 +18,8 @@ type Props = {
 }
 
 const {
+  id,
+  isCreatable = false,
   autofocus,
   optionList,
   selectedList,
@@ -97,7 +101,7 @@ const handleKeyDown = (
       const option = filteredOptionList[0]
       if (option) {
         handleAdd(option)
-      } else if (searchQuery.length > 0) {
+      } else if (isCreatable && searchQuery.length > 0) {
         handleCreate()
       }
     }
@@ -137,6 +141,7 @@ const handleRemoveAll = () => {
   </div>
 
   <input
+    {id}
     bind:this={inputEl}
     type="text"
     {placeholder}
@@ -153,7 +158,7 @@ const handleRemoveAll = () => {
           type="button"
           onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option) }}>{option.label}</button>
       {/each}
-      {#if searchQuery.length > 0}
+      {#if isCreatable && searchQuery.length > 0}
         <button
           type="button"
           onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleCreate() }}>Create: {searchQuery}</button>
