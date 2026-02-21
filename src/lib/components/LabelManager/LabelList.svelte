@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { ChangeEventHandler } from 'svelte/elements'
+import { SvelteSet } from 'svelte/reactivity'
 
 import type { Store } from '#lib/core/replicache/store.js'
 import type { LabelId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
 
-import Emoji from '#lib/components/Emoji/Emoji.svelte'
+import LabelListItem from './LabelListItem.svelte'
 
 type Props = {
   store: Store
@@ -13,20 +13,9 @@ type Props = {
   labelList: Label[]
 }
 
-const { parentLabel, labelList }: Props = $props()
+const { store, parentLabel, labelList }: Props = $props()
 
-let selectedLabelIdList: LabelId[] = $state([])
-let selectedAll = $derived(selectedLabelIdList.length === labelList.length)
-
-const handleToggleAll: ChangeEventHandler<HTMLInputElement> = (event) => {
-  const { checked } = event.currentTarget
-
-  if (checked) {
-    selectedLabelIdList = labelList.map((label) => label.id)
-  } else {
-    selectedLabelIdList = []
-  }
-}
+let selectedLabelIdSet = new SvelteSet<LabelId>([])
 </script>
 
 <section class="LabelList">
@@ -34,30 +23,18 @@ const handleToggleAll: ChangeEventHandler<HTMLInputElement> = (event) => {
     <h4 id="label-{parentLabel.id}">{parentLabel.icon ? parentLabel.icon + ' ' : ''}{parentLabel.name}</h4>
   {/if}
 
-  <label>
-    <input
-      type="checkbox"
-      onchange={handleToggleAll}
-      checked={selectedAll}
-      autocomplete="off"
-    />
-    <strong>Select All</strong></label>
-
   {#each labelList as label (label.id)}
-    <label style:--local-color={label.color}>
-      <div class="checkbox">
-        <input
-          type="checkbox"
-          name="label"
-          value={label.id}
-          bind:group={selectedLabelIdList}
-          autocomplete="off"
-        />
-      </div>
-      {#if label.icon}<Emoji native={label.icon} scale={3} />{/if}
-      <span>{label.name}</span>
-      <a href="/label/edit/{label.id}">Edit</a>
-    </label>
+    <LabelListItem
+      {store}
+      {label}
+      isSelected={selectedLabelIdSet.has(label.id)}
+      onchange={(isSelected) => {
+        if (isSelected) {
+          selectedLabelIdSet.add(label.id)
+        } else {
+          selectedLabelIdSet.delete(label.id)
+        }}}
+    />
   {/each}
 </section>
 
@@ -77,23 +54,5 @@ const handleToggleAll: ChangeEventHandler<HTMLInputElement> = (event) => {
     top: 0;
     background: var(--theme-background);
     padding: var(--size-2) var(--size-3);
-  }
-
-  label {
-    border-radius: var(--radius-sm);
-    background: color-mix(in lch, var(--local-color), transparent 80%);
-    display: flex;
-    gap: var(--size-2);
-    align-items: center;
-    height: var(--size-10);
-  }
-
-  .checkbox {
-    width: var(--size-10);
-    height: var(--size-10);
-    background: var(--local-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 </style>

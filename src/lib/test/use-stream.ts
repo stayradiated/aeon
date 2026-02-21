@@ -55,8 +55,4 @@ const streamFactory = createFactory<Stream>('Stream')
 const useCreateStream = streamFactory.useCreateValue
 const useStream = streamFactory.useValue
 
-export {
-  /** @knipignore **/
-  useCreateStream,
-  useStream,
-}
+export { useCreateStream, useStream }

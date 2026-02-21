@@ -1,4 +1,7 @@
 <script lang="ts">
+import { tz } from '@date-fns/tz'
+import * as dateFns from 'date-fns'
+
 import type { Store } from '#lib/core/replicache/store.js'
 import type { Slice } from '#lib/core/shape/types.js'
 import type { StreamId } from '#lib/ids.js'
@@ -6,7 +9,6 @@ import type { StreamId } from '#lib/ids.js'
 import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
-import { formatTime } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import Line from './Line.svelte'
@@ -33,6 +35,10 @@ const streamColumnIndexRecord: Record<StreamId, number> = $derived(
     filteredStreamList.map((stream, index) => [stream.id, index]),
   ),
 )
+
+const formatTime = (instant: number): string => {
+  return dateFns.format(instant, 'HH:mm', { in: tz(timeZone) })
+}
 </script>
 
 <div class="SliceList" style:--num-cols={1 + filteredStreamList.length}>
@@ -45,7 +51,7 @@ const streamColumnIndexRecord: Record<StreamId, number> = $derived(
 
   {#each sliceList as slice, index (index)}
     <section>
-      <div class="cell" style:--row={index + 2} style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(timeZone, slice.startedAt)}</a></div>
+      <div class="cell" style:--row={index + 2} style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(slice.startedAt)}</a></div>
 
       {#each slice.lineList as line (line.streamId)}
         {@const streamColumnIndex = streamColumnIndexRecord[line.streamId]}
