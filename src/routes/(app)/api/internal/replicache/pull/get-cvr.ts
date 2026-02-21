@@ -103,7 +103,7 @@ const getEntities = async (
       db,
       where: { userId: sessionUserId, labelId: { in: diff.label.puts } },
     }),
-    labelUsage: getLabelUsageList({
+    labelPopularity: getLabelUsageList({
       db,
       where: {
         userId: sessionUserId,
@@ -114,6 +114,13 @@ const getEntities = async (
             lte: Date.now(),
           },
         },
+      },
+    }),
+    labelUsage: getLabelUsageList({
+      db,
+      where: {
+        userId: sessionUserId,
+        labelId: { in: diff.label.puts },
       },
     }),
     stream: getStreamList({
@@ -137,8 +144,20 @@ const getEntities = async (
     return new Error('Could not get entities.', { cause: entities })
   }
 
-  const labelUsageRecord: Record<LabelId, number> = Object.fromEntries(
-    entities.labelUsage.map((usage) => [usage.id, usage.count]),
+  const labelPopularityRecord: Record<LabelId, number> = Object.fromEntries(
+    entities.labelPopularity.map((usage) => [usage.id, usage.count]),
+  )
+  const labelUsageRecord: Record<
+    LabelId,
+    { count: number; lastStartedAt: number }
+  > = Object.fromEntries(
+    entities.labelUsage.map((usage) => [
+      usage.id,
+      {
+        count: usage.count,
+        lastStartedAt: usage.maxStartedAt,
+      },
+    ]),
   )
 
   return Array.from<PatchOperation>({ length: 0 }).concat(
@@ -163,7 +182,9 @@ const getEntities = async (
         icon: entity.icon ?? undefined,
         color: entity.color ?? undefined,
         parentLabelIdList: entity.parentLabelIdList,
-        usage: labelUsageRecord[entity.id] ?? 0,
+        popularity: labelPopularityRecord[entity.id] ?? 0,
+        pointCount: labelUsageRecord[entity.id]?.count ?? 0,
+        lastStartedAt: labelUsageRecord[entity.id]?.lastStartedAt,
       }),
     ),
     buildPatchList(

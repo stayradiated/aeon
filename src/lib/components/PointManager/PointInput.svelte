@@ -79,7 +79,7 @@ const optionList = $derived(
   [
     ...streamLabelList.toSorted((a, b) => {
       // sort by usage
-      return b.usage - a.usage
+      return b.popularity - a.popularity
     }),
     ...createdLabelList,
   ].map((label) => toOption(label)),

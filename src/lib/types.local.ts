@@ -17,8 +17,10 @@ type LocalLabel = {
   name: string
   icon: string | undefined
   color: string | undefined
-  usage: number
   parentLabelIdList: readonly LabelId[]
+  popularity: number
+  pointCount: number
+  lastStartedAt: number | undefined
 }
 
 type LocalPoint = {

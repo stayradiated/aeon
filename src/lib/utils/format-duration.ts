@@ -1,4 +1,3 @@
-import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
 const formatDistanceLocale: Record<string, string> = {
@@ -16,10 +15,6 @@ const durationLocale = {
       `[[${token}=${count}]]`
     )
   },
-}
-
-const formatTime = (timeZone: string, instant: number): string => {
-  return dateFns.format(instant, 'HH:mm', { in: tz(timeZone) })
 }
 
 const formatDuration = (ms: number): string => {
@@ -66,4 +61,4 @@ const formatDurationRough = (input: number): string => {
   return `<${prefix}1m`
 }
 
-export { formatTime, formatDuration, formatDurationRough }
+export { formatDuration, formatDurationRough }
