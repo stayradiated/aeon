@@ -1,5 +1,7 @@
 import type { ServerMutator } from './types.ts'
 
+import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
+
 import { upsertPoint } from '#lib/server/db/point/upsert-point.js'
 
 const point_create: ServerMutator<'point_create'> = async (
@@ -27,6 +29,8 @@ const point_create: ServerMutator<'point_create'> = async (
   if (point instanceof Error) {
     return point
   }
+
+  await scheduleUpdateUserStatus({ userId: sessionUserId })
 }
 
 export default point_create

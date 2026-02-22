@@ -94,6 +94,33 @@ const useTypedViewListsHoook = (filePath, lines) => {
       return line
     })
   }
+  if (filePath === 'src/lib/__generated__/kanel/public/Line.ts') {
+    lines.unshift("import { labelId, type LabelId } from './Label';")
+
+    return lines.map((line) => {
+      switch (line.trim()) {
+        case 'stoppedAt: ColumnType<number, never, never>;': {
+          return '  stoppedAt: ColumnType<number | null, never, never>;'
+        }
+        case 'stoppedAt: z.number(),': {
+          return '  stoppedAt: z.number().nullable(),'
+        }
+        case 'durationMs: ColumnType<number, never, never>;': {
+          return '  durationMs: ColumnType<number | null, never, never>;'
+        }
+        case 'durationMs: z.number(),': {
+          return '  durationMs: z.number().nullable(),'
+        }
+        case 'labelIdList: ColumnType<string[], never, never>;': {
+          return '  labelIdList: ColumnType<LabelId[], never, never>;'
+        }
+        case 'labelIdList: z.string().array(),': {
+          return '  labelIdList: labelId.array(),'
+        }
+      }
+      return line
+    })
+  }
   return lines
 }
 

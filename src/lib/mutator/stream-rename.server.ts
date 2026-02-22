@@ -1,5 +1,7 @@
 import type { ServerMutator } from './types.ts'
 
+import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
+
 import { updateStream } from '#lib/server/db/stream/update-stream.js'
 
 const streamRename: ServerMutator<'stream_rename'> = async (
@@ -22,6 +24,8 @@ const streamRename: ServerMutator<'stream_rename'> = async (
   if (result instanceof Error) {
     return result
   }
+
+  await scheduleUpdateUserStatus({ userId: context.sessionUserId })
 }
 
 export default streamRename

@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { Argon2id } from './argon2id.js'
 
 const argon2id = new Argon2id()
@@ -13,4 +15,12 @@ const cryptoHash = {
   },
 }
 
-export { cryptoHash }
+const fingerprintHash = {
+  hash: (input: string): Uint8Array => {
+    const hash = createHash('sha256')
+    hash.update(Buffer.from(input, 'utf8'))
+    return new Uint8Array(hash.digest())
+  },
+}
+
+export { cryptoHash, fingerprintHash }

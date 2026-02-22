@@ -14,14 +14,17 @@
     "tidy": "just fix"
   },
   "dependencies": {
+    "@ai-sdk/openai": "3.0.30",
     "@date-fns/tz": "1.4.1",
     "@emoji-mart/data": "1.2.1",
     "@floating-ui/dom": "1.7.5",
     "@node-rs/argon2": "2.0.2",
     "@oslojs/crypto": "1.0.1",
     "@oslojs/encoding": "1.1.0",
+    "@slack/web-api": "7.14.1",
     "@stayradiated/hydro": "1.1.0",
     "@sveltelaunch/svelte-5-email": "0.0.11",
+    "ai": "6.0.97",
     "async-mutex": "0.5.0",
     "cookie": "1.1.1",
     "date-fns": "4.1.0",

@@ -47,7 +47,7 @@ const createHandler = (fn: SetupFn) => {
 const onInit = createHandler(async () => {
   const teardownList: TeardownFn[] = []
 
-  teardownList.push(initBoss())
+  teardownList.push(await initBoss())
   teardownList.push(startWebsocketServer())
 
   return async () => {

@@ -11,4 +11,10 @@ const getResendApiKey = createEnvGetter(
   z.string(),
 )
 
-export { getDatabaseUrl, getResendApiKey }
+const getOpenAIApiKey = createEnvGetter(
+  privateEnv,
+  'OPENAI_API_KEY',
+  z.string(),
+)
+
+export { getDatabaseUrl, getResendApiKey, getOpenAIApiKey }

@@ -22,6 +22,12 @@ const mutators: ServerMutatorDefsImportMap = {
   point_setLabelIdList: import('./point-set-label-id-list.server.js'),
   point_setStartedAt: import('./point-set-started-at.server.js'),
 
+  status_toggleEnabled: import('./status-toggle-enabled.server.js'),
+  status_setPrompt: import('./status-set-prompt.server.js'),
+  status_toggleStream: import('./status-toggle-stream.server.js'),
+
+  user_setSlackToken: import('./user-set-slack-token.server.js'),
+
   migrate_fixupLabelParents: import('./migrate-fixup-label-parents.server.js'),
 
   danger_deleteAllData: import('./danger-delete-all-data.server.js'),

@@ -85,6 +85,55 @@ SELECT
 
 
 --
+-- Name: point_with_label_list; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.point_with_label_list AS
+SELECT
+    NULL::text AS id,
+    NULL::text AS user_id,
+    NULL::text AS stream_id,
+    NULL::text AS description,
+    NULL::bigint AS started_at,
+    NULL::bigint AS created_at,
+    NULL::bigint AS updated_at,
+    NULL::text[] AS label_id_list;
+
+
+--
+-- Name: line; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.line AS
+ WITH point_with_stop AS (
+         SELECT point.id,
+            point.user_id,
+            point.stream_id,
+            point.description,
+            point.started_at,
+            lead(point.started_at) OVER (PARTITION BY point.stream_id ORDER BY point.started_at) AS stopped_at,
+            point.label_id_list,
+            point.created_at,
+            point.updated_at
+           FROM public.point_with_label_list point
+        ), now_ms AS (
+         SELECT ((EXTRACT(epoch FROM now()) * (1000)::numeric))::bigint AS now_ms
+        )
+ SELECT point_with_stop.id AS point_id,
+    point_with_stop.user_id,
+    point_with_stop.stream_id,
+    point_with_stop.description,
+    point_with_stop.started_at,
+    point_with_stop.stopped_at,
+    (COALESCE(point_with_stop.stopped_at, now_ms.now_ms) - point_with_stop.started_at) AS duration_ms,
+    point_with_stop.label_id_list,
+    point_with_stop.created_at,
+    point_with_stop.updated_at
+   FROM (point_with_stop
+     CROSS JOIN now_ms);
+
+
+--
 -- Name: meta_task; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -131,22 +180,6 @@ CREATE TABLE public.point_label (
 
 
 --
--- Name: point_with_label_list; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.point_with_label_list AS
-SELECT
-    NULL::text AS id,
-    NULL::text AS user_id,
-    NULL::text AS stream_id,
-    NULL::text AS description,
-    NULL::bigint AS started_at,
-    NULL::bigint AS created_at,
-    NULL::bigint AS updated_at,
-    NULL::text[] AS label_id_list;
-
-
---
 -- Name: replicache_client; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -185,6 +218,24 @@ CREATE TABLE public.replicache_client_view (
 
 
 --
+-- Name: status; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.status (
+    user_id text NOT NULL,
+    enabled_at bigint,
+    prompt text NOT NULL,
+    stream_id_list text[] NOT NULL,
+    hash text NOT NULL,
+    status text NOT NULL,
+    emoji text NOT NULL,
+    expires_at bigint,
+    created_at bigint NOT NULL,
+    updated_at bigint NOT NULL
+);
+
+
+--
 -- Name: stream; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -211,6 +262,7 @@ CREATE TABLE public."user" (
     created_at bigint NOT NULL,
     updated_at bigint NOT NULL,
     email text NOT NULL,
+    slack_token text,
     CONSTRAINT "user:check(email)" CHECK ((email = lower(email)))
 );
 
@@ -346,6 +398,14 @@ ALTER TABLE ONLY public.replicache_client_group
 
 ALTER TABLE ONLY public.replicache_client_view
     ADD CONSTRAINT "replicache_client_view:primaryKey(id)" PRIMARY KEY (id);
+
+
+--
+-- Name: status status:primaryKey(user_id); Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.status
+    ADD CONSTRAINT "status:primaryKey(user_id)" PRIMARY KEY (user_id);
 
 
 --
@@ -527,6 +587,14 @@ ALTER TABLE ONLY public.replicache_client
 
 ALTER TABLE ONLY public.replicache_client_group
     ADD CONSTRAINT "replicache_client_group:foreignKey(user_id)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+--
+-- Name: status status:foreignKey(user_id,user); Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.status
+    ADD CONSTRAINT "status:foreignKey(user_id,user)" FOREIGN KEY (user_id) REFERENCES public."user"(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
 --

@@ -6,13 +6,13 @@ const labelSetColor: ServerMutator<'label_setColor'> = async (
   context,
   options,
 ) => {
-  const { db } = context
+  const { db, sessionUserId } = context
   const { labelId, color } = options
 
   const result = await updateLabel({
     db,
     where: {
-      userId: context.sessionUserId,
+      userId: sessionUserId,
       labelId,
     },
     set: {

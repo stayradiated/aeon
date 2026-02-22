@@ -15,6 +15,7 @@ type CVR = {
   replicacheClient: VersionRecord<ReplicacheClientId>
   stream: VersionRecord<StreamId>
   user: VersionRecord<UserId>
+  status: VersionRecord<UserId>
 }
 
 const EMPTY_CVR: CVR = {
@@ -24,6 +25,7 @@ const EMPTY_CVR: CVR = {
   replicacheClient: {},
   stream: {},
   user: {},
+  status: {},
 }
 const CVR_KEY_LIST = Object.keys(EMPTY_CVR) as (keyof CVR)[]
 
