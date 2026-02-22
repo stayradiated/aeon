@@ -9,6 +9,7 @@ import type {
 type LocalUser = {
   readonly id: UserId
   email: string
+  slackTokenMasked: string | undefined
 }
 
 type LocalLabel = {
@@ -50,6 +51,16 @@ type LocalMeta = {
   state: 'LOADING' | 'READY'
 }
 
+type LocalStatus = {
+  isEnabled: boolean
+  prompt: string
+  streamIdList: readonly StreamId[]
+
+  expiresAt: number | undefined
+  status: string
+  emoji: string
+}
+
 export type {
   LocalUser as User,
   LocalLabel as Label,
@@ -57,4 +68,5 @@ export type {
   LocalStream as Stream,
   LocalMeta as Meta,
   LocalMetaTask as MetaTask,
+  LocalStatus as Status,
 }

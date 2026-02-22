@@ -1,5 +1,7 @@
 import type { ServerMutator } from './types.ts'
 
+import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
+
 import { bulkDeletePoint } from '#lib/server/db/point/bulk-delete-point.js'
 
 const pointDelete: ServerMutator<'point_delete'> = async (context, options) => {
@@ -16,6 +18,8 @@ const pointDelete: ServerMutator<'point_delete'> = async (context, options) => {
   if (result instanceof Error) {
     return result
   }
+
+  await scheduleUpdateUserStatus({ userId: context.sessionUserId })
 }
 
 export default pointDelete

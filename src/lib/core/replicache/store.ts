@@ -4,6 +4,7 @@ import type {
   AnonLabel,
   AnonMetaTask,
   AnonPoint,
+  AnonStatus,
   AnonStream,
   AnonUser,
   Replicache,
@@ -21,6 +22,7 @@ import type {
   Meta,
   MetaTask,
   Point,
+  Status,
   Stream,
   User,
 } from '#lib/types.local.js'
@@ -63,6 +65,10 @@ const createStore = (options: CreateStoreOptions) => {
     key: Key.user,
     mapValue: (value, id) => ({ id, ...value }),
   })
+  const status = new Table<UserId, AnonStatus, Status>({
+    key: Key.status,
+    mapValue: (value, id) => ({ id, ...value }),
+  })
 
   // biome-ignore lint/suspicious/noExplicitAny: this is fine
   const tableByName: Record<string, Table<any, any, any>> = {
@@ -71,6 +77,7 @@ const createStore = (options: CreateStoreOptions) => {
     [Key.label.name]: label,
     [Key.point.name]: point,
     [Key.metaTask.name]: metaTask,
+    [Key.status.name]: status,
   }
 
   const setMetaState = (state: 'READY' | 'LOADING') => {
@@ -129,6 +136,7 @@ const createStore = (options: CreateStoreOptions) => {
     stream,
     user,
     metaTask,
+    status,
 
     mutate: mapRecordValues(
       rep.mutate,

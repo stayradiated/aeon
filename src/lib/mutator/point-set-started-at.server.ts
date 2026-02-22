@@ -1,5 +1,7 @@
 import type { ServerMutator } from './types.ts'
 
+import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
+
 import { updatePoint } from '#lib/server/db/point/update-point.js'
 
 const pointSetStartedAt: ServerMutator<'point_setStartedAt'> = async (
@@ -22,6 +24,8 @@ const pointSetStartedAt: ServerMutator<'point_setStartedAt'> = async (
   if (result instanceof Error) {
     return result
   }
+
+  await scheduleUpdateUserStatus({ userId: context.sessionUserId })
 }
 
 export default pointSetStartedAt

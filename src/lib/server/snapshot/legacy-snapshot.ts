@@ -69,6 +69,7 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
         stravaClientId: user.stravaClientId ?? null,
         stravaClientSecret: user.stravaClientSecret ?? null,
         stravaSession: user.stravaSession ?? null,
+        slackToken: null,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt ?? user.createdAt,
       }),

@@ -21,6 +21,7 @@ const getMinimalInitialData = (
   return {
     [`user/${sessionUserId}`]: {
       email: 'test@example.com',
+      slackTokenMasked: undefined,
     } satisfies AnonUser,
   }
 }

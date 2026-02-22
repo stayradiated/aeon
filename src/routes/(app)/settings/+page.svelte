@@ -10,6 +10,7 @@ import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
+import StatusManager from '#lib/components/Status/StatusManager.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
 
 const { data }: PageProps = $props()
@@ -97,6 +98,11 @@ const handleAssignLabelParent = async () => {
   <section>
     <h2>Streams</h2>
     <StreamManager {store} />
+  </section>
+
+  <section>
+    <h2>Status</h2>
+    <StatusManager {store} />
   </section>
 
   <section>

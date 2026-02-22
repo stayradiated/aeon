@@ -108,6 +108,7 @@ const actions = {
           stravaClientId: null,
           stravaClientSecret: null,
           stravaSession: null,
+          slackToken: null,
         },
       })
       if (user instanceof Error) {

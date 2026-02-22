@@ -41,6 +41,17 @@ type Mutators = {
     destinationLabelId: LabelId
   }>
 
+  status_toggleEnabled: Mutator<{
+    isEnabled: boolean
+  }>
+  status_setPrompt: Mutator<{
+    prompt: string
+  }>
+  status_toggleStream: Mutator<{
+    streamId: StreamId
+    isEnabled: boolean
+  }>
+
   stream_create: Mutator<{
     streamId: StreamId
     name: string
@@ -86,6 +97,10 @@ type Mutators = {
   }>
   point_delete: Mutator<{
     pointId: PointId
+  }>
+
+  user_setSlackToken: Mutator<{
+    slackToken: string | undefined
   }>
 
   migrate_fixupLabelParents: Mutator<Record<string, never>>

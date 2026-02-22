@@ -6,13 +6,13 @@ const labelSetIcon: ServerMutator<'label_setIcon'> = async (
   context,
   options,
 ) => {
-  const { db } = context
+  const { db, sessionUserId } = context
   const { labelId, icon } = options
 
   const result = await updateLabel({
     db,
     where: {
-      userId: context.sessionUserId,
+      userId: sessionUserId,
       labelId,
     },
     set: {
