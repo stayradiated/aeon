@@ -4,30 +4,39 @@ import * as dateFns from 'date-fns'
 
 import type { Store } from '#lib/core/replicache/store.js'
 import type { Slice } from '#lib/core/shape/types.js'
+import type { CalendarDate } from '#lib/utils/calendar-date.js'
 
 import { getSliceList } from '#lib/core/select/get-slice-list.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
+import * as calDateFns from '#lib/utils/calendar-date.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import SliceList from './SliceList.svelte'
 
 type Props = {
   store: Store
+  viewStart: CalendarDate
+  viewEnd: CalendarDate
 }
 
-const { store }: Props = $props()
-
-const rangeStartDate = $derived(dateFns.subDays(Date.now(), 7).getTime())
+const { store, viewStart, viewEnd }: Props = $props()
 
 const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
+
 const { _: sliceList } = $derived(
   watch(
     getSliceList(store, {
-      startedAt: { gte: rangeStartDate },
+      startedAt: {
+        gte: calDateFns.toEarliestInstant(viewStart),
+        lte: calDateFns.toLatestInstant(viewEnd),
+      },
     }),
   ),
 )
+
+const viewStartISO = $derived(calDateFns.toISOString(viewStart))
+const viewEndISO = $derived(calDateFns.toISOString(viewEnd))
 
 type ZonedSliceList = {
   date: string
@@ -67,6 +76,11 @@ let multiDaySliceList = $derived.by(() => {
     const date = dateFns.format(startedAt, 'yyyy-MM-dd', {
       in: tz(timeZone),
     })
+
+    // ignore slices that are outside the time range
+    if (date < viewStartISO || date > viewEndISO) {
+      continue
+    }
 
     if (currentZSL?.date !== date) {
       currentZSL = {

@@ -6,6 +6,7 @@ import { afterNavigate } from '$app/navigation'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import ServiceWorker from '#lib/components/ServiceWorker.svelte'
+import Status from '#lib/components/Status/Status.svelte'
 
 import { PUBLIC_APP_VERSION } from '$env/static/public'
 
@@ -51,6 +52,8 @@ afterNavigate(() => {
 })
 </script>
 
+<Status {store} />
+
 <header>
   <h1>ΛΣӨП</h1>
   <span class="version">{PUBLIC_APP_VERSION}</span>
@@ -60,11 +63,13 @@ afterNavigate(() => {
       <a href="/add">Add</a>
       <a href="/log">Log</a>
       <a href="/label">Labels</a>
+      <a href="/calendar/year">Year</a>
       <a href="/settings">Settings</a>
     </div>
     <button class="menuToggle" aria-hidden="true" onclick={toggleMenuOpen}>Menu</button>
   </nav>
 </header>
+
 
 {#if isStoreLoading}
   <div class="loading">Loading ({loadingDuration}ms)...</div>

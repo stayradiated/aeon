@@ -4,6 +4,7 @@ import { react } from 'signia'
 type WatchFn = {
   <T>(signal: Signal<T>): WatchProxy<T>
   undefined: WatchProxy<undefined>
+  lit: <T>(value: T) => WatchProxy<T>
 }
 
 type WatchProxy<T> = {
@@ -27,5 +28,6 @@ const watch: WatchFn = (signal) => {
   }
 }
 watch.undefined = { _: undefined }
+watch.lit = (value) => ({ _: value })
 
 export { watch }

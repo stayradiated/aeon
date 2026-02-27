@@ -6,8 +6,7 @@ import type { Store } from '#lib/core/replicache/store.js'
 import type { Slice } from '#lib/core/shape/types.js'
 import type { StreamId } from '#lib/ids.js'
 
-import { getStreamList } from '#lib/core/select/get-stream-list.js'
-import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
+import { getVisibleStreamList } from '#lib/core/select/get-visible-stream-list.js'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
@@ -21,19 +20,12 @@ type Props = {
 
 const { store, timeZone, sliceList }: Props = $props()
 
-const { _: streamList } = $derived(watch(getStreamList(store)))
-const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
-
-const filteredStreamList = $derived(
-  streamList.filter((stream) => stream.id !== timeZoneStream?.id),
-)
+const { _: streamList } = $derived(watch(getVisibleStreamList(store)))
 
 // build an index of streamId → column index
 // so we can quickly lookup where to render each cell
 const streamColumnIndexRecord: Record<StreamId, number> = $derived(
-  Object.fromEntries(
-    filteredStreamList.map((stream, index) => [stream.id, index]),
-  ),
+  Object.fromEntries(streamList.map((stream, index) => [stream.id, index])),
 )
 
 const formatTime = (instant: number): string => {
@@ -41,10 +33,10 @@ const formatTime = (instant: number): string => {
 }
 </script>
 
-<div class="SliceList" style:--num-cols={1 + filteredStreamList.length}>
+<div class="SliceList" style:--num-cols={1 + streamList.length}>
   <header>
     <h5>time</h5>
-    {#each filteredStreamList as stream (stream.id)}
+    {#each streamList as stream (stream.id)}
       <h5>{stream.name}</h5>
     {/each}
   </header>
