@@ -1,127 +1,116 @@
 import { tz } from '@date-fns/tz'
+import { UTCDate, utc } from '@date-fns/utc'
+import type { ContextFn } from 'date-fns'
 import * as dateFns from 'date-fns'
 
-const MS_PER_DAY = 86_400_000;
+type TimeZone = ContextFn<Date>
 
-type EpochDate = number & { __brand: 'EpochDate' }
+const MS_PER_DAY = 86_400_000
 
-// Convert a Date to an integer "epoch day" based on UTC calendar days.
-const toEpochDate = (instant: number): EpochDate => {
-  return Math.floor(instant / MS_PER_DAY) as EpochDate
+type CalendarDate = number & { __brand: 'CalendarDate' }
+
+const fromUTCInstant = (instant: number): CalendarDate => {
+  return Math.floor(instant / MS_PER_DAY) as CalendarDate
 }
 
-type Year = number & { __brand: 'Year' }
-type Month = number & { __brand: 'Month' }
-type Day = number & { __brand: 'Day' }
-type CalendarDate = [Year, Month, Day]
+const fromUTC = (
+  year: number,
+  monthIndex: number,
+  day: number,
+): CalendarDate => {
+  return fromUTCInstant(Date.UTC(year, monthIndex, day))
+}
 
-const getYear = (date: CalendarDate): number => date[0]
-const getMonth = (date: CalendarDate): number => date[1] + 1
-const getDay = (date: CalendarDate): number => date[2]
+const toUTCInstant = (date: CalendarDate): number => {
+  return date * MS_PER_DAY
+}
 
-const toISOString = (date: CalendarDate): string => {
-  const [year, month, day] = date
-  return `${year.toString().padStart(4, '0')}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+const getYear = (date: CalendarDate): number => {
+  return new Date(toUTCInstant(date)).getUTCFullYear()
+}
+const getMonth = (date: CalendarDate): number => {
+  return new Date(toUTCInstant(date)).getUTCMonth()
+}
+const getDay = (date: CalendarDate): number => {
+  return new Date(toUTCInstant(date)).getUTCDate()
+}
+
+const formatISO = (date: CalendarDate): string => {
+  return dateFns.formatISO(toUTCInstant(date), { representation: 'date' })
 }
 
 const fromISOString = (iso: string): CalendarDate => {
-  const match = iso.match(/^(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})$/)
-  const year = Number.parseInt(match?.groups?.year ?? '', 10)
-  const month = Number.parseInt(match?.groups?.month ?? '', 10)
-  const day = Number.parseInt(match?.groups?.day ?? '', 10)
-
-  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
-    if (!match) {
-      throw new Error(
-        `Could not parse string as date, expecting "yyyy-MM-dd" format, received: "${iso}"`,
-      )
-    }
-  }
-  return [year, month - 1, day] as CalendarDate
+  return fromUTCInstant(dateFns.parseISO(iso, { in: utc }).getTime())
 }
 
-const fromInstant = (instant: number, timeZone: string): CalendarDate => {
-  const year = dateFns.getYear(instant, { in: tz(timeZone) }) as Year
-  const month = dateFns.getMonth(instant, { in: tz(timeZone) }) as Month
-  const day = dateFns.getDate(instant, { in: tz(timeZone) }) as Day
-  return [year, month, day]
+const fromInstant = (instant: number, timeZone: TimeZone): CalendarDate => {
+  return fromUTCInstant(dateFns.transpose(timeZone(instant), UTCDate).getTime())
 }
 
-const toInstant = (date: CalendarDate, timeZone: string): number => {
-  const isoString = toISOString(date)
-  const instant = dateFns
-    .parse(`${isoString} 12:00:00`, 'yyyy-MM-dd HH:mm:ss', new Date(), {
-      in: tz(timeZone),
-    })
-    .getTime()
-  return instant
+const toInstant = (date: CalendarDate, timeZone: TimeZone): number => {
+  return dateFns.transpose(new UTCDate(toUTCInstant(date)), timeZone).getTime()
 }
 
-const EARLIEST_TZ = 'Etc/GMT-14' // UTC+14 (earliest place to reach the date)
-const LATEST_TZ = 'Etc/GMT+12' // UTC-12 (latest place to still be on the date)
+const EARLIEST_TZ = tz('Etc/GMT-14')
+const LATEST_TZ = tz('Etc/GMT+12')
 
 const toEarliestInstant = (date: CalendarDate): number => {
-  return dateFns
-    .startOfDay(toInstant(date, EARLIEST_TZ), { in: tz(EARLIEST_TZ) })
-    .getTime()
+  return toInstant(date, EARLIEST_TZ)
 }
 
 const toLatestInstant = (date: CalendarDate): number => {
-  return dateFns
-    .endOfDay(toInstant(date, LATEST_TZ), { in: tz(LATEST_TZ) })
-    .getTime()
+  return toInstant(date, LATEST_TZ) + MS_PER_DAY - 1
 }
 
 const format = (date: CalendarDate, formatStr: string): string => {
-  return dateFns.format(toInstant(date, 'UTC'), formatStr, {
-    in: tz('UTC'),
-  })
+  return dateFns.format(toUTCInstant(date), formatStr, { in: utc })
 }
 
-const eachDayOfInterval  = ({ start, end }: { start: CalendarDate, end: CalendarDate }): CalendarDate[] => {
-  const startInstant = toInstant(start, 'UTC')
-  const endInstant = toInstant(end, 'UTC')
-
-  return dateFns.eachDayOfInterval({
-    start: startInstant,
-    end: endInstant,
-  }).map((date): CalendarDate => {
-    return fromInstant(date.getTime(), 'UTC')
-  })
-}
-
-const createTransform = <Args extends unknown[]>(
-  fn: (instant: number, ...args: Args) => number,
-) => {
-  return (date: CalendarDate, ...args: Args) => {
-    const instant = toInstant(date, 'UTC')
-    const nextInstant = fn(instant, ...args)
-    return fromInstant(nextInstant, 'UTC')
+const eachDayOfInterval = ({
+  start,
+  end,
+}: {
+  start: CalendarDate
+  end: CalendarDate
+}): CalendarDate[] => {
+  if (end < start) {
+    return []
   }
+  const n = end - start + 1
+  const out = new Array<CalendarDate>(n)
+  for (let i = 0; i < n; i++) {
+    out[i] = (start + i) as CalendarDate
+  }
+  return out
 }
 
-const subDays = createTransform((instant, days: number) => {
-  return dateFns.subDays(instant, days).getTime()
-})
+const subDays = (date: CalendarDate, days: number): CalendarDate => {
+  return (date - days) as CalendarDate
+}
 
-const addDays = createTransform((instant, days: number) => {
-  return dateFns.addDays(instant, days).getTime()
-})
+const addDays = (date: CalendarDate, days: number): CalendarDate => {
+  return (date + days) as CalendarDate
+}
+
+const dayOfWeek = (date: CalendarDate): number => {
+  return (date + 4) % 7
+}
 
 const isWeekend = (date: CalendarDate): boolean => {
-  const instant = toInstant(date, 'UTC')
-  return dateFns.isWeekend(instant, { in: tz('UTC') })
+  const day = dayOfWeek(date)
+  return day === 0 || day === 6
 }
 
 export type { CalendarDate }
 export {
-  toEpochDate,
+  fromUTC,
+  fromUTCInstant,
   getYear,
   getMonth,
   getDay,
   fromInstant,
   toInstant,
-  toISOString,
+  formatISO,
   fromISOString,
   format,
   toEarliestInstant,
@@ -129,5 +118,6 @@ export {
   eachDayOfInterval,
   subDays,
   addDays,
+  dayOfWeek,
   isWeekend,
 }

@@ -1,8 +1,9 @@
+import { tz } from '@date-fns/tz'
 import type { Signal } from 'signia'
 import { computed } from 'signia'
 
+import type { LabelId, StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
-import type { StreamId, LabelId } from '#lib/ids.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { createSelector } from '#lib/utils/selector.js'
@@ -10,7 +11,7 @@ import { createSelector } from '#lib/utils/selector.js'
 import { getFilteredLineList } from './get-filtered-line-list.js'
 import { getTimeZone } from './get-time-zone.js'
 
-type Calendar = Record<string, LabelId[]>
+type Calendar = Record<CalendarDate, LabelId[]>
 
 const getCalendar = createSelector(
   'getCalendar',
@@ -46,26 +47,28 @@ const getCalendar = createSelector(
         const { startedAt, stoppedAt } = line
         const startedAtDate = calDateFns.fromInstant(
           startedAt,
-          getTimeZone(store, startedAt).value,
+          tz(getTimeZone(store, startedAt).value),
         )
         const stoppedAtDate = stoppedAt
           ? calDateFns.fromInstant(
               stoppedAt,
-              getTimeZone(store, stoppedAt).value,
+              tz(getTimeZone(store, stoppedAt).value),
             )
           : calDateFns.fromInstant(
               startedAtLte,
-              getTimeZone(store, startedAtLte).value,
+              tz(getTimeZone(store, startedAtLte).value),
             )
 
-        for (const date of calDateFns.eachDayOfInterval({ start: startedAtDate, end: stoppedAtDate })) {
-          const key = calDateFns.toISOString(date)
-          calendar[key] ??= []
+        for (const date of calDateFns.eachDayOfInterval({
+          start: startedAtDate,
+          end: stoppedAtDate,
+        })) {
+          calendar[date] ??= []
           for (const labelId of line.labelIdList) {
-            if (calendar[key].includes(labelId)) {
+            if (calendar[date].includes(labelId)) {
               continue
             }
-            calendar[key].push(labelId)
+            calendar[date].push(labelId)
           }
         }
       }

@@ -35,11 +35,8 @@ const { _: sliceList } = $derived(
   ),
 )
 
-const viewStartISO = $derived(calDateFns.toISOString(viewStart))
-const viewEndISO = $derived(calDateFns.toISOString(viewEnd))
-
 type ZonedSliceList = {
-  date: string
+  date: CalendarDate
   startedAt: number
   timeZone: string
   sliceList: Slice[]
@@ -73,12 +70,9 @@ let multiDaySliceList = $derived.by(() => {
     }
 
     // serialize as calendar date so we can compare days
-    const date = dateFns.format(startedAt, 'yyyy-MM-dd', {
-      in: tz(timeZone),
-    })
-
+    const date = calDateFns.fromInstant(startedAt, tz(timeZone))
     // ignore slices that are outside the time range
-    if (date < viewStartISO || date > viewEndISO) {
+    if (date < viewStart || date > viewEnd) {
       continue
     }
 

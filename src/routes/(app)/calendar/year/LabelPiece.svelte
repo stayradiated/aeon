@@ -17,20 +17,23 @@ const { _: label } = $derived(watch(store.label.get(labelId)))
 </script>
 
 {#if label}
-  <div class="labelPiece" style:--color={label.color}>
+  <a href="/label/edit/{label.id}" class="labelPiece" style:--color={label.color}>
     {#if label.icon}
       <Emoji native={label.icon} scale={3} />
     {/if}
     <span class="name">{label.name}</span>
-  </div>
+  </a>
 {/if}
 
 <style>
   .labelPiece {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: var(--size-2);
     background: var(--color);
+    text-decoration: none;
+    padding-inline: var(--size-2);
   }
 
   .name {

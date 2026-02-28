@@ -1,4 +1,6 @@
 <script lang="ts">
+import { tz } from '@date-fns/tz'
+
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
 import type { PageProps } from './$types'
 
@@ -38,7 +40,7 @@ const handleNext = () => {
 }
 
 const handleToday = () => {
-  viewEnd = calDateFns.fromInstant(now, timeZone)
+  viewEnd = calDateFns.fromInstant(now, tz(timeZone))
   viewStart = calDateFns.subDays(viewEnd, 6)
 }
 

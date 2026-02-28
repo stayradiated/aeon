@@ -14,6 +14,7 @@ const { store } = $derived(data)
 
 const { _: streamList } = $derived(watch(getVisibleStreamList(store)))
 
+let year = $state<number>(new Date().getFullYear())
 let selectedStreamId = $state<StreamId | undefined>()
 
 $effect(() => {
@@ -21,10 +22,14 @@ $effect(() => {
     selectedStreamId = streamList[0]?.id
   }
 })
+
+const handleChangeYear = (nextYear: number) => {
+  year = nextYear
+}
 </script>
 
 <StreamSelector {streamList} {selectedStreamId} onselect={(streamId) => selectedStreamId = streamId} />
 
 {#if selectedStreamId}
-  <YearCalendar {store} streamId={selectedStreamId} year={2025} />
+  <YearCalendar {store} streamId={selectedStreamId} {year} onchangeyear={handleChangeYear} />
 {/if}
