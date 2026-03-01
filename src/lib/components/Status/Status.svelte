@@ -13,18 +13,21 @@ const { _: status } = $derived(watch(store.status.get(store.sessionUserId)))
 </script>
 
 {#if status}
-  <div>
+  <div class="Status">
     <span>{status.emoji}</span>
     <span>{status.status}</span>
   </div>
 {/if}
 
 <style>
-div {
+.Status {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--size-2);
+  padding: var(--size-3);
+  background-color: var(--color-grey-100);
 }
+
 span {
   font-size: 0.8rem;
 }

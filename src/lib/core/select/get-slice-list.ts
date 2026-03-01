@@ -21,7 +21,7 @@ const getSliceList = createSelector(
   (
     store,
     where: {
-      startedAt: { gte: number; lte?: number }
+      startedAt: { gte: number; lte: number }
     },
   ): Signal<Slice[]> => {
     const $lineListRecord = getAllLineLists(store, where)
