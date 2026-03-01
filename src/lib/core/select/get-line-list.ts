@@ -6,33 +6,32 @@ import type { StreamId } from '#lib/ids.js'
 
 import { buildLine } from '#lib/core/shape/build-line.js'
 
-import { clock } from '#lib/utils/clock.js'
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getActivePointList } from './get-active-point-list.js'
 
-const getLineListForStream = createSelector(
-  'getLineListForStream',
+const getLineList = createSelector(
+  'getLineList',
   (
     store,
     streamId: StreamId,
     where: {
-      startedAt: { gte: number; lte?: number }
+      startedAt: { gte: number; lte: number }
     },
   ): Signal<Line[]> => {
     const $pointList = getActivePointList(store, streamId, where)
 
-    return computed('getLineListForStream', () => {
+    return computed('getLineList', () => {
       const pointList = $pointList.value
       return pointList.map((point, index, list) => {
         const nextPoint = list[index + 1]
         return buildLine({
           points: [point, nextPoint],
-          now: clock.value,
+          now: where.startedAt.lte,
         })
       })
     })
   },
 )
 
-export { getLineListForStream }
+export { getLineList }

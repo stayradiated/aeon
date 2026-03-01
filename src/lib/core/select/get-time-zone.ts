@@ -4,11 +4,12 @@ import { computed } from 'signia'
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getActivePoint } from './get-active-point.js'
+import { getLatestPoint } from './get-latest-point.js'
 import { getTimeZoneStream } from './get-time-zone-stream.js'
 
 const getTimeZone = createSelector(
   'getTimeZone',
-  (store, timestamp: number): Signal<string> => {
+  (store, timestamp: number | undefined): Signal<string> => {
     const $timeZoneStream = getTimeZoneStream(store)
 
     return computed('getTimeZone', () => {
@@ -18,11 +19,11 @@ const getTimeZone = createSelector(
         return 'UTC'
       }
 
-      const activePoint = getActivePoint(
-        store,
-        timeZoneStream.id,
-        timestamp,
-      ).value
+      const activePoint =
+        typeof timestamp === 'undefined'
+          ? getLatestPoint(store, timeZoneStream.id).value
+          : getActivePoint(store, timeZoneStream.id, timestamp).value
+
       if (!activePoint) {
         console.warn('No active point for Time Zone stream')
         return 'UTC'

@@ -20,7 +20,7 @@ type Props = {
 }
 
 const { store, label, isSelected, onchange }: Props = $props()
-const { _: timeZone } = $derived(watch(getTimeZone(store, Date.now())))
+const { _: timeZone } = $derived(watch(getTimeZone(store, undefined)))
 
 const lastStartedAt = $derived(
   label.lastStartedAt
