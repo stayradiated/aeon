@@ -7,7 +7,7 @@ import { getCalendar } from '#lib/core/select/get-calendar.js'
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
-import DayCell from './DayCell.svelte'
+import CalendarRow from './CalendarRow.svelte'
 
 type Props = {
   store: Store
@@ -21,17 +21,7 @@ const { store, year, streamId, onchangeyear }: Props = $props()
 const startOfYear = $derived(calDateFns.fromISOString(`${year}-01-01`))
 const endOfYear = $derived(calDateFns.fromISOString(`${year}-12-31`))
 
-const calendarDateList = $derived(
-  calDateFns.eachDayOfInterval({
-    start: startOfYear,
-    end: endOfYear,
-  }),
-)
-
-// align the grid so that Mondays are on the left
-const gridOffset = $derived(calDateFns.getDay(startOfYear) - 1)
-
-const { _: calendar } = $derived(
+const { _: grid } = $derived(
   watch(
     getCalendar(store, streamId, {
       startDate: startOfYear,
@@ -57,12 +47,8 @@ const handleNext = () => {
 </header>
 
 <div class="calendar">
-  {#each Array(gridOffset) as _, index (index)}
-    <div></div>
-  {/each}
-  {#each calendarDateList as calendarDate (calendarDate)}
-    {@const labelIdList = calendar[calendarDate] ?? []}
-    <DayCell {store} {calendarDate} {labelIdList} />
+  {#each grid.rows as row, index (index)}
+    <CalendarRow {store} {row} />
   {/each}
 </div>
 
@@ -77,11 +63,5 @@ const handleNext = () => {
 
   h1 {
     text-align: center;
-  }
-
-  .calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(auto, 1fr);
   }
 </style>
