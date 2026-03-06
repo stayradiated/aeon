@@ -20,8 +20,9 @@ const getCalendar = createSelector(
       endDate: CalendarDate
       minDurationMs: number
     },
+    now: number,
   ): Signal<Grid> => {
-    const $spanList = getCalendarSpanList(store, streamId, where)
+    const $spanList = getCalendarSpanList(store, streamId, where, now)
 
     return computed('getCalendar', () => {
       const spanList = $spanList.value

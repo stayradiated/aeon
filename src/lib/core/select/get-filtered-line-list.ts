@@ -17,6 +17,7 @@ const getFilteredLineList = createSelector(
       startedAt: { gte: number; lte: number }
       durationMs: { gte: number }
     },
+    now: number,
   ): Signal<Line[]> => {
     const $lineList = getLineList(store, streamId, {
       startedAt: where.startedAt,
@@ -25,7 +26,10 @@ const getFilteredLineList = createSelector(
     return computed('getFilteredLineList', () => {
       const lineList = $lineList.value
       return lineList.filter((line) => {
-        return line.durationMs >= where.durationMs.gte
+        const durationMs = line.durationMs
+          ? line.durationMs
+          : now - line.startedAt
+        return durationMs >= where.durationMs.gte
       })
     })
   },

@@ -5,6 +5,7 @@ import type { StreamId } from '#lib/ids.js'
 import { getCalendar } from '#lib/core/select/get-calendar.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
+import { clock } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import CalendarRow from './CalendarRow.svelte'
@@ -21,13 +22,20 @@ const { store, year, streamId, onchangeyear }: Props = $props()
 const startOfYear = $derived(calDateFns.fromISOString(`${year}-01-01`))
 const endOfYear = $derived(calDateFns.fromISOString(`${year}-12-31`))
 
+const { _: now } = $derived(watch(clock))
+
 const { _: grid } = $derived(
   watch(
-    getCalendar(store, streamId, {
-      startDate: startOfYear,
-      endDate: endOfYear,
-      minDurationMs: 1000 * 60 * 60 * 12, // 12 hours
-    }),
+    getCalendar(
+      store,
+      streamId,
+      {
+        startDate: startOfYear,
+        endDate: endOfYear,
+        minDurationMs: 1000 * 60 * 60 * 12, // 12 hours
+      },
+      now,
+    ),
   ),
 )
 

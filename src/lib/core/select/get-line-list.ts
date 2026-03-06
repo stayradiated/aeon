@@ -27,7 +27,6 @@ const getLineList = createSelector(
         const nextPoint = list[index + 1]
         return buildLine({
           points: [point, nextPoint],
-          now: where.startedAt.lte,
         })
       })
     })

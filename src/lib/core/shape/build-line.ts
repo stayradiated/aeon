@@ -3,13 +3,12 @@ import type { Line } from './types.js'
 
 type BuildLineOptions<PointLike extends Point> = {
   points: [PointLike, PointLike | undefined]
-  now?: number
 }
 
 const buildLine = <PointLike extends Point>(
   options: BuildLineOptions<PointLike>,
 ): Line => {
-  const { points, now = Date.now() } = options
+  const { points } = options
   const [startPoint, stopPoint] = points
   if (stopPoint) {
     if (startPoint.streamId !== stopPoint.streamId) {
@@ -22,7 +21,7 @@ const buildLine = <PointLike extends Point>(
 
   const startedAt = startPoint.startedAt
   const stoppedAt = stopPoint ? stopPoint.startedAt : undefined
-  const durationMs = stoppedAt ? stoppedAt - startedAt : now - startedAt
+  const durationMs = stoppedAt ? stoppedAt - startedAt : undefined
 
   const line: Line = {
     id: startPoint.id,
