@@ -23,19 +23,25 @@ const getCalendarSpanList = createSelector(
       endDate: CalendarDate
       minDurationMs: number
     },
+    now: number,
   ): Signal<CalendarSpan[]> => {
     const startedAtGte = calDateFns.toEarliestInstant(where.startDate)
     const startedAtLte = calDateFns.toLatestInstant(where.endDate)
 
-    const $lineList = getFilteredLineList(store, streamId, {
-      startedAt: {
-        gte: startedAtGte,
-        lte: startedAtLte,
+    const $lineList = getFilteredLineList(
+      store,
+      streamId,
+      {
+        startedAt: {
+          gte: startedAtGte,
+          lte: startedAtLte,
+        },
+        durationMs: {
+          gte: where.minDurationMs,
+        },
       },
-      durationMs: {
-        gte: where.minDurationMs,
-      },
-    })
+      now,
+    )
 
     return computed('getCalendarSpanList', () => {
       const lineList = $lineList.value
@@ -54,7 +60,7 @@ const getCalendarSpanList = createSelector(
               tz(getTimeZone(store, stoppedAt).value),
             )
           : calDateFns.fromInstant(
-              startedAtLte,
+              now,
               tz(getTimeZone(store, startedAtLte).value),
             )
 

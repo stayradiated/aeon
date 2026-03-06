@@ -5,7 +5,7 @@ import type { Point } from '#lib/types.local.js'
 type Line = Simplify<
   Point & {
     stoppedAt: number | undefined
-    durationMs: number
+    durationMs: number | undefined
   }
 >
 
