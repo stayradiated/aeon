@@ -7,7 +7,7 @@ import type { PageProps } from './$types'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
-import { clock } from '#lib/utils/clock.js'
+import { clockMinute } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import MultiDaySliceList from '#lib/components/Log/MultiDaySliceList.svelte'
@@ -15,19 +15,26 @@ import MultiDaySliceList from '#lib/components/Log/MultiDaySliceList.svelte'
 const { data }: PageProps = $props()
 const { store } = $derived(data)
 
-const { _: now } = $derived(watch(clock))
+const { _: now } = $derived(watch(clockMinute))
 const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
+
+const SHOW_DAY_COUNT = 2
+const NAV_DAY_COUNT = 1
 
 let viewStart = $state<CalendarDate>()
 let viewEnd = $state<CalendarDate>()
+
+const today = $derived(calDateFns.fromInstant(now, tz(timeZone)))
+const hasNext = $derived(viewEnd && viewEnd < today)
+const isToday = $derived(viewEnd === today)
 
 const handlePrev = () => {
   if (!viewStart || !viewEnd) {
     return
   }
 
-  viewStart = calDateFns.subDays(viewStart, 7)
-  viewEnd = calDateFns.subDays(viewEnd, 7)
+  viewStart = calDateFns.subDays(viewStart, NAV_DAY_COUNT)
+  viewEnd = calDateFns.subDays(viewEnd, NAV_DAY_COUNT)
 }
 
 const handleNext = () => {
@@ -35,13 +42,13 @@ const handleNext = () => {
     return
   }
 
-  viewStart = calDateFns.addDays(viewStart, 7)
-  viewEnd = calDateFns.addDays(viewEnd, 7)
+  viewStart = calDateFns.addDays(viewStart, NAV_DAY_COUNT)
+  viewEnd = calDateFns.addDays(viewEnd, NAV_DAY_COUNT)
 }
 
 const handleToday = () => {
-  viewEnd = calDateFns.fromInstant(now, tz(timeZone))
-  viewStart = calDateFns.subDays(viewEnd, 6)
+  viewEnd = today
+  viewStart = calDateFns.subDays(viewEnd, SHOW_DAY_COUNT - 1)
 }
 
 $effect.pre(() => {
@@ -56,9 +63,8 @@ $effect.pre(() => {
 {:else}
   <div class="viewRange">
     <button onclick={handlePrev}>&larr;</button>
-    {calDateFns.format(viewStart, 'dd MMM yyyy')} &mdash; {calDateFns.format(viewEnd, 'dd MMM yyyy')}
-    <button onclick={handleNext}>&rarr;</button>
-    <button onclick={handleToday}>Today</button>
+    <button disabled={isToday} onclick={handleToday}>{calDateFns.format(viewEnd, 'd MMM yyyy')}</button>
+    <button disabled={!hasNext} onclick={handleNext}>&rarr;</button>
   </div>
 
   <MultiDaySliceList {store} {viewStart} {viewEnd} />
