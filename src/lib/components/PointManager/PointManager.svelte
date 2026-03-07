@@ -15,10 +15,11 @@ import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
 import { clock } from '#lib/utils/clock.js'
+import { formatDurationRough } from '#lib/utils/format-duration.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { isSetEqual } from '#lib/utils/is-set-equal.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
-import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first'
+import { topoSortParentsFirst } from '#lib/utils/topo-sort-parents-first.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import TimeZoneManager from '#lib/components/TimeZoneManager/TimeZoneManager.svelte'
@@ -60,6 +61,14 @@ const visibleTimestamp = $derived(
     })
     .getTime(),
 )
+
+const highlightLevel = $derived.by(() => {
+  const elapsedSec = (now - visibleTimestamp) / 1000
+  const adjusted = Math.max(0, elapsedSec - 30) // ignore first 30 seconds
+  const t = Math.max(0, Math.min(1, adjusted / 180)) // 0 - 1 to over the next 120 seconds
+  const value = t * t * (3 - 2 * t)
+  return Math.round(value * 100) / 100
+})
 
 // adjust the user clock to the current time
 const handleSetNow = (_event: MouseEvent) => {
@@ -268,6 +277,7 @@ const handleReset = (streamId: StreamId) => {
       bind:value={initialDate}
       disabled={!canEditClock}
     />
+
     <input
       required
       type="time"
@@ -277,10 +287,12 @@ const handleReset = (streamId: StreamId) => {
       disabled={!canEditClock}
     />
 
-    <p class="datetime-relative">
-      {dateFns.formatDistance(visibleTimestamp, now, { includeSeconds: true, addSuffix: true })}
-    </p>
-    <button type="button" class="now-button" onclick={handleSetNow} disabled={!canEditClock}>Now</button>
+    <button
+      type="button"
+      class="now-button"
+      style:--highlight-level={highlightLevel}
+      onclick={handleSetNow}
+      disabled={!canEditClock}>{formatDurationRough(dateFns.differenceInMilliseconds(now, visibleTimestamp))}</button>
   </div>
 
   <button type="button" onclick={handleSubmit} class="save-button">Save</button>
@@ -314,37 +326,22 @@ const handleReset = (streamId: StreamId) => {
   }
 
   .datetime-row {
-    display: grid;
-    grid-template-areas:
-      'date-input time-input now'
-      'datetime-relative datetime-relative datetime-relative';
+    display: flex;
     gap: var(--size-2);
   }
 
-  .date-input {
-    grid-area: date-input;
-  }
-  .time-input {
-    grid-area: time-input;
-  }
-
-  .datetime-relative {
-    text-align: right;
-    color: var(--theme-text-muted);
-    grid-area: datetime-relative;
-    text-align: center;
-    margin: 0;
-    line-height: var(--line-md);
+  .date-input, .time-input {
+    flex: 1;
   }
 
   .now-button {
+    --highlight-level: 0;
+
+    flex: 1;
     background: none;
     border: none;
     cursor: pointer;
-    grid-area: now;
-    text-transform: uppercase;
-    font-size: var(--scale-000);
-    color: var(--theme-text-muted);
+    font-size: var(--scale-00);
     font-weight: var(--weight-bold);
 
     &:hover {
@@ -355,5 +352,9 @@ const handleReset = (streamId: StreamId) => {
       cursor: not-allowed;
       text-decoration: line-through;
     }
+
+    background: rgb(from var(--color-orange-500) r g b / var(--highlight-level));
+    color: var(--theme-text-main);
+    transition: background 0.15s;
   }
 </style>

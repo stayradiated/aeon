@@ -42,23 +42,25 @@ const formatDurationRough = (input: number): string => {
   }
 
   const hours = Math.floor(durationMs / 1000 / 60 / 60)
+  const hasHours = hours > 0
+
   const minutes = Math.floor((durationMs / 1000 / 60) % 60)
-  // over 1 hour, show hours and minutes
-  if (hours >= 1) {
-    if (minutes === 0) {
-      return `${prefix}${hours}h`
-    }
+  const hasMinutes = minutes > 0
 
-    return `${prefix}${hours}h ${minutes}m`
+  const seconds = Math.floor(durationMs / 1000) % 60
+  const hasSeconds = seconds > 0
+
+  const parts = [
+    hasHours ? `${hours}h` : [],
+    hasMinutes ? `${minutes}m` : [],
+    hasSeconds ? `${seconds}s` : [],
+  ].flat()
+
+  if (parts.length > 0) {
+    return `${prefix}${parts.join(' ')}`
   }
 
-  // over 1 minute, show minutes
-  if (minutes >= 1) {
-    return `${prefix}${minutes}m`
-  }
-
-  // otherwise, show "<1m"
-  return `<${prefix}1m`
+  return 'now'
 }
 
 export { formatDuration, formatDurationRough }

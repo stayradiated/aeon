@@ -35,32 +35,46 @@ SOFTWARE.
 ================================================================================
 */
 
+import QuickLRU from 'quick-lru'
+
 // biome-ignore lint/suspicious/noExplicitAny: required for generic function parameter constraints
 type AnyFunction = (...arguments_: readonly any[]) => unknown
 
+type MapLike<Key, Value> = {
+  has: (key: Key) => boolean
+  get: (key: Key) => Value | undefined
+  set: (key: Key, value: Value) => void
+  size: number
+}
+
 type MemoizeOptions<FunctionToMemoize extends AnyFunction> = {
+  readonly debugName?: string
   readonly cacheKey: (arguments_: Parameters<FunctionToMemoize>) => string
-  readonly cache?: Record<string, ReturnType<FunctionToMemoize>>
+  readonly cache?: MapLike<string, ReturnType<FunctionToMemoize>>
 }
 
 const memoize = <FunctionToMemoize extends AnyFunction>(
   fn: FunctionToMemoize,
-  { cacheKey, cache = {} }: MemoizeOptions<FunctionToMemoize>,
+  {
+    cacheKey,
+    cache = new QuickLRU({ maxSize: 50 }),
+  }: MemoizeOptions<FunctionToMemoize>,
 ): FunctionToMemoize => {
   const memoized = ((
     ...args: Parameters<FunctionToMemoize>
   ): ReturnType<FunctionToMemoize> => {
     const key = cacheKey(args)
-    if (key in cache) {
-      const cached = cache[key]
+    if (cache.has(key)) {
+      const cached = cache.get(key)
       if (cached === undefined) {
         throw new Error('Cache corruption: key exists but value is undefined')
       }
       return cached
     }
-    const result = fn(...args) as ReturnType<FunctionToMemoize>
-    cache[key] = result
-    return result
+    const value = fn(...args) as ReturnType<FunctionToMemoize>
+    cache.set(key, value)
+
+    return value
   }) as FunctionToMemoize
 
   // Preserve the original function's name

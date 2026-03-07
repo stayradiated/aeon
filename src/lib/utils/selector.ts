@@ -9,7 +9,7 @@ type WithStoreOptions<Args extends unknown[]> = {
 }
 
 const createSelector = <Args extends unknown[], Result extends Signal<unknown>>(
-  _debugName: string,
+  debugName: string,
   fn: (store: Store, ...args: Args) => Result,
   options: WithStoreOptions<Args> = {
     cacheKey: JSON.stringify,
@@ -17,6 +17,7 @@ const createSelector = <Args extends unknown[], Result extends Signal<unknown>>(
 ) => {
   const { cacheKey } = options
   return memoize(fn, {
+    debugName,
     cacheKey: ([store, ...args]) => `${store.id}|${cacheKey(args)}`,
   })
 }
