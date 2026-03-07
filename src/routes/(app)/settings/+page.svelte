@@ -3,6 +3,7 @@ import { dropAllDatabases } from 'replicache'
 
 import type { PageProps } from './$types'
 
+import { dev as isDev } from '$app/environment'
 import { enhance } from '$app/forms'
 
 import { resetReplicache } from '#lib/core/replicache/get-replicache.js'
@@ -124,13 +125,15 @@ const handleAssignLabelParent = async () => {
     <button onclick={handleImport}>Import</button>
     <MetaTaskProgress {store} name="import-snapshot" />
 
-    <details class="dangerZone">
-      <summary>⚠️ Danger Zone</summary>
+    {#if isDev}
+      <details class="dangerZone">
+        <summary>⚠️ Danger Zone</summary>
 
-      <h3>☠️ Delete all data</h3>
-      <p>This will delete all data from the database. This cannot be undone.</p>
-      <button onclick={handleDeleteAllData}>Delete all data</button>
-    </details>
+        <h3>☠️ Delete all data</h3>
+        <p>This will delete all data from the database. This cannot be undone.</p>
+        <button onclick={handleDeleteAllData}>Delete all data</button>
+      </details>
+    {/if}
   </section>
 
 </main>
