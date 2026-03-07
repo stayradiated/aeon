@@ -61,19 +61,24 @@ class Table<
 
     // memoize all the methods that take arguments
     this.get = memoize(this.get.bind(this), {
+      debugName: `${this.name}.get`,
       cacheKey: ([key]) =>
         typeof key === 'string' ? key : `${key[0]}/${key[1]}`,
     })
     this.find = memoize(this.find.bind(this), {
+      debugName: `${this.name}.find`,
       cacheKey: ([cacheKey]) => cacheKey,
     })
     this.filter = memoize(this.filter.bind(this), {
+      debugName: `${this.name}.filter`,
       cacheKey: ([cacheKey]) => cacheKey,
     })
     this.map = memoize(this.map.bind(this), {
+      debugName: `${this.name}.map`,
       cacheKey: ([cacheKey]) => cacheKey,
     })
     this.some = memoize(this.some.bind(this), {
+      debugName: `${this.name}.some`,
       cacheKey: ([cacheKey]) => cacheKey,
     })
   }

@@ -49,10 +49,10 @@ type GetReplicacheOptions = {
   sessionUserId: UserId
 }
 
-const REPLICACHE_CACHE: Record<
+const REPLICACHE_CACHE: Map<
   string,
-  Promise<Replicache<ReplicacheMutatorDefs>>
-> = {}
+  Promise<Replicache<ReplicacheMutatorDefs> | Error>
+> = new Map()
 
 const getReplicache = memoize(
   async (
@@ -97,14 +97,17 @@ const getReplicache = memoize(
 )
 
 const resetReplicache = async () => {
-  for (const [key, replicachePromise] of Object.entries(REPLICACHE_CACHE)) {
+  for (const [key, replicachePromise] of REPLICACHE_CACHE) {
     try {
       const replicache = await replicachePromise
+      if (replicache instanceof Error) {
+        throw replicache
+      }
       await replicache.close()
     } catch (error) {
       console.error(error)
     }
-    delete REPLICACHE_CACHE[key]
+    REPLICACHE_CACHE.delete(key)
   }
 }
 
