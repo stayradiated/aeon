@@ -8,10 +8,13 @@ import type { LabelId } from '#lib/ids.js'
 import { goto } from '$app/navigation'
 
 import { getDailyDurationList } from '#lib/core/select/get-daily-duration-list.js'
+import { getLabelCount } from '#lib/core/select/get-label-count.js'
+import { getLabelLastStartedAt } from '#lib/core/select/get-label-last-started-at.js'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { clockMin } from '#lib/utils/clock.js'
+import { daysToMs, subDays } from '#lib/utils/days.js'
 import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
@@ -26,15 +29,29 @@ type Props = {
 const { store, labelId }: Props = $props()
 
 const RANGE_DAYS = 30
-const RANGE_DAYS_MS = RANGE_DAYS * 24 * 60 * 60 * 1000 // convert days to ms
 
 const { _: now } = $derived(watch(clockMin))
 
-const rangeStart = $derived(now - RANGE_DAYS_MS)
+const rangeStart = $derived(subDays(now, RANGE_DAYS))
 const rangeEnd = $derived(now)
 
 const { _: label } = $derived(watch(store.label.get(labelId)))
 const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
+const { _: labelLastStartedAt } = $derived(
+  label
+    ? watch(getLabelLastStartedAt(store, label.streamId, labelId))
+    : watch.undefined,
+)
+const { _: pointCount } = $derived(
+  label
+    ? watch(
+        getLabelCount(store, label.streamId, {
+          labelId,
+          startedAt: { gte: subDays(now, 365), lte: now },
+        }),
+      )
+    : watch.undefined,
+)
 
 const { _: dailyDurationList } = $derived(
   label
@@ -55,7 +72,7 @@ const totalDurationMs = $derived(
   }, 0),
 )
 
-const totalPercentage = $derived(totalDurationMs / RANGE_DAYS_MS)
+const totalPercentage = $derived(totalDurationMs / daysToMs(RANGE_DAYS))
 
 const handleDelete = async () => {
   if (
@@ -88,9 +105,9 @@ const handleDelete = async () => {
     Delete
   </SecondaryButton>
 
-  <p>~{label.pointCount} events</p>
-  {#if label.lastStartedAt}
-    <p>Last used {dateFns.format(label.lastStartedAt, 'do MMMM yyyy, p', { in: tz(timeZone) })}</p>
+  <p>{pointCount} events in the last year</p>
+  {#if labelLastStartedAt}
+    <p>Last used {dateFns.format(labelLastStartedAt, 'do MMMM yyyy, p', { in: tz(timeZone) })}</p>
   {:else}
     <p>Never used</p>
   {/if}
