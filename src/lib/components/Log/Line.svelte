@@ -4,7 +4,9 @@ import { computed } from 'signia'
 import type { Store } from '#lib/core/replicache/store.js'
 import type { Line } from '#lib/core/shape/types.js'
 
-import { clockMinute } from '#lib/utils/clock.js'
+import { calcDuration } from '#lib/core/shape/calc-duration.js'
+
+import { clockMin } from '#lib/utils/clock.js'
 import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
@@ -28,11 +30,8 @@ const { _: labelList } = $derived(
   ),
 )
 
-const { _: now } = $derived(watch(clockMinute))
-
-const durationMs = $derived(
-  typeof line.durationMs === 'number' ? line.durationMs : now - line.startedAt,
-)
+const { _: now } = $derived(watch(clockMin))
+const durationMs = $derived(calcDuration(line, now))
 </script>
 
 <div class="Line">

@@ -7,7 +7,7 @@ import type { PageProps } from './$types'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
-import { clockMinute } from '#lib/utils/clock.js'
+import { clockMin } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import MultiDaySliceList from '#lib/components/Log/MultiDaySliceList.svelte'
@@ -15,7 +15,7 @@ import MultiDaySliceList from '#lib/components/Log/MultiDaySliceList.svelte'
 const { data }: PageProps = $props()
 const { store } = $derived(data)
 
-const { _: now } = $derived(watch(clockMinute))
+const { _: now } = $derived(watch(clockMin))
 const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
 
 const SHOW_DAY_COUNT = 2

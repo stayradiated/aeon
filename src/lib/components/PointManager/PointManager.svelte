@@ -14,7 +14,7 @@ import { getStreamList } from '#lib/core/select/get-stream-list.js'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
-import { clock } from '#lib/utils/clock.js'
+import { clockSec } from '#lib/utils/clock.js'
 import { formatDuration } from '#lib/utils/format-duration.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { isSetEqual } from '#lib/utils/is-set-equal.js'
@@ -37,7 +37,7 @@ type Props = {
 
 const { store, initialStartedAt, canEditClock }: Props = $props()
 
-const { _: now } = $derived(watch(clock))
+const { _: now } = $derived(watch(clockSec))
 const { _: streamList } = $derived(watch(getStreamList(store)))
 const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 const { _: initialTimeZone } = $derived(
@@ -73,7 +73,7 @@ const highlightLevel = $derived.by(() => {
 // adjust the user clock to the current time
 const handleSetNow = (_event: MouseEvent) => {
   ;[initialDate, initialTime] = dateFns
-    .format(clock.value, DATE_FORMAT, {
+    .format(clockSec.value, DATE_FORMAT, {
       in: tz(timeZone),
     })
     .split('T')

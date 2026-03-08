@@ -4,6 +4,8 @@ import { computed } from 'signia'
 import type { Line } from '#lib/core/shape/types.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
 
+import { calcDuration } from '#lib/core/shape/calc-duration'
+
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getLineList } from './get-line-list.js'
@@ -28,9 +30,7 @@ const getFilteredLineList = createSelector(
       const lineList = $lineList.value
       return lineList.filter((line) => {
         if (where.durationMs) {
-          const durationMs = line.durationMs
-            ? line.durationMs
-            : now - line.startedAt
+          const durationMs = calcDuration(line, now)
           if (durationMs < where.durationMs.gte) {
             return false
           }

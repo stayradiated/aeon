@@ -8,6 +8,7 @@ import type { Label } from '#lib/types.local.js'
 
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
+import { clockMin } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import Emoji from '#lib/components/Emoji/Emoji.svelte'
@@ -20,7 +21,8 @@ type Props = {
 }
 
 const { store, label, isSelected, onchange }: Props = $props()
-const { _: timeZone } = $derived(watch(getTimeZone(store, undefined)))
+const { _: now } = $derived(watch(clockMin))
+const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
 
 const lastStartedAt = $derived(
   label.lastStartedAt
