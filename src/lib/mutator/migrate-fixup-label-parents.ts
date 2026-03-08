@@ -1,4 +1,4 @@
-import type { LocalMutator } from './types.ts'
+import type { LocalMutator } from './types.js'
 
 const migrateFixupLabelParents: LocalMutator<
   'migrate_fixupLabelParents'

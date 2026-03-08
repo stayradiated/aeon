@@ -38,7 +38,7 @@ const durationMs = $derived(
 <div class="Line">
   {#if labelList.length > 0}
     {#each labelList as label (label.id)}
-      <a class="label" style:--color={label.color} href="/label/edit/{label.id}">
+      <a class="label" style:--color={label.color} href="/label/{label.id}">
         {#if label.icon}
           <Emoji native={label.icon} />
         {/if}

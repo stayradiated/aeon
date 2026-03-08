@@ -1,4 +1,4 @@
-import type { LocalMutator } from './types.ts'
+import type { LocalMutator } from './types.js'
 
 import * as Key from '#lib/core/replicache/keys.js'
 

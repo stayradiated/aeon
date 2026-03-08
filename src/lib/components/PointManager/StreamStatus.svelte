@@ -7,7 +7,7 @@ import type { Label, Stream } from '#lib/types.local.js'
 
 import { getActivePoint } from '#lib/core/select/get-active-point.js'
 
-import { formatDurationRough } from '#lib/utils/format-duration.js'
+import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 export type StreamState =
@@ -82,7 +82,7 @@ const handleDelete = () => {
       {/if}
     </div>
     <div class="duration">
-      {currentPoint ? formatDurationRough(currentTime - currentPoint?.startedAt) : ''}
+      {currentPoint ? formatDuration(currentTime - currentPoint?.startedAt) : ''}
     </div>
   </button>
   {#if isStartedAtCurrentTime}

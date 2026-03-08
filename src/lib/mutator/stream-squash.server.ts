@@ -2,7 +2,7 @@ import { listOrError } from '@stayradiated/error-boundary'
 
 import type { StreamId } from '#lib/ids.js'
 import type { Stream } from '#lib/server/types.js'
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { bulkDeleteLabel } from '#lib/server/db/label/bulk-delete-label.js'
 import { bulkDeletePoint } from '#lib/server/db/point/bulk-delete-point.js'

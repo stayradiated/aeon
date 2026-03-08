@@ -1,5 +1,5 @@
 import type { StreamId } from '#lib/ids.js'
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
 

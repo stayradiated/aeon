@@ -24,7 +24,7 @@ const { _: label } = $derived(watch(store.label.get(labelId)))
 
 {#if label}
   <a
-    href="/label/edit/{label.id}"
+    href="/label/{label.id}"
     class="Span"
     class:isStart
     class:isEnd

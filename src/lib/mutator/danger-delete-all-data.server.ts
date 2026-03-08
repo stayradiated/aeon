@@ -1,4 +1,4 @@
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { bulkDeleteLabel } from '#lib/server/db/label/bulk-delete-label.js'
 import { bulkDeletePoint } from '#lib/server/db/point/bulk-delete-point.js'

@@ -1,4 +1,4 @@
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { bulkDeleteStream } from '#lib/server/db/stream/bulk-delete-stream.js'
 

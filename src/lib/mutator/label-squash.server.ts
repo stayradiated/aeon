@@ -2,7 +2,7 @@ import { listOrError } from '@stayradiated/error-boundary'
 
 import type { LabelId } from '#lib/ids.js'
 import type { Label } from '#lib/server/types.js'
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { bulkDeleteLabel } from '#lib/server/db/label/bulk-delete-label.js'
 import { bulkDeleteLabelParent } from '#lib/server/db/label/bulk-delete-label-parent.js'

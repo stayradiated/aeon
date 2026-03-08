@@ -1,5 +1,5 @@
 import type { AnonLabel } from '#lib/core/replicache/types.js'
-import type { LocalMutator } from './types.ts'
+import type { LocalMutator } from './types.js'
 
 import * as Key from '#lib/core/replicache/keys.js'
 

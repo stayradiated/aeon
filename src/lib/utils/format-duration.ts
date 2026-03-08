@@ -1,32 +1,4 @@
-import * as dateFns from 'date-fns'
-
-const formatDistanceLocale: Record<string, string> = {
-  xSeconds: '{{count}}s',
-  xMinutes: '{{count}}m',
-  xHours: '{{count}}h',
-  xDays: '{{count}}d',
-  xMonths: '{{count}}mo',
-}
-
-const durationLocale = {
-  formatDistance(token: string, count: number) {
-    return (
-      formatDistanceLocale[token]?.replace('{{count}}', String(count)) ??
-      `[[${token}=${count}]]`
-    )
-  },
-}
-
-const formatDuration = (ms: number): string => {
-  return (
-    dateFns.formatDuration(dateFns.intervalToDuration({ start: 0, end: ms }), {
-      format: ['hours', 'minutes'],
-      locale: durationLocale,
-    }) || 'now'
-  )
-}
-
-const formatDurationRough = (input: number): string => {
+const formatDuration = (input: number): string => {
   if (input === 0) {
     return '0m'
   }
@@ -63,4 +35,4 @@ const formatDurationRough = (input: number): string => {
   return 'now'
 }
 
-export { formatDuration, formatDurationRough }
+export { formatDuration }
