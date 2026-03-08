@@ -63,7 +63,7 @@
     "knip": "5.86.0",
     "kysely": "0.28.11",
     "svelte": "5.53.7",
-    "svelte-check": "4.4.4",
+    "svelte-check": "4.4.5",
     "test-fixture-factory": "2.1.0",
     "type-fest": "5.4.4",
     "typescript": "5.9.3",

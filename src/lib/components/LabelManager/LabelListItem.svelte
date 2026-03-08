@@ -1,14 +1,6 @@
 <script lang="ts">
-import { tz } from '@date-fns/tz'
-import * as dateFns from 'date-fns'
-import type { ChangeEventHandler } from 'svelte/elements'
-
 import type { Store } from '#lib/core/replicache/store.js'
 import type { Label } from '#lib/types.local.js'
-
-import { getTimeZone } from '#lib/core/select/get-time-zone.js'
-
-import { watch } from '#lib/utils/watch.svelte.js'
 
 import Emoji from '#lib/components/Emoji/Emoji.svelte'
 
@@ -19,85 +11,48 @@ type Props = {
   onchange?: (isSelected: boolean) => void
 }
 
-const { store, label, isSelected, onchange }: Props = $props()
-const { _: timeZone } = $derived(watch(getTimeZone(store, undefined)))
-
-const lastStartedAt = $derived(
-  label.lastStartedAt
-    ? dateFns.format(label.lastStartedAt, 'd MMM yyyy', {
-        in: tz(timeZone),
-      })
-    : undefined,
-)
-
-const handleSelect: ChangeEventHandler<HTMLInputElement> = (event) => {
-  const { checked } = event.currentTarget
-  onchange?.(checked)
-}
+const { label }: Props = $props()
 </script>
 
-<label class="LabelListItem" style:--local-color={label.color}>
-  <div class="checkbox">
-    <input
-      type="checkbox"
-      name="label"
-      value={label.id}
-      checked={isSelected}
-      autocomplete="off"
-      onchange={handleSelect}
-    />
-  </div>
-  {#if label.icon}<Emoji native={label.icon} scale={3} />{/if}
-  <span class="name">{label.name}</span>
-  {#if lastStartedAt}<span class="lastStartedAt">{lastStartedAt}</span>{/if}
-  {#if label.pointCount > 0}<span class="pointCount">{label.pointCount}</span>{/if}
+<div class="LabelListItem" style:--color={label.color}>
+  <a href="/label/{label.id}" class="link">
+    <div class="icon">
+      {#if label.icon}
+        <Emoji native={label.icon} scale={3} />
+      {/if}
+    </div>
+    <div class="name">{label.name}</div>
+  </a>
   <a class="editBtn" href="/label/edit/{label.id}">Edit</a>
-</label>
+</div>
 
 <style>
   .LabelListItem {
+    display: flex;
+    gap: var(--size-2);
+    max-width: 600px;
+    align-items: center;
+  }
+
+  .link {
     flex: 1;
     display: flex;
     gap: var(--size-2);
     align-items: center;
     height: var(--size-10);
-    max-width: 600px;
-    padding-right: var(--size-2);
+    text-decoration: none;
+    padding-inline: var(--size-4);
+
+    background: var(--color);
+    color: contrast-color(var(--color));
 
     &:hover {
-      background: var(--color-grey-100);
+      text-decoration: underline;
     }
   }
 
-  .checkbox {
-    width: var(--size-10);
-    height: var(--size-10);
-    background: var(--local-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-sm);
-  }
-
-  .name {
-    flex: 1;
-  }
-
-  .pointCount {
-    font-size: var(--scale-00);
-    color: var(--color-grey-600);
-    background: var(--color-grey-100);
-    padding-inline: var(--size-2);
-    border-radius: var(--radius-sm);
-    font-family: var(--font-mono);
-  }
-
-  .lastStartedAt {
-    font-size: var(--scale-00);
-    color: var(--color-blue-700);
-    background: var(--color-grey-100);
-    padding-inline: var(--size-2);
-    border-radius: var(--radius-sm);
+  .icon {
+    width: var(--size-8);
   }
 
   .editBtn {

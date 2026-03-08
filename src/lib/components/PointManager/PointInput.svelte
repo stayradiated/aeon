@@ -8,7 +8,10 @@ import type { Label, Stream } from '#lib/types.local.js'
 
 import { getActivePoint } from '#lib/core/select/get-active-point.js'
 import { getFilteredLabelList } from '#lib/core/select/get-filtered-label-list.js'
+import { getLabelCountRecord } from '#lib/core/select/get-label-count-record.js'
 
+import { clockMin } from '#lib/utils/clock.js'
+import { subDays } from '#lib/utils/days.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
@@ -49,6 +52,8 @@ let {
   onreset,
 }: Props = $props()
 
+const { _: now } = watch(clockMin)
+
 const { _: currentParentPoint } = $derived(
   stream.parentId
     ? watch(getActivePoint(store, stream.parentId, currentTime))
@@ -65,6 +70,15 @@ const { _: streamLabelList } = $derived(
   watch(getFilteredLabelList(store, stream.id, parentLabelIdList)),
 )
 
+// count label usage over the last 7 days
+const { _: labelPopularity } = $derived(
+  watch(
+    getLabelCountRecord(store, stream.id, {
+      startedAt: { gte: subDays(now, 7), lte: now },
+    }),
+  ),
+)
+
 type Option = {
   value: LabelId
   label: string
@@ -79,7 +93,9 @@ const optionList = $derived(
   [
     ...streamLabelList.toSorted((a, b) => {
       // sort by usage
-      return b.popularity - a.popularity
+      const popularityA = labelPopularity[a.id] ?? 0
+      const popularityB = labelPopularity[b.id] ?? 0
+      return popularityB - popularityA
     }),
     ...createdLabelList,
   ].map((label) => toOption(label)),
