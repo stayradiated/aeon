@@ -21,6 +21,7 @@ type Row = {
 type Cell = {
   date: CalendarDate
   tracks: Array<undefined | Track>
+  durationMs: number
 }
 
 type Track = {
@@ -90,6 +91,7 @@ const buildGrid = (options: BuildGridOptions): Grid => {
     row.cells[cellIndex] = {
       date,
       tracks: [],
+      durationMs: 0,
     }
   }
 
@@ -236,5 +238,5 @@ const renderGrid = (grid: Grid): string => {
   return `\n${border}\n${rowList.join(`\n${border}\n`)}\n${border}\n`
 }
 
-export { buildGrid, renderGrid, pushCalendarSpan }
+export { getCoords, buildGrid, renderGrid, pushCalendarSpan }
 export type { Grid, Row, Cell, Track }

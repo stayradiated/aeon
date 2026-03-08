@@ -10,6 +10,7 @@ import { goto } from '$app/navigation'
 import { getDailyDurationList } from '#lib/core/select/get-daily-duration-list.js'
 import { getLabelCount } from '#lib/core/select/get-label-count.js'
 import { getLabelLastStartedAt } from '#lib/core/select/get-label-last-started-at.js'
+import { getStartYear } from '#lib/core/select/get-start-year.js'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
@@ -20,6 +21,8 @@ import { watch } from '#lib/utils/watch.svelte.js'
 
 import SecondaryButton from '#lib/components/Button/SecondaryButton.svelte'
 import Emoji from '#lib/components/Emoji/Emoji.svelte'
+
+import LabelHeatGrid from './LabelHeatGrid.svelte'
 
 type Props = {
   store: Store
@@ -37,6 +40,18 @@ const rangeEnd = $derived(now)
 
 const { _: label } = $derived(watch(store.label.get(labelId)))
 const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
+
+const { _: startYear } = $derived(
+  label ? watch(getStartYear(store, label.streamId)) : watch.undefined,
+)
+const thisYear = new Date().getUTCFullYear()
+
+const yearList = $derived(
+  startYear
+    ? Array.from({ length: thisYear - startYear + 1 }, (_, i) => startYear + i)
+    : [thisYear],
+)
+
 const { _: labelLastStartedAt } = $derived(
   label
     ? watch(getLabelLastStartedAt(store, label.streamId, labelId))
@@ -113,6 +128,10 @@ const handleDelete = async () => {
   {/if}
 
   <p>Total duration over last {RANGE_DAYS} days: {formatDuration(totalDurationMs)} ({Math.round(totalPercentage*100)}%)</p>
+
+  {#each yearList as year (year)}
+    <LabelHeatGrid {store} {labelId} {year} />
+  {/each}
 
   {#each dailyDurationList.toReversed() as entry (entry.date)}
     <h4>{calDateFns.format(entry.date, 'do MMM yyyy')}</h4>
