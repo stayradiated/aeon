@@ -1,4 +1,4 @@
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { getNextStreamSortOrder } from '#lib/server/db/stream/get-next-stream-sort-order.js'
 import { insertStream } from '#lib/server/db/stream/insert-stream.js'

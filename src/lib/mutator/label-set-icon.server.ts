@@ -1,4 +1,4 @@
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { updateLabel } from '#lib/server/db/label/update-label.js'
 

@@ -1,11 +1,14 @@
 class MinHeap<T> {
   readonly data: T[] = []
+  readonly isLess: (a: T, b: T) => boolean
 
   constructor(
     // should return true if a < b
     // false if a >= b
-    private isLess: (a: T, b: T) => boolean,
-  ) {}
+    isLess: (a: T, b: T) => boolean,
+  ) {
+    this.isLess = isLess
+  }
 
   get size(): number {
     return this.data.length

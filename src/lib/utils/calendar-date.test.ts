@@ -20,7 +20,7 @@ import {
   toEarliestInstant,
   toInstant,
   toLatestInstant,
-} from './calendar-date.ts'
+} from './calendar-date.js'
 
 const AUCKLAND = tz('Pacific/Auckland')
 const CHICAGO = tz('America/Chicago')

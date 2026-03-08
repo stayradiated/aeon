@@ -2,7 +2,7 @@ import type { Signal } from 'signia'
 import { computed } from 'signia'
 
 import type { Line } from '#lib/core/shape/types.js'
-import type { StreamId } from '#lib/ids.js'
+import type { LabelId, StreamId } from '#lib/ids.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -15,7 +15,8 @@ const getFilteredLineList = createSelector(
     streamId: StreamId,
     where: {
       startedAt: { gte: number; lte: number }
-      durationMs: { gte: number }
+      durationMs?: { gte: number }
+      labelId?: LabelId
     },
     now: number,
   ): Signal<Line[]> => {
@@ -26,10 +27,23 @@ const getFilteredLineList = createSelector(
     return computed('getFilteredLineList', () => {
       const lineList = $lineList.value
       return lineList.filter((line) => {
-        const durationMs = line.durationMs
-          ? line.durationMs
-          : now - line.startedAt
-        return durationMs >= where.durationMs.gte
+        if (where.durationMs) {
+          const durationMs = line.durationMs
+            ? line.durationMs
+            : now - line.startedAt
+          if (durationMs < where.durationMs.gte) {
+            return false
+          }
+        }
+
+        if (where.labelId) {
+          const hasLabel = line.labelIdList.includes(where.labelId)
+          if (!hasLabel) {
+            return false
+          }
+        }
+
+        return true
       })
     })
   },

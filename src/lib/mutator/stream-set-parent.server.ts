@@ -1,4 +1,4 @@
-import type { ServerMutator } from './types.ts'
+import type { ServerMutator } from './types.js'
 
 import { updateStream } from '#lib/server/db/stream/update-stream.js'
 

@@ -15,7 +15,7 @@ import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
 import { clock } from '#lib/utils/clock.js'
-import { formatDurationRough } from '#lib/utils/format-duration.js'
+import { formatDuration } from '#lib/utils/format-duration.js'
 import { genId } from '#lib/utils/gen-id.js'
 import { isSetEqual } from '#lib/utils/is-set-equal.js'
 import { objectEntries } from '#lib/utils/object-entries.js'
@@ -292,7 +292,7 @@ const handleReset = (streamId: StreamId) => {
       class="now-button"
       style:--highlight-level={highlightLevel}
       onclick={handleSetNow}
-      disabled={!canEditClock}>{formatDurationRough(dateFns.differenceInMilliseconds(now, visibleTimestamp))}</button>
+      disabled={!canEditClock}>{formatDuration(dateFns.differenceInMilliseconds(now, visibleTimestamp))}</button>
   </div>
 
   <button type="button" onclick={handleSubmit} class="save-button">Save</button>

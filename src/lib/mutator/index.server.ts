@@ -15,6 +15,7 @@ const mutators: ServerMutatorDefsImportMap = {
   label_setColor: import('./label-set-color.server.js'),
   label_setIcon: import('./label-set-icon.server.js'),
   label_squash: import('./label-squash.server.js'),
+  label_delete: import('./label-delete.server.js'),
 
   point_create: import('./point-create.server.js'),
   point_delete: import('./point-delete.server.js'),

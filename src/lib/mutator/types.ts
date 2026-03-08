@@ -40,6 +40,9 @@ type Mutators = {
     sourceLabelIdList: LabelId[]
     destinationLabelId: LabelId
   }>
+  label_delete: Mutator<{
+    labelId: LabelId
+  }>
 
   status_toggleEnabled: Mutator<{
     isEnabled: boolean
