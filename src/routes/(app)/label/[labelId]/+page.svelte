@@ -18,7 +18,7 @@ const labelId = $derived(page.params.labelId as LabelId)
 
 <style>
   main {
-    max-width: var(--width-xs);
+    max-width: var(--width-md);
     margin-inline: auto;
   }
 </style>
