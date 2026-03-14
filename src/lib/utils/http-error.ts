@@ -6,4 +6,5 @@ const errorResponse = (status: number, error: Error | string): Response => {
     { status },
   )
 }
+
 export { errorResponse }

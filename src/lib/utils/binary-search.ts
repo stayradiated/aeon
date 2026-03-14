@@ -64,4 +64,4 @@ const lowerBound = <K>(list: readonly K[], compare: Comparator<K>): number =>
 const upperBound = <K>(list: readonly K[], compare: Comparator<K>): number =>
   firstTrue(list, (item) => compare(item) > 0)
 
-export { upperBound, lowerBound }
+export { lowerBound, upperBound }

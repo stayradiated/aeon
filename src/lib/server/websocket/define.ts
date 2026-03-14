@@ -69,5 +69,6 @@ const defineWebsocketHandler = (
   }
 }
 
-export { defineWebsocketHandler }
 export type { WebsocketHandler, WebsocketHandlerFn }
+
+export { defineWebsocketHandler }

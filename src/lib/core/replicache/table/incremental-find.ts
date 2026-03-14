@@ -127,4 +127,5 @@ const incrementalFind = <Value>(
     },
   )
 }
+
 export { incrementalFind }

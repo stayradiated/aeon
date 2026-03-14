@@ -238,5 +238,6 @@ const renderGrid = (grid: Grid): string => {
   return `\n${border}\n${rowList.join(`\n${border}\n`)}\n${border}\n`
 }
 
-export { getCoords, buildGrid, renderGrid, pushCalendarSpan }
-export type { Grid, Row, Cell, Track }
+export type { Cell, Grid, Row, Track }
+
+export { buildGrid, getCoords, pushCalendarSpan, renderGrid }

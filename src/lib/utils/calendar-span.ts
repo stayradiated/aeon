@@ -55,5 +55,6 @@ const mergeCalendarSpanList = (list: CalendarSpan[]): CalendarSpan[] => {
   return out
 }
 
-export { mergeCalendarSpanList }
 export type { CalendarSpan }
+
+export { mergeCalendarSpanList }

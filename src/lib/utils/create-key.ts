@@ -122,9 +122,10 @@ const createCompositeKey = <Name extends string>(name: Name) => {
   }
 }
 
+export type { Key, KeyValue }
+
 export {
-  createKey,
   /** @knipignore **/
   createCompositeKey,
+  createKey,
 }
-export type { Key, KeyValue }

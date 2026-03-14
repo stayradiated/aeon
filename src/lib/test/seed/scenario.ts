@@ -33,5 +33,6 @@ const generateScenarioData = async (options: GenerateScenarioDataOptions) => {
   }
 }
 
-export { generateScenarioData }
 export type { ScenarioName }
+
+export { generateScenarioData }
