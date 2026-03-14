@@ -14,6 +14,8 @@ import { useUser } from '#lib/test/use-user.js'
 import { mergeStreamsIntoDestination } from './merge-streams-into-destination.js'
 
 const test = anyTest.extend({
+  stream: undefined,
+
   db: useDb(),
   now: useNow(),
   user: useUser(),

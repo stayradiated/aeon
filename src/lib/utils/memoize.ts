@@ -82,5 +82,6 @@ const memoize = <FunctionToMemoize extends AnyFunction>(
   return memoized
 }
 
-export { memoize }
 export type { MemoizeOptions }
+
+export { memoize }

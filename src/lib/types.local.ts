@@ -59,11 +59,11 @@ type LocalStatus = {
 }
 
 export type {
-  LocalUser as User,
   LocalLabel as Label,
-  LocalPoint as Point,
-  LocalStream as Stream,
   LocalMeta as Meta,
   LocalMetaTask as MetaTask,
+  LocalPoint as Point,
   LocalStatus as Status,
+  LocalStream as Stream,
+  LocalUser as User,
 }

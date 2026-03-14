@@ -17,4 +17,4 @@ const getOpenAIApiKey = createEnvGetter(
   z.string(),
 )
 
-export { getDatabaseUrl, getResendApiKey, getOpenAIApiKey }
+export { getDatabaseUrl, getOpenAIApiKey, getResendApiKey }

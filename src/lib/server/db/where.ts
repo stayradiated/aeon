@@ -324,4 +324,4 @@ function extendWhere<DB, UT extends keyof DB, T extends keyof DB, O>(
   return createBuilder(query)
 }
 
-export { extendWhere, ANY_ID }
+export { ANY_ID, extendWhere }

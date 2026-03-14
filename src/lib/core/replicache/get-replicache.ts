@@ -111,4 +111,4 @@ const resetReplicache = async () => {
   }
 }
 
-export { getReplicache, resetReplicache, mutators, createReplicacheMutators }
+export { createReplicacheMutators, getReplicache, mutators, resetReplicache }
