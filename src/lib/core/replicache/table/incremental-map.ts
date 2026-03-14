@@ -75,4 +75,5 @@ const incrementalMap = <InValue, OutValue>(
     },
   )
 }
+
 export { incrementalMap }

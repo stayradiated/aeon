@@ -13,4 +13,4 @@ const clockMin = computed('clockMinute', () => {
     .getTime()
 })
 
-export { clockSec, clockMin }
+export { clockMin, clockSec }

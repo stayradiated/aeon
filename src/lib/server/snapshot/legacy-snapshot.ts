@@ -110,5 +110,6 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
   }
 }
 
-export { $LegacySnapshot, migrateLegacySnapshot }
 export type { LegacySnapshot }
+
+export { $LegacySnapshot, migrateLegacySnapshot }

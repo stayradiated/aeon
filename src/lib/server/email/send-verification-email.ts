@@ -40,4 +40,5 @@ ${JSON.stringify(options, null, 2)}
   }
   return undefined
 }
+
 export { sendVerificationEmail }

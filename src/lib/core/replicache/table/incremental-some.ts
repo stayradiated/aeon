@@ -120,4 +120,5 @@ const incrementalSome = <Value>(
     },
   )
 }
+
 export { incrementalSome }

@@ -14,8 +14,9 @@ import {
   deleteSessionTokenCookie,
   setSessionTokenCookie,
   validateSessionToken,
-} from '$lib/server/auth.js'
-import { getDb } from '$lib/server/db/get-db'
+} from '#lib/server/auth.js'
+
+import { getDb } from '#lib/server/db/get-db'
 
 export const handle: Handle = async ({ event, resolve }) => {
   const token = event.cookies.get('session')

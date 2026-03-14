@@ -205,11 +205,11 @@ type ServerMutatorDefsImportMap<
 export type {
   GenericLocalMutator,
   GenericServerMutator,
+  InternalMutatorInput,
   LocalMutator,
   LocalMutatorContext,
   LocalMutatorDefs,
   LocalMutatorDefsImportMap,
-  InternalMutatorInput,
   Mutator,
   MutatorKey,
   ReplicacheMutatorDefs,
