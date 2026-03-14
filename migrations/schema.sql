@@ -263,6 +263,7 @@ CREATE TABLE public."user" (
     updated_at bigint NOT NULL,
     email text NOT NULL,
     slack_token text,
+    api_token_hash bytea,
     CONSTRAINT "user:check(email)" CHECK ((email = lower(email)))
 );
 
