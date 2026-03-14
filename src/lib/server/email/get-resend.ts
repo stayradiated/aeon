@@ -8,4 +8,5 @@ const getResend = once(() => {
   const apiKey = getResendApiKey()
   return new Resend(apiKey)
 })
+
 export { getResend }

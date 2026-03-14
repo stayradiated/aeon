@@ -64,5 +64,6 @@ const maybeResolveId = <Id extends string>(
   return null
 }
 
-export { createIdMap, resolveId, mustResolveId, maybeResolveId }
 export type { IdMap }
+
+export { createIdMap, maybeResolveId, mustResolveId, resolveId }

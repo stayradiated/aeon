@@ -123,4 +123,4 @@ const exposeConfigureServerGlobal = () => {
   setConfigureServer(createConfigureServerFn(() => state.wss))
 }
 
-export { startWebsocketServer, exposeConfigureServerGlobal }
+export { exposeConfigureServerGlobal, startWebsocketServer }

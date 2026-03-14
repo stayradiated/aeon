@@ -10,4 +10,4 @@ type KyselyDb = Kysely<DB>
 type Transaction = GenericTransaction<DB>
 type ControlledTransaction = GenericControlledTransaction<DB>
 
-export type { DB, KyselyDb, Transaction, ControlledTransaction }
+export type { ControlledTransaction, DB, KyselyDb, Transaction }

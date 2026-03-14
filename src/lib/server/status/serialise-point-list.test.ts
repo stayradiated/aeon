@@ -9,6 +9,9 @@ import { useUser } from '#lib/test/use-user.js'
 import { serialisePointList } from './serialise-point-list.js'
 
 const test = anyTest.extend({
+  now: undefined,
+  stream: undefined,
+
   db: useDb(),
   user: useUser(),
   createStream: useCreateStream(),

@@ -10,5 +10,6 @@ const $Snapshot = z.object({
 })
 type Snapshot = z.infer<typeof $Snapshot>
 
-export { $Snapshot }
 export type { Snapshot }
+
+export { $Snapshot }

@@ -41,8 +41,8 @@ const asyncMapRecordValues = async <Key extends string, InValue, OutValue>(
 }
 
 export {
+  asyncMapRecordValues,
   /** @knipignore **/
   inverseRecord,
   mapRecordValues,
-  asyncMapRecordValues,
 }
