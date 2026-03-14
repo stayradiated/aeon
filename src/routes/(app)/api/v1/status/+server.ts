@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit'
+import { error, json } from '@sveltejs/kit'
 
 import type { RequestHandler } from './$types.js'
 
@@ -7,6 +7,11 @@ import { getDb } from '#lib/server/db/get-db.js'
 import { getLabelList } from '#lib/server/db/label/get-label-list.js'
 import { getActiveLineList } from '#lib/server/db/line/get-active-line-list.js'
 import { getStreamList } from '#lib/server/db/stream/get-stream-list.js'
+
+import {
+  AuthenticationError,
+  getApiSession,
+} from '#lib/server/api-token/get-api-session.js'
 
 import { errorResponse } from '#lib/utils/http-error.js'
 import { promiseAllRecord } from '#lib/utils/promise-all-record.js'
@@ -19,13 +24,19 @@ type StatusItem = {
 }
 
 const GET: RequestHandler = async (event) => {
-  const { locals } = event
-  const sessionUserId = locals.session?.userId
-  if (!sessionUserId) {
-    return new Response('Must be logged in', { status: 401 })
-  }
+  const { request } = event
 
   const db = getDb()
+
+  const session = await getApiSession({ db, request })
+  if (session instanceof AuthenticationError) {
+    throw error(401, session.message)
+  }
+  if (session instanceof Error) {
+    throw session
+  }
+
+  const { sessionUserId } = session
 
   const streamAndLineData = await promiseAllRecord({
     streamList: getStreamList({

@@ -30,6 +30,7 @@ const userFactory = createFactory<User>('User')
         stravaClientSecret: null,
         stravaSession: null,
         slackToken: null,
+        apiTokenHash: null,
       },
     })
     assertOk(user)

@@ -10,6 +10,7 @@ type UpdateUserOptions = {
   }
   set: {
     slackToken?: string | null
+    apiTokenHash?: Uint8Array | null
   }
   now?: number
 }

@@ -14,8 +14,12 @@ import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
 import StatusManager from '#lib/components/Status/StatusManager.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
 
+import { setApiToken } from './set-api-token.remote.js'
+
 const { data }: PageProps = $props()
 const { store } = $derived(data)
+
+let apiToken = $state<string>()
 
 import { openFilePicker } from '#lib/utils/open-file-picker.js'
 
@@ -111,6 +115,17 @@ const handleAssignLabelParent = async () => {
     <p>Scan existing labels and associate them with the correct parent.</p>
     <button onclick={handleAssignLabelParent}>Assign Label Parent</button>
     <MetaTaskProgress {store} name="fixup-all-label-parents" />
+  </section>
+
+  <section>
+    <h2>API Access</h2>
+    {#if apiToken}
+      <pre><code>{apiToken}</code></pre>
+      <p>Copy this token, it will be hidden when you next view this page!</p>
+    {:else}
+      <pre><code>aeon.**************************.*******************************************</code></pre>
+      <button onclick={async () => { apiToken = await setApiToken() }}>Reset API Token</button>
+    {/if}
   </section>
 
   <section>

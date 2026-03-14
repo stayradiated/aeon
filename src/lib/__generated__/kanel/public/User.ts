@@ -21,6 +21,8 @@ export default interface UserTable {
   email: ColumnType<string, string, string>;
 
   slackToken: ColumnType<string | null, string | null, string | null>;
+
+  apiTokenHash: ColumnType<Uint8Array | null, Uint8Array | null, Uint8Array | null>;
 }
 
 export type User = Selectable<UserTable>;
@@ -40,6 +42,7 @@ export const user = z.object({
   updatedAt: z.number(),
   email: z.string(),
   slackToken: z.string().nullable().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).nullable().nullable(),
 });
 
 export const userInitializer = z.object({
@@ -51,6 +54,7 @@ export const userInitializer = z.object({
   updatedAt: z.number(),
   email: z.string(),
   slackToken: z.string().nullable().optional().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).nullable().optional().nullable(),
 });
 
 export const userMutator = z.object({
@@ -62,4 +66,5 @@ export const userMutator = z.object({
   updatedAt: z.number().optional(),
   email: z.string().optional(),
   slackToken: z.string().nullable().optional().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).nullable().optional().nullable(),
 });

@@ -23,6 +23,10 @@ const config = {
       // see src/service-worker.init.ts
       register: false,
     },
+
+    experimental: {
+      remoteFunctions: true,
+    },
   },
 }
 
