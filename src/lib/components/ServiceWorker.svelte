@@ -3,7 +3,7 @@ import { onMount } from 'svelte'
 
 import { registerServiceWorker } from '../../service-worker.init.js'
 
-let showUpdate = $state(true)
+let showUpdate = $state(false)
 let applyUpdate = $state<() => void>()
 
 onMount(async () => {
