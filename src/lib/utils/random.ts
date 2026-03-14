@@ -70,5 +70,6 @@ const arrayElements = <T>(rng: RNG, arr: T[], count: number): T[] => {
   return shuffled.slice(0, count)
 }
 
-export { createRNG, integer, arrayElement, arrayElements }
 export type { RNG }
+
+export { arrayElement, arrayElements, createRNG, integer }

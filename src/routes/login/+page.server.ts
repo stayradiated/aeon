@@ -76,4 +76,4 @@ const actions = {
   },
 } satisfies Actions
 
-export { load, actions }
+export { actions, load }

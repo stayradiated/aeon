@@ -102,22 +102,23 @@ const isWeekend = (date: CalendarDate): boolean => {
 }
 
 export type { CalendarDate }
+
 export {
-  fromUTC,
-  fromUTCInstant,
-  getYear,
-  getMonth,
-  getDay,
-  fromInstant,
-  toInstant,
-  formatISO,
-  fromISOString,
-  format,
-  toEarliestInstant,
-  toLatestInstant,
-  eachDayOfInterval,
-  subDays,
   addDays,
   dayOfWeek,
+  eachDayOfInterval,
+  format,
+  formatISO,
+  fromInstant,
+  fromISOString,
+  fromUTC,
+  fromUTCInstant,
+  getDay,
+  getMonth,
+  getYear,
   isWeekend,
+  subDays,
+  toEarliestInstant,
+  toInstant,
+  toLatestInstant,
 }

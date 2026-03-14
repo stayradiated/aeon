@@ -18,4 +18,5 @@ const incrementalGet = <Value>(
     },
   )
 }
+
 export { incrementalGet }

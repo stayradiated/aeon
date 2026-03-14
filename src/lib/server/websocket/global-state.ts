@@ -1,6 +1,6 @@
 import type { HttpServer } from 'vite'
 
-import { defineGlobalVariable } from '#lib/utils/define-global-variable.js'
+import { defineGlobalVariable } from '../../utils/define-global-variable.ts'
 
 /*
  * IMPORTANT:
@@ -16,5 +16,6 @@ type ConfigureServer = (httpServer: HttpServer) => void
 const [getConfigureServer, setConfigureServer] =
   defineGlobalVariable<ConfigureServer>(GlobalThisConfigureServer)
 
-export { setConfigureServer, getConfigureServer }
 export type { ConfigureServer }
+
+export { getConfigureServer, setConfigureServer }

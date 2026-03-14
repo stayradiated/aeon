@@ -94,5 +94,6 @@ const squashDiffListList = <T>(diffListList: DiffList<T>[]): DiffList<T> => {
   return squashedDiffList
 }
 
-export { applyReplicacheDiff, squashDiffListList }
 export type { Diff, DiffList }
+
+export { applyReplicacheDiff, squashDiffListList }

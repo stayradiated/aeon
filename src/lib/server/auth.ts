@@ -114,11 +114,11 @@ const deleteSessionTokenCookie = (event: RequestEvent): void => {
 }
 
 export {
-  SESSION_COOKIE_NAME,
-  validateSessionToken,
-  invalidateSession,
-  generateSessionToken,
   createSession,
-  setSessionTokenCookie,
   deleteSessionTokenCookie,
+  generateSessionToken,
+  invalidateSession,
+  SESSION_COOKIE_NAME,
+  setSessionTokenCookie,
+  validateSessionToken,
 }

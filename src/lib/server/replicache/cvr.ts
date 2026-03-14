@@ -93,5 +93,6 @@ const isCVRDiffEmpty = (diff: CVRDiff) => {
   )
 }
 
-export { EMPTY_CVR, buildVersionRecord, diffCVR, isCVRDiffEmpty }
-export type { CVR, VersionRecord, CVRDiff, CVREntryDiff }
+export type { CVR, CVRDiff, CVREntryDiff, VersionRecord }
+
+export { buildVersionRecord, diffCVR, EMPTY_CVR, isCVRDiffEmpty }

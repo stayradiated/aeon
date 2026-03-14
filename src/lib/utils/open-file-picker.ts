@@ -44,5 +44,6 @@ const openFilePicker = async (
   return promise
 }
 
-export { openFilePicker }
 export type { OpenFilePickerOptions }
+
+export { openFilePicker }

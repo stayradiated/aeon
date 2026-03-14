@@ -158,5 +158,6 @@ const createStore = (options: CreateStoreOptions) => {
 
 type Store = ReturnType<typeof createStore>
 
-export { createStore }
 export type { Store }
+
+export { createStore }

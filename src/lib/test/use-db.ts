@@ -1,8 +1,8 @@
 import { createFactory } from 'test-fixture-factory'
 
-import type { KyselyDb } from '$lib/server/db/types.js'
+import type { KyselyDb } from '#lib/server/db/types.js'
 
-import { getDb } from '$lib/server/db/get-db.js'
+import { getDb } from '#lib/server/db/get-db.js'
 
 const dbFactory = createFactory<KyselyDb>('Db').fixture(async (_attrs, use) => {
   const db = getDb()
@@ -20,7 +20,7 @@ const useDb = dbFactory.useValue
 const useCreateDb = dbFactory.useCreateValue
 
 export {
-  useDb,
   /** @knipignore **/
   useCreateDb,
+  useDb,
 }

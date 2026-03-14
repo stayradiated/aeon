@@ -216,4 +216,4 @@ const getEntities = async (
   )
 }
 
-export { getNextCVR, getEntities }
+export { getEntities, getNextCVR }

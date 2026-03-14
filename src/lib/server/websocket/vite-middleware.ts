@@ -1,6 +1,6 @@
 import type { PluginOption } from 'vite'
 
-import { getConfigureServer } from './global-state.js'
+import { getConfigureServer } from './global-state.ts'
 
 /*
  * This is a Vite plugin that sets up an integrated websocket server.
