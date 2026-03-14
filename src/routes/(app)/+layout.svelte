@@ -52,6 +52,8 @@ afterNavigate(() => {
 })
 </script>
 
+<ServiceWorker />
+
 <Status {store} />
 
 <header>
@@ -70,14 +72,11 @@ afterNavigate(() => {
   </nav>
 </header>
 
-
 {#if isStoreLoading}
   <div class="loading">Loading ({loadingDuration}ms)...</div>
 {:else}
   {@render children?.()}
 {/if}
-
-<ServiceWorker />
 
 <style>
   :global(html) {

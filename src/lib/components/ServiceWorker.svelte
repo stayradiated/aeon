@@ -3,7 +3,7 @@ import { onMount } from 'svelte'
 
 import { registerServiceWorker } from '../../service-worker.init.js'
 
-let showUpdate = $state(false)
+let showUpdate = $state(true)
 let applyUpdate = $state<() => void>()
 
 onMount(async () => {
@@ -12,32 +12,27 @@ onMount(async () => {
     applyUpdate = update
   })
 })
-
-function handleUpgrade() {
-  applyUpdate?.()
-}
 </script>
 
 {#if showUpdate}
   <div class="update-banner">
-    <span>A new version is available.</span>
-    <button onclick={handleUpgrade}>Update</button>
+    <span>A new version of Aeon is available.</span>
+    <div>
+      <button onclick={() => { showUpdate = false }}>Ignore</button>
+      <button onclick={() => applyUpdate?.()}>Update</button>
+    </div>
   </div>
 {/if}
 
 <style>
   .update-banner {
-    position: fixed;
-    bottom: 1rem;
-    left: 1rem;
-    right: 1rem;
+    width: 100%;
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    background: #111;
-    color: white;
-    z-index: 9999;
+    gap: var(--size-2);
+    padding: var(--size-3);
+    background: var(--color-blue-700);
+    color: var(--color-grey-50);
+    z-index: var(--layer-top);
   }
 </style>
