@@ -92,6 +92,10 @@ const addDays = (date: CalendarDate, days: number): CalendarDate => {
   return (date + days) as CalendarDate
 }
 
+const subWeeks = (date: CalendarDate, weeks: number): CalendarDate => {
+  return (date - weeks * 7) as CalendarDate
+}
+
 const dayOfWeek = (date: CalendarDate): number => {
   return (date + 4) % 7
 }
@@ -101,12 +105,23 @@ const isWeekend = (date: CalendarDate): boolean => {
   return day === 0 || day === 6
 }
 
+// if date is sunday, returns current date
+// else returns the next sunday after the current date
+const endOfWeek = (date: CalendarDate): CalendarDate => {
+  const value = dayOfWeek(date)
+  if (value === 0) {
+    return date
+  }
+  return (date + (7 - value)) as CalendarDate
+}
+
 export type { CalendarDate }
 
 export {
   addDays,
   dayOfWeek,
   eachDayOfInterval,
+  endOfWeek,
   format,
   formatISO,
   fromInstant,
@@ -119,6 +134,7 @@ export {
   isWeekend,
   MS_PER_DAY,
   subDays,
+  subWeeks,
   toEarliestInstant,
   toInstant,
   toLatestInstant,
