@@ -117,6 +117,7 @@ export {
   getMonth,
   getYear,
   isWeekend,
+  MS_PER_DAY,
   subDays,
   toEarliestInstant,
   toInstant,
