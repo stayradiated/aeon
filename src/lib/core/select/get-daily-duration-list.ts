@@ -4,8 +4,6 @@ import { computed } from 'signia'
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
 
-import { calcDuration } from '#lib/core/shape/calc-duration.js'
-
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -47,14 +45,28 @@ const getDailyDurationList = createSelector(
       const entryRecord: Record<CalendarDate, DailyEntry> = {}
 
       for (const line of lineList) {
-        const { startedAt } = line
-        const timeZone = getTimeZone(store, startedAt).value
-        const date = calDateFns.fromInstant(startedAt, tz(timeZone))
+        const { startedAt, stoppedAt } = line
 
-        entryRecord[date] ??= { date, durationMs: 0 }
-        const entry = entryRecord[date]
+        // TODO: handle timezone changes during this time
+        const timeZoneName = getTimeZone(store, startedAt).value
+        const timeZone = tz(timeZoneName)
 
-        entry.durationMs += calcDuration(line, now)
+        for (const date of calDateFns.eachDayOfInterval({
+          start: calDateFns.fromInstant(startedAt, timeZone),
+          end: calDateFns.fromInstant(stoppedAt ?? now, timeZone),
+        })) {
+          const startOfDay = calDateFns.toInstant(date, timeZone)
+          const endOfDay = startOfDay + calDateFns.MS_PER_DAY
+          const startInstant = Math.max(startedAt, startOfDay)
+          const stopInstant = Math.min(stoppedAt ?? now, endOfDay)
+          const durationMs = stopInstant - startInstant
+
+          if (entryRecord[date]) {
+            entryRecord[date].durationMs += durationMs
+          } else {
+            entryRecord[date] = { date, durationMs }
+          }
+        }
       }
 
       return Object.values(entryRecord).sort((a, b) => {

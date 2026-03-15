@@ -71,7 +71,6 @@ const grid = $derived.by(() => {
 </script>
 
 <h4>{year}</h4>
-
 <HeatGrid {grid} />
 
 <style>
