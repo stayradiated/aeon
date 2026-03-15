@@ -7,22 +7,20 @@ import type { LabelId } from '#lib/ids.js'
 
 import { goto } from '$app/navigation'
 
-import { getDailyDurationList } from '#lib/core/select/get-daily-duration-list.js'
 import { getLabelCount } from '#lib/core/select/get-label-count.js'
 import { getLabelLastStartedAt } from '#lib/core/select/get-label-last-started-at.js'
 import { getStartYear } from '#lib/core/select/get-start-year.js'
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
-import * as calDateFns from '#lib/utils/calendar-date.js'
 import { clockMin } from '#lib/utils/clock.js'
-import { daysToMs, subDays } from '#lib/utils/days.js'
-import { formatDuration } from '#lib/utils/format-duration.js'
+import { subDays } from '#lib/utils/days.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import SecondaryButton from '#lib/components/Button/SecondaryButton.svelte'
 import Emoji from '#lib/components/Emoji/Emoji.svelte'
 
 import LabelHeatGrid from './LabelHeatGrid.svelte'
+import LabelWeekChart from './LabelWeekChart.svelte'
 
 type Props = {
   store: Store
@@ -31,12 +29,7 @@ type Props = {
 
 const { store, labelId }: Props = $props()
 
-const RANGE_DAYS = 30
-
 const { _: now } = $derived(watch(clockMin))
-
-const rangeStart = $derived(subDays(now, RANGE_DAYS))
-const rangeEnd = $derived(now)
 
 const { _: label } = $derived(watch(store.label.get(labelId)))
 const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
@@ -67,27 +60,6 @@ const { _: pointCount } = $derived(
       )
     : watch.undefined,
 )
-
-const { _: dailyDurationList } = $derived(
-  label
-    ? watch(
-        getDailyDurationList(
-          store,
-          label.streamId,
-          { startedAt: { gte: rangeStart, lte: rangeEnd }, labelId },
-          now,
-        ),
-      )
-    : watch.lit([]),
-)
-
-const totalDurationMs = $derived(
-  dailyDurationList.reduce((sum, entry) => {
-    return sum + entry.durationMs
-  }, 0),
-)
-
-const totalPercentage = $derived(totalDurationMs / daysToMs(RANGE_DAYS))
 
 const handleDelete = async () => {
   if (
@@ -122,20 +94,15 @@ const handleDelete = async () => {
 
   <p>{pointCount} events in the last year</p>
   {#if labelLastStartedAt}
-    <p>Last used {dateFns.format(labelLastStartedAt, 'do MMMM yyyy, p', { in: tz(timeZone) })}</p>
+    <p>Last logged on {dateFns.format(labelLastStartedAt, 'do MMMM yyyy, p', { in: tz(timeZone) })}</p>
   {:else}
     <p>Never used</p>
   {/if}
 
-  <p>Total duration over last {RANGE_DAYS} days: {formatDuration(totalDurationMs)} ({Math.round(totalPercentage*100)}%)</p>
+  <LabelWeekChart {store} {labelId} />
 
   {#each yearList as year (year)}
     <LabelHeatGrid {store} {labelId} {year} />
-  {/each}
-
-  {#each dailyDurationList.toReversed() as entry (entry.date)}
-    <h4>{calDateFns.format(entry.date, 'do MMM yyyy')}</h4>
-    <p>{formatDuration(entry.durationMs)}</p>
   {/each}
 {/if}
 

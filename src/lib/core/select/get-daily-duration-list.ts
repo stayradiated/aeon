@@ -10,7 +10,7 @@ import { createSelector } from '#lib/utils/selector.js'
 import { getFilteredLineList } from './get-filtered-line-list.js'
 import { getTimeZone } from './get-time-zone.js'
 
-type DailyEntry = {
+type DailyDuration = {
   date: CalendarDate
   durationMs: number
 }
@@ -42,7 +42,7 @@ const getDailyDurationList = createSelector(
     return computed('getDailyDurationList', () => {
       const lineList = $lineList.value
 
-      const entryRecord: Record<CalendarDate, DailyEntry> = {}
+      const entryRecord: Record<CalendarDate, DailyDuration> = {}
 
       for (const line of lineList) {
         const { startedAt, stoppedAt } = line

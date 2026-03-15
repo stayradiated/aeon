@@ -6,6 +6,7 @@ import {
   addDays,
   dayOfWeek,
   eachDayOfInterval,
+  endOfWeek,
   format,
   formatISO,
   fromInstant,
@@ -17,6 +18,7 @@ import {
   getYear,
   isWeekend,
   subDays,
+  subWeeks,
   toEarliestInstant,
   toInstant,
   toLatestInstant,
@@ -222,40 +224,46 @@ describe('subDays', () => {
   })
 })
 
+describe('subWeeks', () => {
+  test('should subtract 1 week', () => {
+    const date = fromUTC(2026, 11, 31)
+    expect(subWeeks(date, 1)).toBe(fromUTC(2026, 11, 24))
+  })
+})
+
 describe('dayOfWeek', () => {
-  test('should return 0 for Sunday', () => {
-    const date = fromUTC(2026, 2, 1)
-    expect(dayOfWeek(date)).toBe(0)
+  test('should work in 2026', () => {
+    const sunday = fromUTC(2026, 2, 1)
+    expect(dayOfWeek(sunday)).toBe(0)
+
+    const monday = fromUTC(2026, 2, 2)
+    expect(dayOfWeek(monday)).toBe(1)
+
+    const tuesday = fromUTC(2026, 2, 3)
+    expect(dayOfWeek(tuesday)).toBe(2)
+
+    const wednesday = fromUTC(2026, 2, 4)
+    expect(dayOfWeek(wednesday)).toBe(3)
+
+    const thursday = fromUTC(2026, 2, 5)
+    expect(dayOfWeek(thursday)).toBe(4)
+
+    const friday = fromUTC(2026, 2, 6)
+    expect(dayOfWeek(friday)).toBe(5)
+
+    const saturday = fromUTC(2026, 2, 7)
+    expect(dayOfWeek(saturday)).toBe(6)
   })
 
-  test('should return 1 for Monday', () => {
-    const date = fromUTC(2026, 2, 2)
-    expect(dayOfWeek(date)).toBe(1)
-  })
+  test('should work in 2025', () => {
+    const jan = fromUTC(2025, 0, 5)
+    expect(dayOfWeek(jan)).toBe(0)
 
-  test('should return 2 for Tuesday', () => {
-    const date = fromUTC(2026, 2, 3)
-    expect(dayOfWeek(date)).toBe(2)
-  })
+    const feb = fromUTC(2025, 1, 2)
+    expect(dayOfWeek(feb)).toBe(0)
 
-  test('should return 3 for Wednesday', () => {
-    const date = fromUTC(2026, 2, 4)
-    expect(dayOfWeek(date)).toBe(3)
-  })
-
-  test('should return 4 for Thursday', () => {
-    const date = fromUTC(2026, 2, 5)
-    expect(dayOfWeek(date)).toBe(4)
-  })
-
-  test('should return 5 for Friday', () => {
-    const date = fromUTC(2026, 2, 6)
-    expect(dayOfWeek(date)).toBe(5)
-  })
-
-  test('should return 6 for Saturday', () => {
-    const date = fromUTC(2026, 2, 7)
-    expect(dayOfWeek(date)).toBe(6)
+    const mar = fromUTC(2025, 2, 2)
+    expect(dayOfWeek(mar)).toBe(0)
   })
 })
 
@@ -283,6 +291,26 @@ describe('isWeekend', () => {
 
     const friday = fromUTC(2026, 2, 6)
     expect(isWeekend(friday)).toBe(false)
+  })
+})
+
+describe('endOfWeek', () => {
+  test('should work in 2026', () => {
+    const monday = fromUTC(2026, 2, 2)
+    const tuesday = fromUTC(2026, 2, 3)
+    const wednesday = fromUTC(2026, 2, 4)
+    const thursday = fromUTC(2026, 2, 5)
+    const friday = fromUTC(2026, 2, 6)
+    const saturday = fromUTC(2026, 2, 7)
+    const sunday = fromUTC(2026, 2, 8)
+
+    expect(endOfWeek(sunday)).toBe(sunday)
+    expect(endOfWeek(monday)).toBe(sunday)
+    expect(endOfWeek(tuesday)).toBe(sunday)
+    expect(endOfWeek(wednesday)).toBe(sunday)
+    expect(endOfWeek(thursday)).toBe(sunday)
+    expect(endOfWeek(friday)).toBe(sunday)
+    expect(endOfWeek(saturday)).toBe(sunday)
   })
 })
 

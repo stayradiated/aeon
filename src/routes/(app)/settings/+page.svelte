@@ -126,6 +126,11 @@ const handleAssignLabelParent = async () => {
       <pre><code>aeon.**************************.*******************************************</code></pre>
       <button onclick={async () => { apiToken = await setApiToken() }}>Reset API Token</button>
     {/if}
+    <details>
+      <summary><strong>API Docs</strong></summary>
+      <strong>Get Status</strong>
+      <pre><code>curl https://aeon.party/api/v1/status -H "Authorization: Bearer API_TOKEN"</code></pre>
+    </details>
   </section>
 
   <section>
