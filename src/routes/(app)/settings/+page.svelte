@@ -14,12 +14,10 @@ import MetaTaskProgress from '#lib/components/MetaTask/MetaTaskProgress.svelte'
 import StatusManager from '#lib/components/Status/StatusManager.svelte'
 import StreamManager from '#lib/components/StreamManager/StreamManager.svelte'
 
-import { setApiToken } from './set-api-token.remote.js'
+import ApiAccess from './ApiAccess.svelte'
 
 const { data }: PageProps = $props()
 const { store } = $derived(data)
-
-let apiToken = $state<string>()
 
 import { openFilePicker } from '#lib/utils/open-file-picker.js'
 
@@ -118,19 +116,7 @@ const handleAssignLabelParent = async () => {
   </section>
 
   <section>
-    <h2>API Access</h2>
-    {#if apiToken}
-      <pre><code>{apiToken}</code></pre>
-      <p>Copy this token, it will be hidden when you next view this page!</p>
-    {:else}
-      <pre><code>aeon.**************************.*******************************************</code></pre>
-      <button onclick={async () => { apiToken = await setApiToken() }}>Reset API Token</button>
-    {/if}
-    <details>
-      <summary><strong>API Docs</strong></summary>
-      <strong>Get Status</strong>
-      <pre><code>curl https://aeon.party/api/v1/status -H "Authorization: Bearer API_TOKEN"</code></pre>
-    </details>
+    <ApiAccess />
   </section>
 
   <section>

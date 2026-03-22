@@ -1,14 +1,7 @@
+import type { Handle } from '@sveltejs/kit'
 import { redirect } from '@sveltejs/kit'
 
 import { building as isBuilding } from '$app/environment'
-
-import { onInit } from './hooks.server.init.js'
-
-if (!isBuilding) {
-  await onInit()
-}
-
-import type { Handle } from '@sveltejs/kit'
 
 import {
   deleteSessionTokenCookie,
@@ -17,6 +10,8 @@ import {
 } from '#lib/server/auth.js'
 
 import { getDb } from '#lib/server/db/get-db'
+
+import { onInit } from './hooks.server.init.js'
 
 export const handle: Handle = async ({ event, resolve }) => {
   const token = event.cookies.get('session')
@@ -48,4 +43,8 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event)
+}
+
+if (!isBuilding) {
+  void onInit()
 }
