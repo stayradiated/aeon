@@ -70,11 +70,21 @@ const grid = $derived.by(() => {
 })
 </script>
 
-<h4>{year}</h4>
-<HeatGrid {grid} />
+<div class="LabelHeatGrid">
+  <h4>{year}</h4>
+  <HeatGrid {grid} />
+</div>
 
 <style>
+  .LabelHeatGrid {
+    position: relative;
+  }
+
   h4 {
-    text-align: center;
+    margin: 0;
+    transform: rotate(-90deg);
+    position: absolute;
+    left: calc(var(--size-8) * -1);
+    top: var(--size-4);
   }
 </style>

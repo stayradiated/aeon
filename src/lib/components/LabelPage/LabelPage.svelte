@@ -99,11 +99,17 @@ const handleDelete = async () => {
     <p>Never used</p>
   {/if}
 
+  <h3>Weekly Overview</h3>
+
   <LabelWeekChart {store} {labelId} />
 
-  {#each yearList as year (year)}
-    <LabelHeatGrid {store} {labelId} {year} />
-  {/each}
+  <h3>Year Grid</h3>
+
+  <div class="heatGridList">
+    {#each yearList.toReversed() as year (year)}
+      <LabelHeatGrid {store} {labelId} {year} />
+    {/each}
+  </div>
 {/if}
 
 <style>
@@ -117,5 +123,11 @@ const handleDelete = async () => {
     gap: var(--size-2);
 
     padding: var(--size-2);
+  }
+
+  .heatGridList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-4);
   }
 </style>
