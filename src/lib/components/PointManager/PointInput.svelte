@@ -1,5 +1,6 @@
 <script lang="ts">
 import { computed } from 'signia'
+import { tick } from 'svelte'
 import type { ChangeEventHandler } from 'svelte/elements'
 
 import type { Store } from '#lib/core/replicache/store.js'
@@ -52,6 +53,9 @@ let {
   onreset,
 }: Props = $props()
 
+let showDescription = $derived(description.length > 0)
+let descriptionEl = $state<HTMLTextAreaElement>()
+
 const { _: now } = watch(clockMin)
 
 const { _: currentParentPoint } = $derived(
@@ -81,12 +85,14 @@ const { _: labelPopularity } = $derived(
 
 type Option = {
   value: LabelId
-  label: string
+  icon: string | undefined
+  name: string
 }
 
 const toOption = (label: Pick<Label, 'id' | 'icon' | 'name'>): Option => ({
   value: label.id,
-  label: `${label.icon ? `${label.icon} ` : ''}${label.name}`,
+  icon: label.icon,
+  name: label.name,
 })
 
 const optionList = $derived(
@@ -132,9 +138,14 @@ const handleReset = (event: MouseEvent) => {
   onreset()
 }
 
-const handleClearDescription = (event: MouseEvent) => {
-  event.preventDefault()
-  onchange({ description: '' })
+const handleToggleDescription = async () => {
+  if (showDescription) {
+    onchange({ description: '' })
+  } else {
+    showDescription = true
+    await tick()
+    descriptionEl?.focus()
+  }
 }
 
 const handleChangeDescription: ChangeEventHandler<HTMLTextAreaElement> = (
@@ -163,7 +174,7 @@ const handleCreateLabel = (name: string) => {
   const createdLabel = {
     id: genId<LabelId>(),
     name,
-    icon: '',
+    icon: undefined,
   }
   onchange({
     labelIdList: [...labelIdList, createdLabel.id],
@@ -178,6 +189,19 @@ const handleCreateLabel = (name: string) => {
     <button class="reset-button" onclick={handleReset}> Reset </button>
   </div>
 
+  {#if showDescription}
+    <div class="textarea-container">
+      <textarea
+        id="{uid}-textarea"
+        bind:this={descriptionEl}
+        rows="1"
+        value={description}
+        onchange={handleChangeDescription}
+        placeholder="Add description…"></textarea>
+      <button class="toggle-description-button" onclick={handleToggleDescription}>🗑</button>
+    </div>
+  {/if}
+
   <MultiSelect
     isCreatable
     {autofocus}
@@ -185,20 +209,11 @@ const handleCreateLabel = (name: string) => {
     {selectedList}
     placeholder="Add label…"
     onchange={handleChangeLabel}
-    oncreate={handleCreateLabel}
-  />
-
-  <div class="textarea-container">
-    <textarea
-      id="{uid}-textarea"
-      rows="1"
-      value={description}
-      onchange={handleChangeDescription}
-      placeholder="Add description…"></textarea>
-    {#if description.length > 0}
-      <button class="clear-value-button" onclick={handleClearDescription}>X</button>
+    oncreate={handleCreateLabel}>
+    {#if !showDescription}
+      <button class="toggle-description-button" onclick={handleToggleDescription}>🗒</button>
     {/if}
-  </div>
+  </MultiSelect>
 </div>
 
 <style>
@@ -223,7 +238,7 @@ const handleCreateLabel = (name: string) => {
   .textarea-container {
     display: flex;
     gap: var(--size-2);
-    padding-top: var(--size-2);
+    padding-bottom: var(--size-2);
   }
 
   textarea {
@@ -240,17 +255,8 @@ const handleCreateLabel = (name: string) => {
     outline: var(--size-px) solid var(--theme-focus);
   }
 
-  .clear-value-button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    width: var(--size-10);
-    font-weight: var(--weight-bold);
-    background: var(--theme-background);
-    border-radius: var(--radius-xs);
-  }
-  .clear-value-button:hover {
-    background: var(--theme-background-alt);
+  .toggle-description-button {
+    width: var(--size-8);
   }
 
   .reset-button {

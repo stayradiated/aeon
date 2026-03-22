@@ -23,19 +23,24 @@ const { _: labelList } = $derived(watch(getLabelList(store, streamId)))
 const optionList = $derived(
   labelList.map((label) => ({
     value: label.id,
-    label: label.name,
+    icon: label.icon,
+    name: label.name,
   })),
 )
 
 const selectedList = $derived(
-  value.map((labelId) => ({
-    value: labelId,
-    label: labelList.find((label) => label.id === labelId)?.name ?? '',
-  })),
+  value.map((labelId) => {
+    const label = labelList.find((label) => label.id === labelId)
+    return {
+      value: labelId,
+      icon: label?.icon,
+      name: label?.name ?? '',
+    }
+  }),
 )
 
 const handleChange = (
-  selectedList: Array<{ value: LabelId; label: string }>,
+  selectedList: Array<{ value: LabelId; name: string }>,
 ) => {
   onchange?.(selectedList.map(({ value }) => value))
 }

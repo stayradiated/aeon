@@ -1,13 +1,16 @@
 <script lang="ts" generics="Value extends string">
+import type { Snippet } from 'svelte'
 import { onMount } from 'svelte'
 
 type Option = {
   value: Value
-  label: string
+  icon: string | undefined
+  name: string
 }
 
 type Props = {
   id?: string
+  children?: Snippet
   isCreatable?: boolean
   autofocus?: boolean
   optionList: readonly Option[]
@@ -19,6 +22,7 @@ type Props = {
 
 const {
   id,
+  children,
   isCreatable = false,
   autofocus,
   optionList,
@@ -44,7 +48,7 @@ const filteredOptionList = $derived.by(() => {
     }
     return searchQueryLC.length === 0
       ? true
-      : option.label.toLowerCase().includes(searchQueryLC)
+      : option.name.toLowerCase().includes(searchQueryLC)
   })
 })
 
@@ -60,7 +64,7 @@ const handleFocus = () => {
 }
 
 const handleBlur = () => {
-  isOpen = false
+  // isOpen = false
 }
 
 const handleAdd = (option: Option) => {
@@ -87,10 +91,16 @@ const handleKeyDown = (
       const value = event.currentTarget.value
       if (value.length === 0) {
         event.preventDefault()
-        // remove last selected option
-        const lastOption = selectedList.at(-1)
-        if (lastOption) {
-          handleRemove(lastOption)
+
+        // ctrl+backspace removes all
+        if (event.ctrlKey) {
+          handleRemoveAll()
+        } else {
+          // remove last selected option
+          const lastOption = selectedList.at(-1)
+          if (lastOption) {
+            handleRemove(lastOption)
+          }
         }
       }
       break
@@ -118,45 +128,57 @@ const handleRemove = (option: Option) => {
     return
   }
   onchange?.(selectedList.toSpliced(index, 1))
+  isOpen = true
 }
 
 const handleRemoveAll = () => {
   onchange?.([])
+  isOpen = true
 }
 </script>
 
 <div class="MultiSelect">
-  <div class="selected">
-    <div class="itemList">
-      {#each selectedList as option (option.value)}
-        <button type="button" onclick={() => handleRemove(option)}>
-          {option.label}
-        </button>
-      {/each}
-    </div>
+  <div class="input-row">
 
     {#if selectedList.length > 0}
-      <button type="button" onclick={handleRemoveAll}>Clear</button>
+      <div class="selected">
+        <div class="itemList">
+          {#each selectedList as option (option.value)}
+            <button
+              type="button"
+              onmousedown={(e) => e.preventDefault()}
+              onclick={() => handleRemove(option)}>
+              <span class="icon">{option.icon}</span>
+              <span class="name">{option.name}</span>
+            </button>
+          {/each}
+        </div>
+      </div>
     {/if}
-  </div>
 
-  <input
-    {id}
-    bind:this={inputEl}
-    type="text"
-    {placeholder}
-    bind:value={searchQuery}
-    onkeydown={handleKeyDown}
-    onfocus={handleFocus}
-    onblur={handleBlur}
-  />
+    <input
+      {id}
+      bind:this={inputEl}
+      type="text"
+      {placeholder}
+      bind:value={searchQuery}
+      onkeydown={handleKeyDown}
+      onfocus={handleFocus}
+      onblur={handleBlur}
+    />
+
+    {@render children?.()}
+  </div>
 
   {#if isOpen}
     <div class="dropdown">
       {#each filteredOptionList as option (option.value)}
         <button
           type="button"
-          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option) }}>{option.label}</button>
+          onmousedown={(event) => { event.stopImmediatePropagation(); event.preventDefault(); handleAdd(option) }}>
+          <span class="icon">{option.icon}</span>
+          <span class="name">{option.name}</span>
+        </button>
       {/each}
       {#if isCreatable && searchQuery.length > 0}
         <button
@@ -174,6 +196,20 @@ const handleRemoveAll = () => {
     gap: var(--size-2);
   }
 
+  .input-row {
+    display: flex;
+    gap: var(--size-2);
+
+    button {
+      line-height: var(--line-xl);
+    }
+
+    input {
+      flex: 1;
+      line-height: var(--line-xl);
+    }
+  }
+
   .selected {
     display: flex;
     justify-content: space-between;
@@ -189,13 +225,29 @@ const handleRemoveAll = () => {
   .dropdown {
     display: flex;
     flex-direction: column;
+    gap: var(--size-px);
 
     max-height: var(--size-52);
     overflow-y: auto;
-  }
 
-  button {
-    text-align: left;
-    line-height: var(--line-lg);
+    button {
+      text-align: left;
+      line-height: var(--line-xl);
+      padding-left: var(--size-3);
+      border-radius: none;
+      border: none;
+      background: var(--color-grey-100);
+      display: flex;
+      gap: var(--size-2);
+
+      &:hover {
+        background: var(--color-grey-50);
+      }
+
+      .icon {
+        width: var(--size-6);
+        text-align: center;
+      }
+    }
   }
 </style>
