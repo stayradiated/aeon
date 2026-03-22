@@ -24,7 +24,17 @@ const isEnabled = $derived(status?.isEnabled ?? false)
 const streamIdList = $derived(status?.streamIdList ?? [])
 
 let newSlackToken = $state('')
-let prompt = $derived(status?.prompt ?? '')
+let prompt = $state('')
+
+$effect(() => {
+  if (
+    prompt === '' &&
+    typeof status !== 'undefined' &&
+    prompt !== status.prompt
+  ) {
+    prompt = status.prompt
+  }
+})
 
 const handleToggleEnabled: ChangeEventHandler<HTMLInputElement> = async (
   event,
@@ -74,7 +84,7 @@ const handleRemoveSlackToken = async () => {
 <fieldset disabled={!isEnabled}>
   <div>
     <h4>Prompt</h4>
-    <textarea id="prompt-{uid}" bind:value={prompt} rows="4" oninput={handleChangePrompt}></textarea>
+    <textarea id="prompt-{uid}" bind:value={prompt} rows="20" oninput={handleChangePrompt}></textarea>
   </div>
 
   <div>
@@ -98,7 +108,7 @@ const handleRemoveSlackToken = async () => {
       <label>Slack API Key
         <input type="text" disabled value={user.slackTokenMasked} />
       </label>
-      <button type="button" onclick={handleRemoveSlackToken}>Remove</button>
+      <button type="button" onclick={handleRemoveSlackToken}>Disconnect</button>
     {:else}
       <label>Slack API Key
         <input type="text" placeholder="Enter Slack API Key" bind:value={newSlackToken} />
@@ -107,3 +117,11 @@ const handleRemoveSlackToken = async () => {
     {/if}
   </div>
 </fieldset>
+
+<style>
+
+  textarea {
+    width: 100%;
+  }
+
+</style>
