@@ -10,6 +10,7 @@ import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { clockMin } from '#lib/utils/clock.js'
+import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
 type Props = {
@@ -30,12 +31,6 @@ const dateEnd = $derived(calDateFns.endOfWeek(today)) // sunday
 const dateStart = $derived(
   calDateFns.addDays(calDateFns.subWeeks(dateEnd, RANGE_WEEKS), 1),
 ) // monday
-const dateList = $derived(
-  calDateFns.eachDayOfInterval({ start: dateStart, end: dateEnd }),
-)
-const weekList = Array.from({ length: RANGE_WEEKS }).map((_, i) => {
-  return dateList.slice(i * 7, (i + 1) * 7)
-})
 
 const { _: label } = $derived(watch(store.label.get(labelId)))
 
@@ -65,31 +60,86 @@ const dailyDurationRecord = $derived.by(() => {
   }
   return record
 })
+
+const dateList = $derived(
+  calDateFns.eachDayOfInterval({ start: dateStart, end: dateEnd }),
+)
+
+type Week = {
+  entries: Array<{
+    date: CalendarDate
+    durationMs: number
+  }>
+  totalDurationMs: number
+}
+
+const weekList = $derived(
+  Array.from({ length: RANGE_WEEKS }).map((_, i): Week => {
+    const weekDateList = dateList.slice(i * 7, (i + 1) * 7)
+    const entries = weekDateList.map((date) => ({
+      date,
+      durationMs: dailyDurationRecord[date] ?? 0,
+    }))
+
+    const totalDurationMs = entries.reduce(
+      (sum, entry) => sum + entry.durationMs,
+      0,
+    )
+
+    return {
+      entries,
+      totalDurationMs,
+    }
+  }),
+)
 </script>
 
 <div class="LabelWeekChart" style:--cols={RANGE_WEEKS * 7} style:--color={label?.color ?? '#000'}>
-  <div class="chart">
-    {#each weekList as week, index (index)}
-      {#each week as date (date)}
-        {@const durationMs = dailyDurationRecord[date] ?? 0}
-        {@const isWeekend = calDateFns.isWeekend(date)}
-        <div class="day" class:isWeekend>
-          <div class="bar" style:--height={Math.round((durationMs / 1000 / 60) / 1440 * 100) + '%'}></div>
-          <div class="label">{WEEKDAY[calDateFns.dayOfWeek(date)]}</div>
-        </div>
-      {/each}
-    {/each}
-  </div>
+  {#each weekList as week, index (index)}
+    <div class="week">
+      <div class="chart">
+        {#each week.entries as entry (entry.date)}
+          {@const isWeekend = calDateFns.isWeekend(entry.date)}
+          <div class="day" class:isWeekend>
+            <div class="bar" style:--height={Math.round((entry.durationMs / 1000 / 60) / 1440 * 100) + '%'}></div>
+            <div class="label">{WEEKDAY[calDateFns.dayOfWeek(entry.date)]}</div>
+          </div>
+        {/each}
+      </div>
+      <div class="weekTotalDuration">{formatDuration(week.totalDurationMs)}</div>
+    </div>
+  {/each}
 </div>
 
 <style>
   .LabelWeekChart{
+    --gap: var(--size-px);
+    --col-width: calc((100cqw - ((var(--cols) - 1) * var(--gap))) / var(--cols));
+
     container-type: inline-size;
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap);
+  }
+
+  .week {
+    width: calc((var(--col-width) * 7) + (var(--gap) * 6));
+
+    &:nth-child(2n) {
+      background: #eee;
+    }
+
+    .weekTotalDuration {
+      padding-top: var(--size-4);
+      padding-bottom: var(--size-2);
+      font-size: var(--scale-000);
+      text-align: center;
+      color: var(--theme-text-muted);
+      font-weight: var(--weight-bold);
+    }
   }
 
   .chart {
-    --gap: var(--size-px);
-    --col-width: calc((100cqw - ((var(--cols) - 1) * var(--gap))) / var(--cols));
 
     display: grid;
     grid-template-columns: repeat(var(--cols), var(--col-width));
