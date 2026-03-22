@@ -7,25 +7,19 @@ import { getOpenAIApiKey } from '#lib/server/env.js'
 
 type SlackStatus = {
   status: string
-  emoji: string // slack emoji, e.g. ":ramen:"
+  emoji: string
 }
 
 const SYSTEM = `
-You write Slack statuses, based on the current user activity.
-
+Set the users Slack status, based on their current activity.
 Return your result ONLY by calling the tool "setSlackStatus".
-Do not output normal text.
 `.trim()
 
 const setSlackStatus = tool({
-  description: 'Set my current Slack status.',
+  description: 'Set the Slack status',
   inputSchema: z.object({
-    status: z
-      .string()
-      .describe(
-        'A short, single-line description of my current activity (10–20 words).',
-      ),
-    emoji: z.string().describe('A single emoji.'),
+    status: z.string().describe('The description of my current status'),
+    emoji: z.string().describe('A single emoji'),
   }),
 })
 
@@ -43,12 +37,18 @@ const generateStatus = async (
     })
 
     const result = await generateText({
-      model: openai('gpt-5-mini'),
+      model: openai('gpt-5-nano'),
       system: SYSTEM,
       prompt: currentStatus,
       tools: { setSlackStatus },
       toolChoice: { type: 'tool', toolName: 'setSlackStatus' },
       stopWhen: stepCountIs(1),
+      providerOptions: {
+        openai: {
+          reasoningEffort: 'high',
+          textVerbosity: 'low',
+        },
+      },
     })
 
     const toolCall = result.toolCalls.at(0)

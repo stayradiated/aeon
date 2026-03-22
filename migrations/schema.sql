@@ -125,7 +125,7 @@ CREATE VIEW public.line AS
     point_with_stop.description,
     point_with_stop.started_at,
     point_with_stop.stopped_at,
-    (COALESCE(point_with_stop.stopped_at, now_ms.now_ms) - point_with_stop.started_at) AS duration_ms,
+    (point_with_stop.stopped_at - point_with_stop.started_at) AS duration_ms,
     point_with_stop.label_id_list,
     point_with_stop.created_at,
     point_with_stop.updated_at
