@@ -71,7 +71,7 @@ const handleDelete = () => {
 
 <div class="StreamStatus">
   <button class="container" class:isHighlighted={isStartedAtCurrentTime} class:isDeleted onclick={handleEdit}>
-    <div class="label">{stream.name}</div>
+    <div class="streamName">{stream.name}</div>
     <div class="value">
       {#if labelList.length === 0}
         --
@@ -80,6 +80,9 @@ const handleDelete = () => {
           {label.icon ?? ''} {label.name}
         {/each}
       {/if}
+    </div>
+    <div class="description">
+      {currentPoint?.description}
     </div>
     <div class="duration">
       {currentPoint ? formatDuration(currentTime - currentPoint?.startedAt) : ''}
@@ -113,7 +116,7 @@ const handleDelete = () => {
     display: grid;
     grid-template-areas:
       'label value'
-      'label duration';
+      'description duration';
 
     justify-content: space-between;
     line-height: var(--line-xl);
@@ -131,7 +134,8 @@ const handleDelete = () => {
     }
   }
 
-  .label {
+  .streamName {
+    text-align: left;
     font-weight: var(--weight-bold);
     grid-area: label;
     font-size: var(--scale-1);
@@ -148,5 +152,10 @@ const handleDelete = () => {
     text-align: right;
     font-size: var(--scale-0);
     color: var(--theme-text-muted);
+  }
+
+  .description {
+    grid-area: description;
+    font-style: italic;
   }
 </style>
