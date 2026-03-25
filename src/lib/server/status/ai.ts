@@ -8,6 +8,11 @@ import { getOpenAIApiKey } from '#lib/server/env.js'
 type SlackStatus = {
   status: string
   emoji: string
+  messageLog: {
+    system: string
+    prompt: string
+    steps: unknown
+  }
 }
 
 const SYSTEM = `
@@ -59,8 +64,15 @@ const generateStatus = async (
       return new Error('Unexpected tool result')
     }
 
+    const messageLog = {
+      system: SYSTEM,
+      prompt: currentStatus,
+      steps: result.steps.flatMap((step) => step.content),
+    }
+
     const { status, emoji } = toolCall.input as SlackStatus
-    return { status, emoji }
+
+    return { status, emoji, messageLog }
   })
 }
 

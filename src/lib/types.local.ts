@@ -5,6 +5,7 @@ import type {
   StreamId,
   UserId,
 } from '#lib/ids.js'
+import type { JSONValue } from '#lib/utils/json-value.js'
 
 type LocalUser = {
   readonly id: UserId
@@ -56,6 +57,8 @@ type LocalStatus = {
   expiresAt: number | undefined
   status: string
   emoji: string
+
+  messageLog: JSONValue | undefined
 }
 
 export type {

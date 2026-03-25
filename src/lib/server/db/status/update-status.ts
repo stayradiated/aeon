@@ -17,6 +17,8 @@ type UpdateStatusOptions = {
     status?: string
     emoji?: string
     expiresAt?: number | null
+
+    messageLog?: Record<string, unknown>
   }
   now?: number
 }
