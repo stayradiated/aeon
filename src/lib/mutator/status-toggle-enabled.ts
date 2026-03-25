@@ -18,6 +18,7 @@ const statusToggleEnabled: LocalMutator<'status_toggleEnabled'> = async (
     status: '',
     emoji: '',
     expiresAt: undefined,
+    messageLog: undefined,
     ...value,
     isEnabled,
   } satisfies AnonStatus)

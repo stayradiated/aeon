@@ -23,6 +23,8 @@ export default interface StatusTable {
   createdAt: ColumnType<number, number, number>;
 
   updatedAt: ColumnType<number, number, number>;
+
+  messageLog: ColumnType<Record<string, unknown> | null, Record<string, unknown> | null, Record<string, unknown> | null>;
 }
 
 export type Status = Selectable<StatusTable>;
@@ -42,6 +44,7 @@ export const status = z.object({
   expiresAt: z.number().nullable().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  messageLog: z.record(z.string(), z.unknown()).nullable().nullable(),
 });
 
 export const statusInitializer = z.object({
@@ -55,6 +58,7 @@ export const statusInitializer = z.object({
   expiresAt: z.number().nullable().optional().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  messageLog: z.record(z.string(), z.unknown()).nullable().optional().nullable(),
 });
 
 export const statusMutator = z.object({
@@ -68,4 +72,5 @@ export const statusMutator = z.object({
   expiresAt: z.number().nullable().optional().nullable(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
+  messageLog: z.record(z.string(), z.unknown()).nullable().optional().nullable(),
 });

@@ -4,8 +4,7 @@ import type { ServerMutator } from './types.js'
 import { scheduleUpdateUserStatus } from '#lib/server/worker.js'
 
 import { getStatus } from '#lib/server/db/status/get-status.js'
-import { insertStatus } from '#lib/server/db/status/insert-status.js'
-import { updateStatus } from '#lib/server/db/status/update-status.js'
+import { upsertStatus } from '#lib/server/db/status/upsert-status.js'
 
 const statusToggleStream: ServerMutator<'status_toggleStream'> = async (
   context,
@@ -28,34 +27,27 @@ const statusToggleStream: ServerMutator<'status_toggleStream'> = async (
     streamIdList.splice(streamIdList.indexOf(streamId), 1)
   }
 
-  if (!prevStatus) {
-    const result = await insertStatus({
-      db,
-      set: {
-        enabledAt: null,
-        userId: sessionUserId,
-        prompt: '',
-        hash: '',
-        status: '',
-        emoji: '',
-        expiresAt: null,
-        streamIdList,
-      },
-    })
-    if (result instanceof Error) {
-      return result
-    }
-  } else {
-    const result = await updateStatus({
-      db,
-      where: { userId: sessionUserId },
-      set: {
-        streamIdList,
-      },
-    })
-    if (result instanceof Error) {
-      return result
-    }
+  const result = await upsertStatus({
+    db,
+    where: {
+      userId: sessionUserId,
+    },
+    insert: {
+      enabledAt: null,
+      prompt: '',
+      hash: '',
+      status: '',
+      emoji: '',
+      expiresAt: null,
+      streamIdList,
+      messageLog: null,
+    },
+    update: {
+      streamIdList,
+    },
+  })
+  if (result instanceof Error) {
+    return result
   }
 
   await scheduleUpdateUserStatus({ userId: sessionUserId })

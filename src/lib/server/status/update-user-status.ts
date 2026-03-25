@@ -159,6 +159,7 @@ const updateUserStatus = async (
       emoji: result.emoji,
       status: result.status,
       expiresAt: dateFns.addHours(now, STATUS_EXPIRY_HOURS).getTime(),
+      messageLog: result.messageLog,
     },
   })
   if (updateResult instanceof Error) {

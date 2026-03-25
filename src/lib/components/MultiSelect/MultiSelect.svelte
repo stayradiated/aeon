@@ -64,7 +64,7 @@ const handleFocus = () => {
 }
 
 const handleBlur = () => {
-  // isOpen = false
+  isOpen = false
 }
 
 const handleAdd = (option: Option) => {
@@ -156,18 +156,19 @@ const handleRemoveAll = () => {
       </div>
     {/if}
 
-    <input
-      {id}
-      bind:this={inputEl}
-      type="text"
-      {placeholder}
-      bind:value={searchQuery}
-      onkeydown={handleKeyDown}
-      onfocus={handleFocus}
-      onblur={handleBlur}
-    />
-
-    {@render children?.()}
+    <div class="input">
+      <input
+        {id}
+        bind:this={inputEl}
+        type="text"
+        {placeholder}
+        bind:value={searchQuery}
+        onkeydown={handleKeyDown}
+        onfocus={handleFocus}
+        onblur={handleBlur}
+      />
+      {@render children?.()}
+    </div>
   </div>
 
   {#if isOpen}
@@ -198,15 +199,23 @@ const handleRemoveAll = () => {
 
   .input-row {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--size-2);
 
     button {
       line-height: var(--line-xl);
     }
 
+    .input {
+      flex: 1;
+      display: flex;
+      gap: var(--size-2);
+    }
+
     input {
       flex: 1;
       line-height: var(--line-xl);
+      height: var(--line-xl);
     }
   }
 

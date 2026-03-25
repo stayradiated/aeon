@@ -18,6 +18,7 @@ const statusSetPrompt: LocalMutator<'status_setPrompt'> = async (
     status: '',
     emoji: '',
     expiresAt: undefined,
+    messageLog: undefined,
     ...value,
     prompt,
   } satisfies AnonStatus)

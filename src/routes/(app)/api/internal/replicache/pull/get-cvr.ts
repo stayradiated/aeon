@@ -17,6 +17,7 @@ import type {
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { CVR, CVRDiff } from '#lib/server/replicache/cvr.js'
 import type { Key as GenericKey } from '#lib/utils/create-key.js'
+import type { JSONValue } from '#lib/utils/json-value.js'
 
 import { getLabelList } from '#lib/server/db/label/get-label-list.js'
 import { getLabelVersionRecord } from '#lib/server/db/label/get-label-version-record.js'
@@ -211,6 +212,7 @@ const getEntities = async (
         expiresAt: entity.expiresAt ?? undefined,
         status: entity.status,
         emoji: entity.emoji,
+        messageLog: (entity.messageLog as JSONValue) ?? undefined,
       }),
     ),
   )

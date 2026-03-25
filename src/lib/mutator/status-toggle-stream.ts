@@ -28,6 +28,7 @@ const statusToggleStream: LocalMutator<'status_toggleStream'> = async (
     status: '',
     emoji: '',
     expiresAt: undefined,
+    messageLog: undefined,
     ...value,
     streamIdList,
   } satisfies AnonStatus)

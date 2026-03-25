@@ -231,7 +231,8 @@ CREATE TABLE public.status (
     emoji text NOT NULL,
     expires_at bigint,
     created_at bigint NOT NULL,
-    updated_at bigint NOT NULL
+    updated_at bigint NOT NULL,
+    message_log jsonb
 );
 
 
