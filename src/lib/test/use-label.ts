@@ -49,8 +49,5 @@ const labelFactory = createFactory<Label>('Label')
 const useCreateLabel = labelFactory.useCreateValue
 const useLabel = labelFactory.useValue
 
-export {
-  useCreateLabel,
-  /** @knipignore **/
-  useLabel,
-}
+/** @knipignore **/
+export { useCreateLabel, useLabel }

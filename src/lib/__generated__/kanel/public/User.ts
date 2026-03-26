@@ -35,36 +35,36 @@ export const userId = z.string() as unknown as z.Schema<UserId>;
 
 export const user = z.object({
   id: userId,
-  stravaClientId: z.string().nullable().nullable(),
-  stravaClientSecret: z.string().nullable().nullable(),
-  stravaSession: z.record(z.string(), z.unknown()).nullable().nullable(),
+  stravaClientId: z.string().nullable(),
+  stravaClientSecret: z.string().nullable(),
+  stravaSession: z.record(z.string(), z.unknown()).nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
   email: z.string(),
-  slackToken: z.string().nullable().nullable(),
-  apiTokenHash: z.instanceof(Uint8Array).nullable().nullable(),
+  slackToken: z.string().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).nullable(),
 });
 
 export const userInitializer = z.object({
   id: userId,
-  stravaClientId: z.string().nullable().optional().nullable(),
-  stravaClientSecret: z.string().nullable().optional().nullable(),
-  stravaSession: z.record(z.string(), z.unknown()).nullable().optional().nullable(),
+  stravaClientId: z.string().optional().nullable(),
+  stravaClientSecret: z.string().optional().nullable(),
+  stravaSession: z.record(z.string(), z.unknown()).optional().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
   email: z.string(),
-  slackToken: z.string().nullable().optional().nullable(),
-  apiTokenHash: z.instanceof(Uint8Array).nullable().optional().nullable(),
+  slackToken: z.string().optional().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).optional().nullable(),
 });
 
 export const userMutator = z.object({
   id: userId.optional(),
-  stravaClientId: z.string().nullable().optional().nullable(),
-  stravaClientSecret: z.string().nullable().optional().nullable(),
-  stravaSession: z.record(z.string(), z.unknown()).nullable().optional().nullable(),
+  stravaClientId: z.string().optional().nullable(),
+  stravaClientSecret: z.string().optional().nullable(),
+  stravaSession: z.record(z.string(), z.unknown()).optional().nullable(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
   email: z.string().optional(),
-  slackToken: z.string().nullable().optional().nullable(),
-  apiTokenHash: z.instanceof(Uint8Array).nullable().optional().nullable(),
+  slackToken: z.string().optional().nullable(),
+  apiTokenHash: z.instanceof(Uint8Array).optional().nullable(),
 });

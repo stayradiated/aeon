@@ -38,7 +38,7 @@ export const metaTask = z.object({
   name: z.string(),
   status: z.string(),
   lastStartedAt: z.number(),
-  lastFinishedAt: z.number().nullable().nullable(),
+  lastFinishedAt: z.number().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -49,7 +49,7 @@ export const metaTaskInitializer = z.object({
   name: z.string(),
   status: z.string(),
   lastStartedAt: z.number(),
-  lastFinishedAt: z.number().nullable().optional().nullable(),
+  lastFinishedAt: z.number().optional().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -60,7 +60,7 @@ export const metaTaskMutator = z.object({
   name: z.string().optional(),
   status: z.string().optional(),
   lastStartedAt: z.number().optional(),
-  lastFinishedAt: z.number().nullable().optional().nullable(),
+  lastFinishedAt: z.number().optional().nullable(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
 });

@@ -72,7 +72,7 @@ const useTypedViewListsHoook = (filePath, lines) => {
         case 'labelIdList: ColumnType<string[], never, never>;': {
           return '  labelIdList: ColumnType<LabelId[], never, never>;'
         }
-        case 'labelIdList: z.string().array(),': {
+        case 'labelIdList: z.string(),': {
           return '  labelIdList: labelId.array(),'
         }
       }
@@ -87,7 +87,7 @@ const useTypedViewListsHoook = (filePath, lines) => {
         case 'parentLabelIdList: ColumnType<string[], never, never>;': {
           return '  parentLabelIdList: ColumnType<LabelId[], never, never>;'
         }
-        case 'parentLabelIdList: z.string().array(),': {
+        case 'parentLabelIdList: z.string(),': {
           return '  parentLabelIdList: labelId.array(),'
         }
       }
@@ -114,7 +114,7 @@ const useTypedViewListsHoook = (filePath, lines) => {
         case 'labelIdList: ColumnType<string[], never, never>;': {
           return '  labelIdList: ColumnType<LabelId[], never, never>;'
         }
-        case 'labelIdList: z.string().array(),': {
+        case 'labelIdList: z.string(),': {
           return '  labelIdList: labelId.array(),'
         }
       }

@@ -124,8 +124,5 @@ const createCompositeKey = <Name extends string>(name: Name) => {
 
 export type { Key, KeyValue }
 
-export {
-  /** @knipignore **/
-  createCompositeKey,
-  createKey,
-}
+/** @knipignore **/
+export { createCompositeKey, createKey }

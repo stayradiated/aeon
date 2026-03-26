@@ -11,7 +11,6 @@ type SlackStatus = {
   messageLog: {
     system: string
     prompt: string
-    steps: unknown
   }
 }
 
@@ -64,13 +63,11 @@ const generateStatus = async (
       return new Error('Unexpected tool result')
     }
 
+    const { status, emoji } = toolCall.input as SlackStatus
     const messageLog = {
       system: SYSTEM,
       prompt: currentStatus,
-      steps: result.steps.flatMap((step) => step.content),
     }
-
-    const { status, emoji } = toolCall.input as SlackStatus
 
     return { status, emoji, messageLog }
   })

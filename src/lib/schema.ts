@@ -5,6 +5,7 @@ export {
   pointWithLabelList as $Point,
   replicacheClientGroupId as $ReplicacheClientGroupId,
   replicacheClientViewId as $ReplicacheClientViewId,
+  status as $Status,
   stream as $Stream,
   streamId as $StreamId,
   user as $User,

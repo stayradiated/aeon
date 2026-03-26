@@ -55,8 +55,5 @@ const pointFactory = createFactory<Point>('Point')
 const useCreatePoint = pointFactory.useCreateValue
 const usePoint = pointFactory.useValue
 
-export {
-  useCreatePoint,
-  /** @knipignore **/
-  usePoint,
-}
+/** @knipignore **/
+export { useCreatePoint, usePoint }
