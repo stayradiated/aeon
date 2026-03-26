@@ -107,6 +107,7 @@ const migrateLegacySnapshot = (legacySnapshot: LegacySnapshot): Snapshot => {
         updatedAt: point.updatedAt ?? point.createdAt,
       }),
     ),
+    status: [],
   }
 }
 

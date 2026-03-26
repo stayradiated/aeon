@@ -10,6 +10,22 @@ type Props = {
 const { store }: Props = $props()
 
 const { _: status } = $derived(watch(store.status.get(store.sessionUserId)))
+const systemPrompt = $derived(
+  status?.messageLog &&
+    typeof status?.messageLog === 'object' &&
+    'system' in status.messageLog &&
+    typeof status.messageLog.system === 'string'
+    ? status.messageLog.system
+    : undefined,
+)
+const userPrompt = $derived(
+  status?.messageLog &&
+    typeof status?.messageLog === 'object' &&
+    'prompt' in status.messageLog &&
+    typeof status.messageLog.prompt === 'string'
+    ? status.messageLog.prompt
+    : undefined,
+)
 
 let showMessageLog = $state(false)
 
@@ -25,12 +41,18 @@ const handleToggleMessageLog = () => {
   </button>
 
   {#if showMessageLog}
-    <pre class="messageLog"><code>{JSON.stringify(status.messageLog, null, 2)}</code></pre>
+    <div class="messageLog">
+      <h4>System</h4>
+      <pre><code>{systemPrompt}</code></pre>
+      <h4>User</h4>
+      <pre><code>{userPrompt}</code></pre>
+    </div>
   {/if}
 {/if}
 
 <style>
 .Status {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: var(--size-2);
@@ -46,13 +68,18 @@ const handleToggleMessageLog = () => {
 }
 
 .messageLog {
-  margin: 0;
   white-space: pre-wrap;
   font-size: var(--scale-000);
   line-height: var(--line-md);
   text-align: left;
   padding: var(--size-3);
   background: var(--color-grey-50);
-  color: var(--color-blue-700);
+
+  h4 {
+    margin: 0;
+  }
+  pre {
+    margin: 0;
+  }
 }
 </style>

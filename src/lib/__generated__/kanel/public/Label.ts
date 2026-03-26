@@ -38,8 +38,8 @@ export const label = z.object({
   userId: userId,
   streamId: streamId,
   name: z.string(),
-  icon: z.string().nullable().nullable(),
-  color: z.string().nullable().nullable(),
+  icon: z.string().nullable(),
+  color: z.string().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -49,8 +49,8 @@ export const labelInitializer = z.object({
   userId: userId,
   streamId: streamId,
   name: z.string(),
-  icon: z.string().nullable().optional().nullable(),
-  color: z.string().nullable().optional().nullable(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });
@@ -60,8 +60,8 @@ export const labelMutator = z.object({
   userId: userId.optional(),
   streamId: streamId.optional(),
   name: z.string().optional(),
-  icon: z.string().nullable().optional().nullable(),
-  color: z.string().nullable().optional().nullable(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
   createdAt: z.number().optional(),
   updatedAt: z.number().optional(),
 });

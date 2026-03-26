@@ -14,7 +14,7 @@
     "tidy": "just fix"
   },
   "dependencies": {
-    "@ai-sdk/openai": "3.0.47",
+    "@ai-sdk/openai": "3.0.48",
     "@date-fns/tz": "1.4.1",
     "@date-fns/utc": "2.1.1",
     "@emoji-mart/data": "1.2.1",
@@ -25,7 +25,7 @@
     "@slack/web-api": "7.15.0",
     "@stayradiated/hydro": "1.1.0",
     "@sveltelaunch/svelte-5-email": "0.0.11",
-    "ai": "6.0.134",
+    "ai": "6.0.138",
     "async-mutex": "0.5.0",
     "cookie": "1.1.1",
     "date-fns": "4.1.0",
@@ -40,7 +40,7 @@
     "signia": "0.1.5",
     "svelte-awesome-color-picker": "4.1.1",
     "websocket-ts": "2.2.1",
-    "ws": "8.19.0",
+    "ws": "8.20.0",
     "zod": "4.3.6"
   },
   "devDependencies": {
@@ -51,25 +51,25 @@
     "@sveltejs/kit": "2.55.0",
     "@sveltejs/vite-plugin-svelte": "7.0.0",
     "@types/node": "25.5.0",
-    "@types/pg": "8.18.0",
+    "@types/pg": "8.20.0",
     "@types/ws": "8.18.1",
-    "@vitest/coverage-v8": "4.1.0",
+    "@vitest/coverage-v8": "4.1.1",
     "eslint": "10.1.0",
-    "eslint-plugin-svelte": "3.15.2",
+    "eslint-plugin-svelte": "3.16.0",
     "id128": "1.6.6",
     "kanel": "3.16.1",
     "kanel-kysely": "0.8.0",
     "kanel-zod": "1.7.0",
-    "knip": "5.86.0",
+    "knip": "6.0.5",
     "kysely": "0.28.14",
-    "svelte": "5.54.0",
+    "svelte": "5.55.0",
     "svelte-check": "4.4.5",
     "test-fixture-factory": "2.1.0",
     "type-fest": "5.5.0",
-    "typescript": "5.9.3",
-    "typescript-eslint": "8.57.1",
-    "vite": "8.0.1",
-    "vitest": "4.1.0"
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.57.2",
+    "vite": "8.0.2",
+    "vitest": "4.1.1"
   },
   "knip": {
     "vite": false,
@@ -121,7 +121,6 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "kanel-zod": "patches/kanel-zod.patch",
       "replicache": "patches/replicache.patch"
     }
   }
