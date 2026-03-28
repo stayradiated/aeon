@@ -74,7 +74,7 @@ const updateUserStatus = async (
     return prevStatus
   }
   // silently abort if status is not enabled
-  if (!prevStatus || !prevStatus.enabledAt) {
+  if (!prevStatus?.enabledAt) {
     return
   }
 
