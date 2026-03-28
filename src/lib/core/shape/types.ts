@@ -9,9 +9,4 @@ type Line = Simplify<
   }
 >
 
-type Slice = {
-  startedAt: number
-  lineList: Line[]
-}
-
-export type { Line, Slice }
+export type { Line }

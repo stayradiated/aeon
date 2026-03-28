@@ -3,30 +3,29 @@ import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
 import type { Store } from '#lib/core/replicache/store.js'
-import type { Slice } from '#lib/core/shape/types.js'
-import type { StreamId } from '#lib/ids.js'
+import type { SliceGrid } from '#lib/utils/slice-grid.js'
 
+import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 import { getVisibleStreamList } from '#lib/core/select/get-visible-stream-list.js'
+import { calcDuration } from '#lib/core/shape/calc-duration.js'
 
+import { clockMin } from '#lib/utils/clock.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
+import { getLineHeight } from './get-line-height.js'
 import Line from './Line.svelte'
 
 type Props = {
   store: Store
   timeZone: string
-  sliceList: Slice[]
+  sliceGrid: SliceGrid
 }
 
-const { store, timeZone, sliceList }: Props = $props()
+const { store, timeZone, sliceGrid }: Props = $props()
 
+const { _: now } = watch(clockMin)
 const { _: streamList } = $derived(watch(getVisibleStreamList(store)))
-
-// build an index of streamId → column index
-// so we can quickly lookup where to render each cell
-const streamColumnIndexRecord: Record<StreamId, number> = $derived(
-  Object.fromEntries(streamList.map((stream, index) => [stream.id, index])),
-)
+const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 
 const formatTime = (instant: number): string => {
   return dateFns.format(instant, 'HH:mm', { in: tz(timeZone) })
@@ -41,16 +40,18 @@ const formatTime = (instant: number): string => {
     {/each}
   </header>
 
-  {#each sliceList as slice, index (index)}
-    <section>
-      <div class="cell" style:--row={index + 2} style:--col="1"><a href="/edit/slice/{slice.startedAt}">{formatTime(slice.startedAt)}</a></div>
+  {#each sliceGrid.rowList as row, rowIndex (rowIndex)}
+    {@const prevRow = sliceGrid.rowList[rowIndex - 1]}
+    <section style:--height={getLineHeight(calcDuration(row, now))}>
+      <div class="cell time" style:--row={rowIndex + 2} style:--col="1"><a href="/edit/slice/{row.startedAt}">{formatTime(row.startedAt)}</a></div>
 
-      {#each slice.lineList as line (line.streamId)}
-        {@const streamColumnIndex = streamColumnIndexRecord[line.streamId]}
-        {#if typeof streamColumnIndex === 'number'}
-          <div class="cell" style:--row={index + 2} style:--col={streamColumnIndex + 2}>
+      {#each row.cellList as line, columnIndex (columnIndex)}
+        {#if line && line.streamId !== timeZoneStream?.id}
+          <div class="cell" style:--row={rowIndex + 2} style:--col={columnIndex + 2}>
             {#if line}
-              <Line {store} {line} />
+              {@const isHeading = !prevRow || line.stoppedAt === prevRow.startedAt}
+              {@const isEnd = line.startedAt === row.startedAt}
+              <Line {store} {line} {isHeading} {isEnd} />
             {/if}
           </div>
         {/if}
@@ -63,17 +64,31 @@ const formatTime = (instant: number): string => {
   .SliceList {
     display: grid;
     grid-template-columns: repeat(var(--num-cols), minmax(0, 1fr));
-    gap: var(--size-1);
+    column-gap: var(--size-2);
   }
 
   header, section {
     display: contents;
   }
 
+  section:hover .cell {
+    background: rgba(0, 0, 0, 5%);
+  }
+
   .cell {
     grid-column: var(--col);
     grid-row: var(--row);
     white-space: pre-wrap;
+    height: calc(var(--height) * 1px);
+
+    &.time {
+      font-size: var(--scale-000);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: end;
+      padding: var(--size-2);
+    }
   }
 
   a {

@@ -3,10 +3,10 @@ import { tz, tzOffset } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
 import type { Store } from '#lib/core/replicache/store.js'
-import type { Slice } from '#lib/core/shape/types.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
+import type { SliceGrid } from '#lib/utils/slice-grid.js'
 
-import { getSliceList } from '#lib/core/select/get-slice-list.js'
+import { getSliceGrid } from '#lib/core/select/get-slice-grid.js'
 import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
@@ -24,9 +24,9 @@ const { store, viewStart, viewEnd }: Props = $props()
 
 const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 
-const { _: sliceList } = $derived(
+const { _: sliceGrid } = $derived(
   watch(
-    getSliceList(store, {
+    getSliceGrid(store, {
       startedAt: {
         gte: calDateFns.toEarliestInstant(viewStart),
         lte: calDateFns.toLatestInstant(viewEnd),
@@ -35,35 +35,41 @@ const { _: sliceList } = $derived(
   ),
 )
 
-type ZonedSliceList = {
+type ZonedSliceGrid = {
   date: CalendarDate
   startedAt: number
   timeZone: string
-  sliceList: Slice[]
+  sliceGrid: SliceGrid
 }
 
 /*
  * grouping slices by day
- * the sliceList is sorted by startedAt ascending
+ * the sliceGrid is sorted by startedAt ascending
  * (i.e. oldest first)
  * this is important, as we need to track the current time zone as we progress
  * through the slices
  * however, for displaying the log, we want to show the most recent entries first
  * so after grouping, we reverse each list
  */
-let multiDaySliceList = $derived.by(() => {
+let multiDaySliceGrid = $derived.by(() => {
   let timeZone = 'UTC'
-  let multiDaySliceList: ZonedSliceList[] = []
-  let currentZSL: ZonedSliceList | undefined
+  let multiDaySliceGrid: ZonedSliceGrid[] = []
+  let currentZSL: ZonedSliceGrid | undefined
 
-  for (const slice of sliceList) {
-    const { startedAt, lineList } = slice
+  for (const row of sliceGrid.rowList) {
+    const { startedAt, cellList } = row
 
     if (timeZoneStream) {
-      for (const line of lineList) {
-        if (line.streamId === timeZoneStream.id) {
+      for (const line of cellList) {
+        if (typeof line === 'undefined') {
+          continue
+        }
+        if (
+          line.streamId === timeZoneStream.id &&
+          line.startedAt === row.startedAt
+        ) {
           timeZone = line.description
-          // start a new sliceList
+          // start a new sliceGrid
           currentZSL = undefined
         }
       }
@@ -81,27 +87,27 @@ let multiDaySliceList = $derived.by(() => {
         date,
         startedAt,
         timeZone,
-        sliceList: [],
+        sliceGrid: { rowList: [] },
       }
-      multiDaySliceList.push(currentZSL)
+      multiDaySliceGrid.push(currentZSL)
     }
 
-    currentZSL.sliceList.push(slice)
+    currentZSL.sliceGrid.rowList.push(row)
   }
 
-  for (const zonedSliceList of multiDaySliceList) {
-    zonedSliceList.sliceList.reverse()
+  for (const zonedSliceList of multiDaySliceGrid) {
+    zonedSliceList.sliceGrid.rowList.reverse()
   }
 
-  return multiDaySliceList.reverse()
+  return multiDaySliceGrid.reverse()
 })
 </script>
 
-{#each multiDaySliceList as { startedAt, timeZone, sliceList }, index (index)}
-  {@const prevTimeZone = multiDaySliceList[index + 1]?.timeZone}
+{#each multiDaySliceGrid as { startedAt, timeZone, sliceGrid }, index (index)}
+  {@const prevTimeZone = multiDaySliceGrid[index + 1]?.timeZone}
   <div class="container">
     <h2>{dateFns.format(startedAt, 'PPPP', { in: tz(timeZone) })}</h2>
-    <SliceList {store} {timeZone} {sliceList} />
+    <SliceList {store} {timeZone} {sliceGrid} />
   </div>
   {#if timeZone !== prevTimeZone}
     {@const offset = tzOffset(timeZone, new Date(startedAt))}
