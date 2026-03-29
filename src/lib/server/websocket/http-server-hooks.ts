@@ -10,7 +10,7 @@ const createHttpServerUpgradeHandler =
   (getWss: WssGetter) =>
   (request: IncomingMessage, socket: Duplex, head: Buffer) => {
     // Only handle upgrades for paths that start with '/websocket'
-    if (!request.url || !request.url.startsWith('/websocket')) {
+    if (!request.url?.startsWith('/websocket')) {
       console.warn(styleText('red', `[wss:kit] ignoring: ${request.url}`))
       return
     }
