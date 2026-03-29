@@ -183,7 +183,7 @@ afterNavigate(() => {
       padding-right: 7vw;
 
       background: var(--color-grey-800);
-      z-index: 10;
+      z-index: var(--layer-2);
 
       opacity: 0;
       transform: translateY(-100%);
@@ -199,7 +199,7 @@ afterNavigate(() => {
 
     .menuToggle {
       display: initial;
-      z-index: 11;
+      z-index: var(--layer-3);
     }
 
     .menuContainer > a {

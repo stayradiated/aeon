@@ -1,8 +1,10 @@
 <script lang="ts">
 import { tz } from '@date-fns/tz'
 
-import type { CalendarDate } from '#lib/utils/calendar-date.js'
 import type { PageProps } from './$types'
+
+import { goto } from '$app/navigation'
+import { page } from '$app/state'
 
 import { getTimeZone } from '#lib/core/select/get-time-zone.js'
 
@@ -21,8 +23,16 @@ const { _: timeZone } = $derived(watch(getTimeZone(store, now)))
 const SHOW_DAY_COUNT = 2
 const NAV_DAY_COUNT = 1
 
-let viewStart = $state<CalendarDate>()
-let viewEnd = $state<CalendarDate>()
+const dateParam = $derived(page.url.searchParams.get('date'))
+
+let viewEnd = $derived(
+  typeof dateParam === 'string'
+    ? calDateFns.fromISOString(dateParam)
+    : undefined,
+)
+let viewStart = $derived(
+  viewEnd ? calDateFns.subDays(viewEnd, SHOW_DAY_COUNT - 1) : undefined,
+)
 
 const today = $derived(calDateFns.fromInstant(now, tz(timeZone)))
 const hasNext = $derived(viewEnd && viewEnd < today)
@@ -33,8 +43,10 @@ const handlePrev = () => {
     return
   }
 
-  viewStart = calDateFns.subDays(viewStart, NAV_DAY_COUNT)
-  viewEnd = calDateFns.subDays(viewEnd, NAV_DAY_COUNT)
+  const nextDate = calDateFns.subDays(viewEnd, NAV_DAY_COUNT)
+  const nextUrl = new URL(page.url)
+  nextUrl.searchParams.set('date', calDateFns.formatISO(nextDate))
+  goto(nextUrl)
 }
 
 const handleNext = () => {
@@ -42,8 +54,10 @@ const handleNext = () => {
     return
   }
 
-  viewStart = calDateFns.addDays(viewStart, NAV_DAY_COUNT)
-  viewEnd = calDateFns.addDays(viewEnd, NAV_DAY_COUNT)
+  const nextDate = calDateFns.addDays(viewEnd, NAV_DAY_COUNT)
+  const nextUrl = new URL(page.url)
+  nextUrl.searchParams.set('date', calDateFns.formatISO(nextDate))
+  goto(nextUrl)
 }
 
 const handleToday = () => {

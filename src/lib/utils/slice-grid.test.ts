@@ -60,8 +60,15 @@ test('foo', () => {
 
   const streamIdList: StreamId[] = [people, location, project, task]
 
-  const result = buildSliceGrid({ lineListRecord, streamIdList })
+  const result = buildSliceGrid({
+    lineListRecord,
+    streamIdList,
+    startedAt: 1308,
+    stoppedAt: 1510,
+  })
   expect(result).toStrictEqual({
+    startedAt: 1308,
+    stoppedAt: 1510,
     rowList: [
       {
         startedAt: 1308,

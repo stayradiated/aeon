@@ -13,10 +13,14 @@ type Row = {
 }
 
 type SliceGrid = {
+  startedAt: number
+  stoppedAt: number
   rowList: Row[]
 }
 
 type BuildSliceGridOptions = {
+  startedAt: number
+  stoppedAt: number
   lineListRecord: Record<StreamId, Line[]>
   streamIdList: StreamId[]
 }
@@ -94,6 +98,8 @@ const buildSliceGrid = (options: BuildSliceGridOptions): SliceGrid => {
   }
 
   const grid: SliceGrid = {
+    startedAt: options.startedAt,
+    stoppedAt: options.stoppedAt,
     rowList: [],
   }
 

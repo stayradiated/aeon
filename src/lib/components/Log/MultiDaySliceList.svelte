@@ -37,7 +37,6 @@ const { _: sliceGrid } = $derived(
 
 type ZonedSliceGrid = {
   date: CalendarDate
-  startedAt: number
   timeZone: string
   sliceGrid: SliceGrid
 }
@@ -83,11 +82,17 @@ let multiDaySliceGrid = $derived.by(() => {
     }
 
     if (currentZSL?.date !== date) {
+      const startOfDay = calDateFns.toInstant(date, tz(timeZone))
+      const endOfDay = startOfDay + calDateFns.MS_PER_DAY - 1
+
       currentZSL = {
         date,
-        startedAt,
         timeZone,
-        sliceGrid: { rowList: [] },
+        sliceGrid: {
+          startedAt: startOfDay,
+          stoppedAt: endOfDay,
+          rowList: [],
+        },
       }
       multiDaySliceGrid.push(currentZSL)
     }
@@ -103,18 +108,18 @@ let multiDaySliceGrid = $derived.by(() => {
 })
 </script>
 
-{#each multiDaySliceGrid as { startedAt, timeZone, sliceGrid }, index (index)}
+{#each multiDaySliceGrid as { timeZone, sliceGrid }, index (index)}
   {@const prevTimeZone = multiDaySliceGrid[index + 1]?.timeZone}
   <div class="container">
-    <h2>{dateFns.format(startedAt, 'PPPP', { in: tz(timeZone) })}</h2>
+    <h2>{dateFns.format(sliceGrid.startedAt, 'PPpp', { in: tz(timeZone) })}</h2>
     <SliceList {store} {timeZone} {sliceGrid} />
   </div>
   {#if timeZone !== prevTimeZone}
-    {@const offset = tzOffset(timeZone, new Date(startedAt))}
+    {@const offset = tzOffset(timeZone, new Date(sliceGrid.startedAt))}
     {#if typeof prevTimeZone === 'undefined'}
       <div class="timeZoneChange">{timeZone} (UTC{#if offset > 0}+{/if}{offset / 60})</div>
     {:else}
-      {@const prevOffset = tzOffset(prevTimeZone, new Date(startedAt))}
+      {@const prevOffset = tzOffset(prevTimeZone, new Date(sliceGrid.startedAt))}
       {@const diff = (prevOffset - offset)/60}
       <div class="timeZoneChange">Time zone changed to {timeZone} ({#if diff > 0}+{/if}{diff} hours)</div>
     {/if}
