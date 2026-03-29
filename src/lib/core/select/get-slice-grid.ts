@@ -23,7 +23,12 @@ const getSliceGrid = createSelector(
     return computed('getLineListForStream', () => {
       const lineListRecord = $lineListRecord.value
       const streamIdList = $streamList.value.map((stream) => stream.id)
-      return buildSliceGrid({ lineListRecord, streamIdList })
+      return buildSliceGrid({
+        lineListRecord,
+        streamIdList,
+        startedAt: where.startedAt.gte,
+        stoppedAt: where.startedAt.lte,
+      })
     })
   },
 )

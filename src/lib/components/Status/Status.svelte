@@ -35,7 +35,7 @@ const handleToggleMessageLog = () => {
 </script>
 
 {#if status}
-  <button onclick={handleToggleMessageLog} class="Status">
+  <button tabIndex={-1} onclick={handleToggleMessageLog} class="Status">
     <span>{status.emoji}</span>
     <span>{status.status}</span>
   </button>
