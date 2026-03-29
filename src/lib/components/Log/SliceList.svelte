@@ -49,9 +49,16 @@ const formatTime = (instant: number): string => {
         {#if line && line.streamId !== timeZoneStream?.id}
           <div class="cell" style:--row={rowIndex + 2} style:--col={columnIndex + 2}>
             {#if line}
-              {@const isHeading = !prevRow || line.stoppedAt === prevRow.startedAt}
+              {@const isCarryOver = !prevRow && typeof line.stoppedAt !== 'undefined' && line.stoppedAt > sliceGrid.stoppedAt}
+              {@const isStart = line.stoppedAt === prevRow?.startedAt}
               {@const isEnd = line.startedAt === row.startedAt}
-              <Line {store} {line} {isHeading} {isEnd} />
+              <Line
+                {store}
+                {line}
+                {isCarryOver}
+                {isStart}
+                {isEnd}
+              />
             {/if}
           </div>
         {/if}
@@ -79,7 +86,7 @@ const formatTime = (instant: number): string => {
     grid-column: var(--col);
     grid-row: var(--row);
     white-space: pre-wrap;
-    height: calc(var(--height) * 1px);
+    min-height: calc(var(--height) * 1px);
 
     &.time {
       font-size: var(--scale-000);
