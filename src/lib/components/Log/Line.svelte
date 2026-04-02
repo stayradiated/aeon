@@ -1,4 +1,5 @@
 <script lang="ts">
+import { layoutWithLines, prepareWithSegments } from '@chenglou/pretext'
 import { computed } from 'signia'
 
 import type { Store } from '#lib/core/replicache/store.js'
@@ -10,17 +11,16 @@ import { clockMin } from '#lib/utils/clock.js'
 import { formatDuration } from '#lib/utils/format-duration.js'
 import { watch } from '#lib/utils/watch.svelte.js'
 
-import Emoji from '#lib/components/Emoji/Emoji.svelte'
-
 type Props = {
   store: Store
   line: Line
-  isCarryOver: boolean
   isStart: boolean
   isEnd: boolean
 }
 
-const { store, line, isCarryOver, isStart, isEnd }: Props = $props()
+const { store, line, isStart, isEnd }: Props = $props()
+
+let elWidth = $state<number>(0)
 
 const { _: labelList } = $derived(
   watch(
@@ -33,23 +33,38 @@ const { _: labelList } = $derived(
   ),
 )
 
+const labelLines = $derived.by(() => {
+  const lineWidth = Math.max(100, elWidth)
+  const lineHeight = 21
+
+  return labelList.map((label) => {
+    const text = [label.icon ? `${label.icon} ` : '', label.name].join('')
+    const preparedText = prepareWithSegments(text, 'bold 14px Cambay')
+    const result = layoutWithLines(preparedText, lineWidth, lineHeight)
+    return result.lines
+  })
+})
+
 const { _: now } = $derived(watch(clockMin))
 const durationMs = $derived(calcDuration(line, now))
 
 const firstLabel = $derived(labelList.at(0))
-const showDetails = $derived(isStart || isCarryOver)
+const showDetails = $derived(isStart)
 </script>
 
-<div class="Line" class:isCarryOver class:isEnd style:--color={firstLabel?.color}>
+<div class="Line" bind:clientWidth={elWidth} class:isEnd style:--color={firstLabel?.color}>
   {#if showDetails}
     {#if labelList.length > 0}
-      {#each labelList as label (label.id)}
-        <a class="label" href="/label/{label.id}">
-          {#if label.icon}
-            <Emoji native={label.icon} scale="00" />
-          {/if}<span class="name">{label.name}</span>
-        </a>
-      {/each}
+      <div class="labelList">
+        {#each labelList as label, index (label.id)}
+          {@const lines = labelLines[index] ?? []}
+          <a class="label" href="/label/{label.id}" style:--color={label.color}>
+            {#each lines as line, lineIndex (lineIndex)}
+              <div class="line" style:--width={line.width}>{line.text}</div>
+            {/each}
+          </a>
+        {/each}
+      </div>
     {/if}
 
     {#if line.description}
@@ -71,50 +86,60 @@ const showDetails = $derived(isStart || isCarryOver)
     color: #000;
     box-shadow: inset 6px 0 var(--color);
 
-    gap: var(--size-1);
+    /* gap: var(--size-1); */
 
     &.isEnd {
       border-bottom: 2px solid #fff;
     }
   }
 
-  .isCarryOver .label {
-    background-color: color-mix(in srgb, var(--color) 25%, transparent);
-    color: rgba(0, 0, 0, 0.8);
-    font-weight: var(--weight-regular);
+  .labelList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-1);
   }
 
   .label {
     /* use z-index hack to render text above the neighbours border */
     position: relative;
     z-index: var(--layer-1);
-    background-color: var(--color);
 
-    padding-block: var(--size-1);
-    padding-left: var(--size-2);
-
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--size-1);
     line-height: var(--line-md);
     align-items: center;
 
     text-decoration: none;
-    color: contrast-color(var(--color));
-    font-weight: 600;
-    font-size: var(--scale-00);
+    background-color: var(--color);
 
     &:hover {
       text-decoration: underline;
     }
+
+    .line {
+      box-sizing: content-box;
+      padding-inline: var(--size-2);
+      width: calc(var(--width) * 1px);
+      background-color: var(--color);
+      color: contrast-color(var(--color));
+      font-size: var(--scale-00);
+      font-weight: 600;
+    }
   }
 
   .description {
+    /* use z-index hack to render text above the neighbours border */
+    position: relative;
+    z-index: var(--layer-1);
+
     font-style: italic;
-    padding-left: var(--size-2);
+    padding-left: var(--size-3);
+    font-size: var(--scale-00);
   }
 
   .duration {
+    /* use z-index hack to render text above the neighbours border */
+    position: relative;
+    z-index: var(--layer-1);
+
     font-family: var(--font-mono);
     font-size: var(--scale-000);
     padding-left: var(--size-2);

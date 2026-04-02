@@ -16,6 +16,9 @@ importers:
       '@ai-sdk/openai':
         specifier: 3.0.49
         version: 3.0.49(zod@4.3.6)
+      '@chenglou/pretext':
+        specifier: 0.0.3
+        version: 0.0.3
       '@date-fns/tz':
         specifier: 1.4.1
         version: 1.4.1
@@ -282,6 +285,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@chenglou/pretext@0.0.3':
+    resolution: {integrity: sha512-RQmqMqUAPRCyv4R3LlRi/ao6KbNWYclqLA+V1HS7sWgyUUbjn3JmmlfXZSY/BjM4rbmIaMSyIVisYocYGYftiQ==}
 
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
@@ -3245,6 +3251,8 @@ snapshots:
   '@biomejs/cli-win32-x64@2.4.10':
     optional: true
 
+  '@chenglou/pretext@0.0.3': {}
+
   '@date-fns/tz@1.4.1': {}
 
   '@date-fns/utc@2.1.1': {}
@@ -4575,7 +4583,7 @@ snapshots:
   extract-pg-schema@5.8.1(@electric-sql/pglite@0.3.16):
     dependencies:
       knex: 3.1.0(pg@8.17.2)
-      knex-pglite: 0.12.1(@electric-sql/pglite@0.3.16)(knex@3.1.0(pg@8.20.0))
+      knex-pglite: 0.12.1(@electric-sql/pglite@0.3.16)(knex@3.1.0(pg@8.17.2))
       pg: 8.17.2
       pg-query-emscripten: 5.1.0
       ramda: 0.31.3
@@ -4901,7 +4909,7 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knex-pglite@0.12.1(@electric-sql/pglite@0.3.16)(knex@3.1.0(pg@8.20.0)):
+  knex-pglite@0.12.1(@electric-sql/pglite@0.3.16)(knex@3.1.0(pg@8.17.2)):
     dependencies:
       '@electric-sql/pglite': 0.3.16
       knex: 3.1.0(pg@8.17.2)

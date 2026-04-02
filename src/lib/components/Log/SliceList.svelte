@@ -49,13 +49,11 @@ const formatTime = (instant: number): string => {
         {#if line && line.streamId !== timeZoneStream?.id}
           <div class="cell" style:--row={rowIndex + 2} style:--col={columnIndex + 2}>
             {#if line}
-              {@const isCarryOver = !prevRow && typeof line.stoppedAt !== 'undefined' && line.stoppedAt > sliceGrid.stoppedAt}
               {@const isStart = line.stoppedAt === prevRow?.startedAt}
               {@const isEnd = line.startedAt === row.startedAt}
               <Line
                 {store}
                 {line}
-                {isCarryOver}
                 {isStart}
                 {isEnd}
               />
