@@ -49,8 +49,8 @@ const formatTime = (instant: number): string => {
         {#if line && line.streamId !== timeZoneStream?.id}
           <div class="cell" style:--row={rowIndex + 2} style:--col={columnIndex + 2}>
             {#if line}
-              {@const isStart = line.stoppedAt === prevRow?.startedAt}
-              {@const isEnd = line.startedAt === row.startedAt}
+              {@const isEnd = line.stoppedAt === prevRow?.startedAt}
+              {@const isStart = line.startedAt === row.startedAt}
               <Line
                 {store}
                 {line}
