@@ -1,7 +1,7 @@
 #syntax=docker/dockerfile:1.4
 
 # --- Base Stage ---
-FROM node:25.9.0-alpine@sha256:ad82ecad30371c43f4057aaa4800a8ed88f9446553a2d21323710c7b937177fc AS base
+FROM node:26.0.0-alpine@sha256:30f5a66e7265ef70aac56b4753ffa7905e54eca1084bc25503893ad8e9273f05 AS base
 WORKDIR /app
 RUN npm install --global pnpm
 
