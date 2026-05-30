@@ -1,5 +1,5 @@
-import { userId, type UserId } from './User';
-import { streamId, type StreamId } from './Stream';
+import { userId, type UserId } from './User.ts';
+import { streamId, type StreamId } from './Stream.ts';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 

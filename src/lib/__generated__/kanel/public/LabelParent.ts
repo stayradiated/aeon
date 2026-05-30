@@ -1,5 +1,5 @@
-import { labelId, type LabelId } from './Label';
-import { userId, type UserId } from './User';
+import { labelId, type LabelId } from './Label.ts';
+import { userId, type UserId } from './User.ts';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 

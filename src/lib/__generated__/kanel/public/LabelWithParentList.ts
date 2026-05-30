@@ -1,6 +1,6 @@
-import { labelId, type LabelId } from './Label';
-import { userId, type UserId } from './User';
-import { streamId, type StreamId } from './Stream';
+import { labelId, type LabelId } from './Label.ts';
+import { userId, type UserId } from './User.ts';
+import { streamId, type StreamId } from './Stream.ts';
 import type { ColumnType, Selectable } from 'kysely';
 import { z } from 'zod';
 

@@ -1,4 +1,4 @@
-import { replicacheClientGroupId, type ReplicacheClientGroupId } from './ReplicacheClientGroup';
+import { replicacheClientGroupId, type ReplicacheClientGroupId } from './ReplicacheClientGroup.ts';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 

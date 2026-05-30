@@ -1,4 +1,5 @@
 const { makeKyselyHook, kyselyCamelCaseHook } = require('kanel-kysely')
+const { makePgTsGenerator } = require('kanel')
 const { generateIndexFile } = require('kanel')
 const {
   makeGenerateZodSchemas,
@@ -44,7 +45,7 @@ const generateKyselySchemas = makeKyselyHook()
  * zod.castToSchema doesn't work with kysely
  * https://github.com/kristiandupont/kanel/issues/563
  */
-const kanelKyselyZodCompatibilityHook = (_path, lines, _instantiatedConfig) => {
+const kanelKyselyZodCompatibilityHook = (_path, lines) => {
   const kanelZodCastRegex = /^\}\) as unknown as z\.Schema<\w+>;$/
   return lines.map((line) => {
     return line.replace(kanelZodCastRegex, '});')
@@ -132,22 +133,31 @@ module.exports = {
   // the DATABASE_URL environment variable and force us to use GM_DBURL
   // instead.
   connection: process.env.GM_DBURL ?? process.env.DATABASE_URL,
-
-  schemas: ['public'],
-
-  enumStyle: 'enum',
+  schemaNames: ['public'],
 
   outputPath: 'src/lib/__generated__/kanel',
   preDeleteOutputFolder: true,
 
-  preRenderHooks: [
-    generateKyselySchemas,
-    kyselyCamelCaseHook,
+  typescriptConfig: {
+    enumStyle: 'literal-union',
+    tsModuleFormat: 'esm',
+    importsExtension: '.ts',
+  },
 
-    generateZodSchemas,
-    zodCamelCaseHook,
+  generators: [
+    makePgTsGenerator({
+      preRenderHooks: [
+        generateKyselySchemas,
+        kyselyCamelCaseHook,
 
-    generateIndexFile,
+        generateZodSchemas,
+        zodCamelCaseHook,
+
+        generateIndexFile,
+      ],
+
+      customTypeMap: getTypeMap('typescript'),
+    }),
   ],
 
   postRenderHooks: [
@@ -155,6 +165,4 @@ module.exports = {
     supportVerbatimModuleSyntaxHook,
     useTypedViewListsHoook,
   ],
-
-  customTypeMap: getTypeMap('typescript'),
 }

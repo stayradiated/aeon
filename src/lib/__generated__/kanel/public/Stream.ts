@@ -1,4 +1,4 @@
-import { userId, type UserId } from './User';
+import { userId, type UserId } from './User.ts';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 
