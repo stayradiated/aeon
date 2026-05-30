@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Vite Dev Server Manager Script
 # Usage: ./script/vite/dev start|stop|restart|status
