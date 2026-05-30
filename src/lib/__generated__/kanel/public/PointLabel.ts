@@ -1,6 +1,6 @@
-import { pointId, type PointId } from './Point';
-import { labelId, type LabelId } from './Label';
-import { streamId, type StreamId } from './Stream';
+import { pointId, type PointId } from './Point.ts';
+import { labelId, type LabelId } from './Label.ts';
+import { streamId, type StreamId } from './Stream.ts';
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely';
 import { z } from 'zod';
 

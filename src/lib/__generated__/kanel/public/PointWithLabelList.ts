@@ -1,7 +1,7 @@
 import { labelId, type LabelId } from './Label';
-import { pointId, type PointId } from './Point';
-import { userId, type UserId } from './User';
-import { streamId, type StreamId } from './Stream';
+import { pointId, type PointId } from './Point.ts';
+import { userId, type UserId } from './User.ts';
+import { streamId, type StreamId } from './Stream.ts';
 import type { ColumnType, Selectable } from 'kysely';
 import { z } from 'zod';
 

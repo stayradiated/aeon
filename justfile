@@ -6,7 +6,7 @@ export PATH := "./node_modules/.bin:" + env_var('PATH')
 
 # Load environment variables from .env file
 
-set dotenv-load := true
+set dotenv-load
 
 # Modules
 

@@ -1,19 +1,19 @@
-import type { default as ReplicacheClientGroupTable } from './ReplicacheClientGroup';
-import type { default as LabelTable } from './Label';
-import type { default as EmailVerificationTable } from './EmailVerification';
-import type { default as ReplicacheClientViewTable } from './ReplicacheClientView';
-import type { default as UserTable } from './User';
-import type { default as ReplicacheClientTable } from './ReplicacheClient';
-import type { default as UserSessionTable } from './UserSession';
-import type { default as PointLabelTable } from './PointLabel';
-import type { default as StreamTable } from './Stream';
-import type { default as StatusTable } from './Status';
-import type { default as MetaTaskTable } from './MetaTask';
-import type { default as LabelParentTable } from './LabelParent';
-import type { default as PointTable } from './Point';
-import type { default as PointWithLabelListTable } from './PointWithLabelList';
-import type { default as LineTable } from './Line';
-import type { default as LabelWithParentListTable } from './LabelWithParentList';
+import type { default as ReplicacheClientGroupTable } from './ReplicacheClientGroup.ts';
+import type { default as LabelTable } from './Label.ts';
+import type { default as EmailVerificationTable } from './EmailVerification.ts';
+import type { default as ReplicacheClientViewTable } from './ReplicacheClientView.ts';
+import type { default as UserTable } from './User.ts';
+import type { default as ReplicacheClientTable } from './ReplicacheClient.ts';
+import type { default as UserSessionTable } from './UserSession.ts';
+import type { default as PointLabelTable } from './PointLabel.ts';
+import type { default as StreamTable } from './Stream.ts';
+import type { default as StatusTable } from './Status.ts';
+import type { default as MetaTaskTable } from './MetaTask.ts';
+import type { default as LabelParentTable } from './LabelParent.ts';
+import type { default as PointTable } from './Point.ts';
+import type { default as PointWithLabelListTable } from './PointWithLabelList.ts';
+import type { default as LineTable } from './Line.ts';
+import type { default as LabelWithParentListTable } from './LabelWithParentList.ts';
 
 export default interface PublicSchema {
   replicacheClientGroup: ReplicacheClientGroupTable;
