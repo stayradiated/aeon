@@ -32,7 +32,7 @@ const formatTime = (instant: number): string => {
 }
 </script>
 
-<div class="SliceList" style:--num-cols={1 + streamList.length}>
+<div class="SliceList" style:--stream-count={streamList.length}>
   <header>
     <h5>time</h5>
     {#each streamList as stream (stream.id)}
@@ -68,8 +68,7 @@ const formatTime = (instant: number): string => {
 <style>
   .SliceList {
     display: grid;
-    grid-template-columns: repeat(var(--num-cols), minmax(0, 1fr));
-    column-gap: var(--size-2);
+    grid-template-columns: var(--size-10) repeat(var(--stream-count), minmax(0, 1fr));
   }
 
   header, section {
@@ -78,6 +77,15 @@ const formatTime = (instant: number): string => {
 
   section:hover .cell {
     background: rgba(0, 0, 0, 5%);
+  }
+
+  h5 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    font-size: var(--scale-000);
+    margin-block: var(--size-2);
   }
 
   .cell {

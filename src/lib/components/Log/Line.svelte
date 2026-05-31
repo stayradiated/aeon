@@ -38,7 +38,7 @@ const labelLines = $derived.by(() => {
   const lineHeight = 21
 
   return labelList.map((label) => {
-    const text = [label.icon ? `${label.icon} ` : '', label.name].join('')
+    const text = label.name
     const preparedText = prepareWithSegments(text, 'bold 14px Cambay')
     const result = layoutWithLines(preparedText, lineWidth, lineHeight)
     return result.lines
@@ -61,7 +61,7 @@ const showDetails = $derived(isEnd)
           {@const lines = labelLines[index] ?? []}
           <a class="label" href="/label/{label.id}" style:--color={label.color}>
             {#each lines as line, lineIndex (lineIndex)}
-              <div class="line" style:--width={line.width}>{line.text}</div>
+              <div class="line" style:--width={line.width}>{#if lineIndex === 0 && typeof label.icon === 'string'}<span class="icon">{label.icon}</span>{/if}{line.text}</div>
             {/each}
           </a>
         {/each}
@@ -123,11 +123,21 @@ const showDetails = $derived(isEnd)
       box-sizing: content-box;
       padding-inline: var(--size-2);
       padding-top: 5px;
-      width: calc(var(--width) * 1px);
       background-color: var(--color);
       color: inherit;
       font-size: 14px;
       font-weight: 600;
+      width: calc(var(--width) * 1px);
+
+      &:has(.icon) {
+        width: calc((var(--width) * 1px) + 24px);
+      }
+
+      .icon {
+        display: block;
+        width: 20px;
+        flex-shrink: 0;
+      }
     }
   }
 
