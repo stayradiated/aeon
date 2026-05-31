@@ -87,5 +87,6 @@ $effect.pre(() => {
 <style>
   .viewRange {
     text-align: center;
+    margin-block: var(--size-4);
   }
 </style>

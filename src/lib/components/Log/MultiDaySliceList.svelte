@@ -111,7 +111,7 @@ let multiDaySliceGrid = $derived.by(() => {
 {#each multiDaySliceGrid as { timeZone, sliceGrid }, index (index)}
   {@const prevTimeZone = multiDaySliceGrid[index + 1]?.timeZone}
   <div class="container">
-    <h2>{dateFns.format(sliceGrid.startedAt, 'PPpp', { in: tz(timeZone) })}</h2>
+    <h2>{dateFns.format(sliceGrid.startedAt, 'PP', { in: tz(timeZone) })}</h2>
     <SliceList {store} {timeZone} {sliceGrid} />
   </div>
   {#if timeZone !== prevTimeZone}
@@ -133,6 +133,13 @@ let multiDaySliceGrid = $derived.by(() => {
     display: flex;
     flex-direction: column;
     margin-bottom: 1rem;
+  }
+
+  h2 {
+    text-align: center;
+    margin-block: 0;
+    line-height: var(--line-xl);
+    background: var(--color-grey-100);
   }
 
   .timeZoneChange {
