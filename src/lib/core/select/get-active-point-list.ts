@@ -1,14 +1,22 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { StreamId } from '#lib/ids.js'
 import type { Point } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
 import { findPointIndex } from './find-point-index.js'
 import { getPointList } from './get-point-list.js'
 
+/**
+ * Returns the points needed to represent a stream across a time window.
+ *
+ * This includes boundary context: when a lower bound is provided, the returned
+ * list starts with the point active at that instant, even if it started earlier;
+ * when an upper bound is provided, it includes the first point at or after that
+ * instant so callers can build a closing line segment.
+ *
+ * Quirk: if both bounds are omitted this warns and returns the full point list.
+ */
 const getActivePointList = createSelector(
   'getActivePointList',
   (
@@ -17,7 +25,7 @@ const getActivePointList = createSelector(
     where: {
       startedAt: { gte?: number; lte?: number }
     },
-  ): Signal<Point[]> => {
+  ): Selection<Point[]> => {
     const $pointList = getPointList(store, streamId)
 
     if (
@@ -44,14 +52,14 @@ const getActivePointList = createSelector(
           })
         : undefined
 
-    return computed('getActivePointList', () => {
+    return () => {
       const startIndex = $startIndex?.value ?? 0
       const endIndex = $endIndex?.value
       return $pointList.value.slice(
         startIndex,
         typeof endIndex === 'number' ? endIndex + 1 : undefined,
       )
-    })
+    }
   },
 )
 

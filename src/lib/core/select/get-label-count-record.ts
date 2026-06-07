@@ -1,13 +1,17 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { LabelId, StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
-import { createSelector } from '#lib/utils/selector'
+import { createSelector } from '#lib/utils/selector.js'
 
 import { findPointIndex } from './find-point-index.js'
 import { getPointList } from './get-point-list.js'
 
+/**
+ * Counts how many points used each label within a stream and started-at range.
+ *
+ * Use this for popularity ordering and simple event counts. The result is keyed
+ * by label id and counts point occurrences, not total duration.
+ */
 const getLabelCountRecord = createSelector(
   'getLabelCountRecord',
   (
@@ -19,7 +23,7 @@ const getLabelCountRecord = createSelector(
         lte: number
       }
     },
-  ): Signal<Record<LabelId, number>> => {
+  ): Selection<Record<LabelId, number>> => {
     const $pointList = getPointList(store, streamId)
 
     const $startIndex = findPointIndex(store, streamId, {
@@ -30,16 +34,16 @@ const getLabelCountRecord = createSelector(
       startedAt: { lte: where.startedAt.lte },
     })
 
-    return computed('getLabelCountRecord', () => {
+    return () => {
       const labelRecord: Record<LabelId, number> = {}
 
       const startIndex = $startIndex.value
-      if (!startIndex) {
+      if (typeof startIndex === 'undefined') {
         return labelRecord
       }
 
       const endIndex = $endIndex.value
-      if (!endIndex) {
+      if (typeof endIndex === 'undefined') {
         return labelRecord
       }
 
@@ -54,7 +58,7 @@ const getLabelCountRecord = createSelector(
       }
 
       return labelRecord
-    })
+    }
   },
 )
 

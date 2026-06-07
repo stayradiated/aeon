@@ -1,8 +1,8 @@
 import { tz } from '@date-fns/tz'
-import { computed } from 'signia'
 
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { createSelector } from '#lib/utils/selector.js'
@@ -15,6 +15,16 @@ type DailyDuration = {
   durationMs: number
 }
 
+/**
+ * Totals the duration of a label for each calendar date in a stream.
+ *
+ * Use this for label activity charts and heat maps. Open-ended lines are counted
+ * up to `now`, and durations that cross midnight are split by local day using
+ * the active time zone at the line's start.
+ *
+ * Quirk: time-zone changes during a line are not handled, and boundary context
+ * can produce entries just outside the requested instant range.
+ */
 const getDailyDurationList = createSelector(
   'getDailyDurationList',
   (
@@ -28,7 +38,7 @@ const getDailyDurationList = createSelector(
       labelId: LabelId
     },
     now: number,
-  ) => {
+  ): Selection<DailyDuration[]> => {
     const $lineList = getFilteredLineList(
       store,
       streamId,
@@ -39,7 +49,7 @@ const getDailyDurationList = createSelector(
       now,
     )
 
-    return computed('getDailyDurationList', () => {
+    return () => {
       const lineList = $lineList.value
 
       const entryRecord: Record<CalendarDate, DailyDuration> = {}
@@ -72,7 +82,7 @@ const getDailyDurationList = createSelector(
       return Object.values(entryRecord).sort((a, b) => {
         return a.date - b.date
       })
-    })
+    }
   },
 )
 

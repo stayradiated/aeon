@@ -1,13 +1,17 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { Line } from '#lib/core/shape/types.js'
 import type { StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getLineList } from './get-line-list.js'
 
+/**
+ * Builds line interval lists for every stream in the requested time window.
+ *
+ * This is primarily used by slice-grid construction, where each stream needs a
+ * list of point-to-next-point intervals over the same range.
+ */
 const getAllLineLists = createSelector(
   'getAllLineLists',
   (
@@ -15,14 +19,14 @@ const getAllLineLists = createSelector(
     where: {
       startedAt: { gte: number; lte: number }
     },
-  ): Signal<Record<StreamId, Line[]>> => {
-    return computed('getAllLineLists', () => {
+  ): Selection<Record<StreamId, Line[]>> => {
+    return () => {
       return Object.fromEntries(
         store.stream.keys.value.map((streamId) => {
           return [streamId, getLineList(store, streamId, where).value] as const
         }),
       )
-    })
+    }
   },
 )
 

@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { StreamId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -12,12 +10,18 @@ const normalizeLabelName = (label: Label): string => {
   return label.name.toLowerCase().trim()
 }
 
+/**
+ * Finds groups of labels in a stream that have the same normalized name.
+ *
+ * Use this to power label cleanup and deduplication UI. Normalization is limited
+ * to trimming whitespace and lower-casing the label name.
+ */
 const getDuplicateLabelList = createSelector(
   'getDuplicateLabelList',
-  (store, streamId: StreamId): Signal<Label[][]> => {
+  (store, streamId: StreamId): Selection<Label[][]> => {
     const $labelList = getLabelList(store, streamId)
 
-    return computed('getDuplicateLabelList', () => {
+    return () => {
       const labelList = $labelList.value
 
       // we build a record storing the normalized name of each label
@@ -39,7 +43,7 @@ const getDuplicateLabelList = createSelector(
       }
 
       return duplicateLabelGroupList
-    })
+    }
   },
 )
 

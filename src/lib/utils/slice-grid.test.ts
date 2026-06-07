@@ -96,9 +96,124 @@ test('foo', () => {
       },
       {
         startedAt: 1430,
-        stoppedAt: undefined,
-        durationMs: undefined,
+        stoppedAt: 1510,
+        durationMs: 80,
         cellList: [undefined, cafe, aeon, design],
+      },
+    ],
+  })
+})
+
+test('clips rows to the requested time range', () => {
+  const streamId = 'stream' as StreamId
+
+  const first = line(streamId, 'first', 100, 200)
+  const second = line(streamId, 'second', 200, undefined)
+
+  const result = buildSliceGrid({
+    lineListRecord: {
+      [streamId]: [first, second],
+    },
+    streamIdList: [streamId],
+    startedAt: 150,
+    stoppedAt: 250,
+  })
+
+  expect(result).toStrictEqual({
+    startedAt: 150,
+    stoppedAt: 250,
+    rowList: [
+      {
+        startedAt: 150,
+        stoppedAt: 200,
+        durationMs: 50,
+        cellList: [first],
+      },
+      {
+        startedAt: 200,
+        stoppedAt: 250,
+        durationMs: 50,
+        cellList: [second],
+      },
+    ],
+  })
+})
+
+test('excludes rows that do not overlap the requested time range', () => {
+  const streamId = 'stream' as StreamId
+
+  const first = line(streamId, 'first', 100, 200)
+  const second = line(streamId, 'second', 200, 300)
+  const third = line(streamId, 'third', 300, 400)
+
+  const result = buildSliceGrid({
+    lineListRecord: {
+      [streamId]: [first, second, third],
+    },
+    streamIdList: [streamId],
+    startedAt: 225,
+    stoppedAt: 275,
+  })
+
+  expect(result).toStrictEqual({
+    startedAt: 225,
+    stoppedAt: 275,
+    rowList: [
+      {
+        startedAt: 225,
+        stoppedAt: 275,
+        durationMs: 50,
+        cellList: [second],
+      },
+    ],
+  })
+})
+
+test('returns an empty row list when no rows overlap the requested time range', () => {
+  const streamId = 'stream' as StreamId
+
+  const first = line(streamId, 'first', 100, 200)
+
+  const result = buildSliceGrid({
+    lineListRecord: {
+      [streamId]: [first],
+    },
+    streamIdList: [streamId],
+    startedAt: 300,
+    stoppedAt: 400,
+  })
+
+  expect(result).toStrictEqual({
+    startedAt: 300,
+    stoppedAt: 400,
+    rowList: [],
+  })
+})
+
+test('excludes rows that only touch the requested time range boundary', () => {
+  const streamId = 'stream' as StreamId
+
+  const first = line(streamId, 'first', 100, 200)
+  const second = line(streamId, 'second', 200, 300)
+
+  const result = buildSliceGrid({
+    lineListRecord: {
+      [streamId]: [first, second],
+    },
+    streamIdList: [streamId],
+    startedAt: 200,
+    stoppedAt: 300,
+  })
+
+  expect(result).toStrictEqual({
+    startedAt: 200,
+    stoppedAt: 300,
+    rowList: [
+      {
+        startedAt: 200,
+        stoppedAt: 300,
+        durationMs: 100,
+        cellList: [second],
       },
     ],
   })

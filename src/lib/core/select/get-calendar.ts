@@ -1,15 +1,19 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
 import type { Grid } from '#lib/utils/calendar-grid.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { buildGrid, pushCalendarSpan } from '#lib/utils/calendar-grid.js'
 import { createSelector } from '#lib/utils/selector.js'
 
 import { getCalendarSpanList } from './get-calendar-span-list.js'
 
+/**
+ * Builds a calendar grid populated with the labelled spans for one stream.
+ *
+ * Use this for year or month-style overviews where each cell is a calendar date
+ * and long-running labels should be laid out on non-overlapping tracks.
+ */
 const getCalendar = createSelector(
   'getCalendar',
   (
@@ -21,10 +25,10 @@ const getCalendar = createSelector(
       minDurationMs: number
     },
     now: number,
-  ): Signal<Grid> => {
+  ): Selection<Grid> => {
     const $spanList = getCalendarSpanList(store, streamId, where, now)
 
-    return computed('getCalendar', () => {
+    return () => {
       const spanList = $spanList.value
 
       const grid = buildGrid({
@@ -38,7 +42,7 @@ const getCalendar = createSelector(
       }
 
       return grid
-    })
+    }
   },
 )
 

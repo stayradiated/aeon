@@ -51,6 +51,22 @@ const toInstant = (date: CalendarDate, timeZone: TimeZone): number => {
   return dateFns.transpose(new UTCDate(toUTCInstant(date)), timeZone).getTime()
 }
 
+const startOfDay = (date: CalendarDate, timeZone: TimeZone): number => {
+  return toInstant(date, timeZone)
+}
+
+const endOfDay = (date: CalendarDate, timeZone: TimeZone): number => {
+  return toInstant(addDays(date, 1), timeZone) - 1
+}
+
+const min = (date: CalendarDate, ...dateList: CalendarDate[]): CalendarDate => {
+  return Math.min(date, ...dateList) as CalendarDate
+}
+
+const max = (date: CalendarDate, ...dateList: CalendarDate[]): CalendarDate => {
+  return Math.max(date, ...dateList) as CalendarDate
+}
+
 const EARLIEST_TZ = tz('Etc/GMT-14')
 const LATEST_TZ = tz('Etc/GMT+12')
 
@@ -121,6 +137,7 @@ export {
   addDays,
   dayOfWeek,
   eachDayOfInterval,
+  endOfDay,
   endOfWeek,
   format,
   formatISO,
@@ -133,6 +150,9 @@ export {
   getYear,
   isWeekend,
   MS_PER_DAY,
+  max,
+  min,
+  startOfDay,
   subDays,
   subWeeks,
   toEarliestInstant,
