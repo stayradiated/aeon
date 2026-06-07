@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { Line } from '#lib/core/shape/types.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { calcDuration } from '#lib/core/shape/calc-duration'
 
@@ -21,12 +19,12 @@ const getFilteredLineList = createSelector(
       labelId?: LabelId
     },
     now: number,
-  ): Signal<Line[]> => {
+  ): Selection<Line[]> => {
     const $lineList = getLineList(store, streamId, {
       startedAt: where.startedAt,
     })
 
-    return computed('getFilteredLineList', () => {
+    return () => {
       const lineList = $lineList.value
       return lineList.filter((line) => {
         if (where.durationMs) {
@@ -45,7 +43,7 @@ const getFilteredLineList = createSelector(
 
         return true
       })
-    })
+    }
   },
 )
 

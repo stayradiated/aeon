@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { StreamId } from '#lib/ids.js'
 import type { Point } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -17,7 +15,7 @@ const getActivePointList = createSelector(
     where: {
       startedAt: { gte?: number; lte?: number }
     },
-  ): Signal<Point[]> => {
+  ): Selection<Point[]> => {
     const $pointList = getPointList(store, streamId)
 
     if (
@@ -44,14 +42,14 @@ const getActivePointList = createSelector(
           })
         : undefined
 
-    return computed('getActivePointList', () => {
+    return () => {
       const startIndex = $startIndex?.value ?? 0
       const endIndex = $endIndex?.value
       return $pointList.value.slice(
         startIndex,
         typeof endIndex === 'number' ? endIndex + 1 : undefined,
       )
-    })
+    }
   },
 )
 

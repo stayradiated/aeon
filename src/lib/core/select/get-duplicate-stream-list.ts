@@ -1,7 +1,5 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { Stream } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -11,8 +9,8 @@ const normalizeStreamName = (stream: Stream): string => {
 
 const getDuplicateStreamList = createSelector(
   'getDuplicateStreamList',
-  (store): Signal<Stream[][]> => {
-    return computed('getDuplicateStreamList', () => {
+  (store): Selection<Stream[][]> => {
+    return () => {
       const streamList = store.stream.asList.value
 
       // we build a record storing the normalized name of each stream
@@ -35,7 +33,7 @@ const getDuplicateStreamList = createSelector(
       }
 
       return duplicateStreamGroupList
-    })
+    }
   },
 )
 

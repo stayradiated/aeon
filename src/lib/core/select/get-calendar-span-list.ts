@@ -1,10 +1,9 @@
 import { tz } from '@date-fns/tz'
-import type { Signal } from 'signia'
-import { computed } from 'signia'
 
 import type { StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
 import type { CalendarSpan } from '#lib/utils/calendar-span.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { mergeCalendarSpanList } from '#lib/utils/calendar-span.js'
@@ -24,7 +23,7 @@ const getCalendarSpanList = createSelector(
       minDurationMs: number
     },
     now: number,
-  ): Signal<CalendarSpan[]> => {
+  ): Selection<CalendarSpan[]> => {
     const startedAtGte = calDateFns.toEarliestInstant(where.startDate)
     const startedAtLte = calDateFns.toLatestInstant(where.endDate)
 
@@ -43,7 +42,7 @@ const getCalendarSpanList = createSelector(
       now,
     )
 
-    return computed('getCalendarSpanList', () => {
+    return () => {
       const lineList = $lineList.value
 
       const spanList: CalendarSpan[] = []
@@ -70,7 +69,7 @@ const getCalendarSpanList = createSelector(
       }
 
       return mergeCalendarSpanList(spanList)
-    })
+    }
   },
 )
 

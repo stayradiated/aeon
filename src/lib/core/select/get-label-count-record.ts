@@ -1,9 +1,7 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { LabelId, StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
-import { createSelector } from '#lib/utils/selector'
+import { createSelector } from '#lib/utils/selector.js'
 
 import { findPointIndex } from './find-point-index.js'
 import { getPointList } from './get-point-list.js'
@@ -19,7 +17,7 @@ const getLabelCountRecord = createSelector(
         lte: number
       }
     },
-  ): Signal<Record<LabelId, number>> => {
+  ): Selection<Record<LabelId, number>> => {
     const $pointList = getPointList(store, streamId)
 
     const $startIndex = findPointIndex(store, streamId, {
@@ -30,7 +28,7 @@ const getLabelCountRecord = createSelector(
       startedAt: { lte: where.startedAt.lte },
     })
 
-    return computed('getLabelCountRecord', () => {
+    return () => {
       const labelRecord: Record<LabelId, number> = {}
 
       const startIndex = $startIndex.value
@@ -54,7 +52,7 @@ const getLabelCountRecord = createSelector(
       }
 
       return labelRecord
-    })
+    }
   },
 )
 

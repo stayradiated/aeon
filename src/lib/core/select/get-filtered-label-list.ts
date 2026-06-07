@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -14,12 +12,12 @@ const getFilteredLabelList = createSelector(
     store,
     streamId: StreamId,
     parentIdList: readonly LabelId[],
-  ): Signal<Label[]> => {
+  ): Selection<Label[]> => {
     const $labelList = getLabelList(store, streamId)
     const parentIdSet =
       parentIdList.length > 0 ? new Set(parentIdList) : undefined
 
-    return computed('getFilteredLabelList', () => {
+    return () => {
       const labelList = $labelList.value
 
       if (parentIdSet === undefined) {
@@ -34,7 +32,7 @@ const getFilteredLabelList = createSelector(
         }
         return false
       })
-    })
+    }
   },
 )
 

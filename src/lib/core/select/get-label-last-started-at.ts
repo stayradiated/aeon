@@ -1,18 +1,20 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { LabelId, StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
-import { createSelector } from '#lib/utils/selector'
+import { createSelector } from '#lib/utils/selector.js'
 
 import { getPointList } from './get-point-list.js'
 
 const getLabelLastStartedAt = createSelector(
   'getLabelLastStartedAt',
-  (store, streamId: StreamId, labelId: LabelId): Signal<number | undefined> => {
+  (
+    store,
+    streamId: StreamId,
+    labelId: LabelId,
+  ): Selection<number | undefined> => {
     const $pointList = getPointList(store, streamId)
 
-    return computed('getLabelLastStartedAt', () => {
+    return () => {
       const pointList = $pointList.value
 
       // iterate backwards through point list
@@ -29,7 +31,7 @@ const getLabelLastStartedAt = createSelector(
       }
 
       return undefined
-    })
+    }
   },
 )
 

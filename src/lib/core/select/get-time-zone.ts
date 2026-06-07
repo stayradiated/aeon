@@ -1,5 +1,4 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
@@ -8,10 +7,10 @@ import { getTimeZoneStream } from './get-time-zone-stream.js'
 
 const getTimeZone = createSelector(
   'getTimeZone',
-  (store, timestamp: number): Signal<string> => {
+  (store, timestamp: number): Selection<string> => {
     const $timeZoneStream = getTimeZoneStream(store)
 
-    return computed('getTimeZone', () => {
+    return () => {
       const timeZoneStream = $timeZoneStream.value
       if (!timeZoneStream) {
         console.warn('Time Zone stream not found')
@@ -30,7 +29,7 @@ const getTimeZone = createSelector(
       }
 
       return activePoint.description
-    })
+    }
   },
 )
 

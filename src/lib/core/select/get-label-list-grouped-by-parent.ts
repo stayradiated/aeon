@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { Label } from '#lib/types.local.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { groupByMultiple } from '#lib/utils/group-by.js'
 import { createSelector } from '#lib/utils/selector.js'
@@ -16,10 +14,10 @@ const getLabelListGroupedByParent = createSelector(
   (
     store,
     streamId: StreamId,
-  ): Signal<(readonly [Label | undefined, Label[]])[]> => {
+  ): Selection<(readonly [Label | undefined, Label[]])[]> => {
     const $labelList = getLabelList(store, streamId)
 
-    return computed('getParentLabelList', () => {
+    return () => {
       const labelList = $labelList.value
 
       const groupedList = groupByMultiple(labelList, (label) => {
@@ -44,7 +42,7 @@ const getLabelListGroupedByParent = createSelector(
         })
 
       return parentLabelList
-    })
+    }
   },
 )
 

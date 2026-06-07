@@ -1,8 +1,8 @@
 import { tz } from '@date-fns/tz'
-import { computed } from 'signia'
 
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { CalendarDate } from '#lib/utils/calendar-date.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import * as calDateFns from '#lib/utils/calendar-date.js'
 import { createSelector } from '#lib/utils/selector.js'
@@ -28,7 +28,7 @@ const getDailyDurationList = createSelector(
       labelId: LabelId
     },
     now: number,
-  ) => {
+  ): Selection<DailyDuration[]> => {
     const $lineList = getFilteredLineList(
       store,
       streamId,
@@ -39,7 +39,7 @@ const getDailyDurationList = createSelector(
       now,
     )
 
-    return computed('getDailyDurationList', () => {
+    return () => {
       const lineList = $lineList.value
 
       const entryRecord: Record<CalendarDate, DailyDuration> = {}
@@ -72,7 +72,7 @@ const getDailyDurationList = createSelector(
       return Object.values(entryRecord).sort((a, b) => {
         return a.date - b.date
       })
-    })
+    }
   },
 )
 

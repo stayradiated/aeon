@@ -1,8 +1,6 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { Line } from '#lib/core/shape/types.js'
 import type { StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { buildLine } from '#lib/core/shape/build-line.js'
 
@@ -18,10 +16,10 @@ const getLineList = createSelector(
     where: {
       startedAt: { gte: number; lte: number }
     },
-  ): Signal<Line[]> => {
+  ): Selection<Line[]> => {
     const $pointList = getActivePointList(store, streamId, where)
 
-    return computed('getLineList', () => {
+    return () => {
       const pointList = $pointList.value
       return pointList.map((point, index, list) => {
         const nextPoint = list[index + 1]
@@ -29,7 +27,7 @@ const getLineList = createSelector(
           points: [point, nextPoint],
         })
       })
-    })
+    }
   },
 )
 

@@ -1,7 +1,5 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
 import type { StreamId } from '#lib/ids.js'
+import type { Selection } from '#lib/utils/selector.js'
 
 import { lowerBound, upperBound } from '#lib/utils/binary-search.js'
 import { createSelector } from '#lib/utils/selector.js'
@@ -14,10 +12,10 @@ const findPointIndex = createSelector(
     store,
     streamId: StreamId,
     where: { startedAt: { lte: number } | { gte: number } },
-  ): Signal<number | undefined> => {
+  ): Selection<number | undefined> => {
     const $list = getPointList(store, streamId)
 
-    return computed('findPointIndex', () => {
+    return () => {
       const list = $list.value
 
       if (list.length === 0) {
@@ -32,7 +30,7 @@ const findPointIndex = createSelector(
       const target = where.startedAt.gte
       const index = lowerBound(list, (point) => point.startedAt - target)
       return index < list.length ? index : undefined
-    })
+    }
   },
 )
 

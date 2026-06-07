@@ -1,6 +1,4 @@
-import type { Signal } from 'signia'
-import { computed } from 'signia'
-
+import type { Selection } from '#lib/utils/selector.js'
 import type { SliceGrid } from '#lib/utils/slice-grid.js'
 
 import { createSelector } from '#lib/utils/selector.js'
@@ -16,11 +14,11 @@ const getSliceGrid = createSelector(
     where: {
       startedAt: { gte: number; lte: number }
     },
-  ): Signal<SliceGrid> => {
+  ): Selection<SliceGrid> => {
     const $lineListRecord = getAllLineLists(store, where)
     const $streamList = getStreamList(store)
 
-    return computed('getLineListForStream', () => {
+    return () => {
       const lineListRecord = $lineListRecord.value
       const streamIdList = $streamList.value.map((stream) => stream.id)
       return buildSliceGrid({
@@ -29,7 +27,7 @@ const getSliceGrid = createSelector(
         startedAt: where.startedAt.gte,
         stoppedAt: where.startedAt.lte,
       })
-    })
+    }
   },
 )
 
