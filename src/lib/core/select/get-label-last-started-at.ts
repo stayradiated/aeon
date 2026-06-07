@@ -5,6 +5,13 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getPointList } from './get-point-list.js'
 
+/**
+ * Returns when a label was most recently used in a stream.
+ *
+ * Use this for label detail pages that need "last logged" metadata. It scans the
+ * stream's sorted points from newest to oldest and returns the first point whose
+ * label list includes the requested label.
+ */
 const getLabelLastStartedAt = createSelector(
   'getLabelLastStartedAt',
   (

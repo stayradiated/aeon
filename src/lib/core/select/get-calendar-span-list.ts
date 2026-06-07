@@ -12,6 +12,17 @@ import { createSelector } from '#lib/utils/selector.js'
 import { getFilteredLineList } from './get-filtered-line-list.js'
 import { getTimeZone } from './get-time-zone.js'
 
+/**
+ * Converts a stream's labelled line intervals into calendar-date spans.
+ *
+ * Use this for calendar views that need to show long-running labels across days;
+ * each qualifying line contributes one span per label, and adjacent or
+ * overlapping spans for the same label are merged.
+ *
+ * Quirk: spans may extend outside the requested date range so the calendar grid
+ * can clip them at render time. Time-zone changes within a single line are not
+ * split into separate spans.
+ */
 const getCalendarSpanList = createSelector(
   'getCalendarSpanList',
   (

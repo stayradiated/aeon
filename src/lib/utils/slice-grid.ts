@@ -39,6 +39,12 @@ type ConsumeOptions = {
   heap: MinHeap<HeapEntry>
 }
 
+type ClipRowOptions = {
+  row: Row
+  startedAt: number
+  stoppedAt: number
+}
+
 const consume = (options: ConsumeOptions) => {
   const { lineListRecord, streamIdList, entry, row, heap } = options
 
@@ -80,6 +86,44 @@ const consume = (options: ConsumeOptions) => {
       index: nextLineIndex,
       startedAt: nextLine.startedAt,
     })
+  }
+}
+
+const getRowStoppedAt = (row: Row, fallbackStoppedAt: number): number => {
+  if (typeof row.stoppedAt === 'number') {
+    return row.stoppedAt
+  }
+
+  const cellStoppedAtList = row.cellList.flatMap((cell) => {
+    if (typeof cell?.stoppedAt === 'number' && cell.stoppedAt > row.startedAt) {
+      return [cell.stoppedAt]
+    }
+    return []
+  })
+
+  if (cellStoppedAtList.length === 0) {
+    return fallbackStoppedAt
+  }
+
+  return Math.min(...cellStoppedAtList, fallbackStoppedAt)
+}
+
+const clipRow = (options: ClipRowOptions): Row | undefined => {
+  const { row } = options
+
+  const rowStoppedAt = getRowStoppedAt(row, options.stoppedAt)
+  const startedAt = Math.max(row.startedAt, options.startedAt)
+  const stoppedAt = Math.min(rowStoppedAt, options.stoppedAt)
+
+  if (stoppedAt <= startedAt) {
+    return undefined
+  }
+
+  return {
+    ...row,
+    startedAt,
+    stoppedAt,
+    durationMs: stoppedAt - startedAt,
   }
 }
 
@@ -157,6 +201,15 @@ const buildSliceGrid = (options: BuildSliceGridOptions): SliceGrid => {
     grid.rowList.push(row)
     prevRow = row
   }
+
+  grid.rowList = grid.rowList.flatMap((row) => {
+    const clippedRow = clipRow({
+      row,
+      startedAt: options.startedAt,
+      stoppedAt: options.stoppedAt,
+    })
+    return clippedRow ? [clippedRow] : []
+  })
 
   return grid
 }

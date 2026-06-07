@@ -9,8 +9,15 @@ import { getLabelList } from './get-label-list.js'
 
 const NO_PARENT_KEY = ''
 
+/**
+ * Groups a stream's labels by their parent label.
+ *
+ * Use this for label-management views that want sections under each parent label.
+ * Labels without parents are grouped under an `undefined` parent, and labels with
+ * multiple parents appear in multiple groups.
+ */
 const getLabelListGroupedByParent = createSelector(
-  'getParentLabelList',
+  'getLabelListGroupedByParent',
   (
     store,
     streamId: StreamId,

@@ -6,6 +6,12 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getLineList } from './get-line-list.js'
 
+/**
+ * Builds line interval lists for every stream in the requested time window.
+ *
+ * This is primarily used by slice-grid construction, where each stream needs a
+ * list of point-to-next-point intervals over the same range.
+ */
 const getAllLineLists = createSelector(
   'getAllLineLists',
   (

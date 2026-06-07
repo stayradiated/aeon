@@ -8,6 +8,12 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getCalendarSpanList } from './get-calendar-span-list.js'
 
+/**
+ * Builds a calendar grid populated with the labelled spans for one stream.
+ *
+ * Use this for year or month-style overviews where each cell is a calendar date
+ * and long-running labels should be laid out on non-overlapping tracks.
+ */
 const getCalendar = createSelector(
   'getCalendar',
   (

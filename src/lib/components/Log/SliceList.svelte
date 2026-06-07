@@ -3,9 +3,8 @@ import { tz } from '@date-fns/tz'
 import * as dateFns from 'date-fns'
 
 import type { Store } from '#lib/core/replicache/store.js'
-import type { SliceGrid } from '#lib/utils/slice-grid.js'
 
-import { getTimeZoneStream } from '#lib/core/select/get-time-zone-stream.js'
+import { getSliceGrid } from '#lib/core/select/get-slice-grid.js'
 import { getVisibleStreamList } from '#lib/core/select/get-visible-stream-list.js'
 import { calcDuration } from '#lib/core/shape/calc-duration.js'
 
@@ -18,18 +17,27 @@ import Line from './Line.svelte'
 type Props = {
   store: Store
   timeZone: string
-  sliceGrid: SliceGrid
+  startedAt: number
+  stoppedAt: number
 }
 
-const { store, timeZone, sliceGrid }: Props = $props()
+const { store, timeZone, startedAt, stoppedAt }: Props = $props()
 
+const { _: sliceGrid } = $derived(
+  watch(
+    getSliceGrid(store, {
+      startedAt: { gte: startedAt, lte: stoppedAt },
+    }),
+  ),
+)
 const { _: now } = watch(clockMin)
 const { _: streamList } = $derived(watch(getVisibleStreamList(store)))
-const { _: timeZoneStream } = $derived(watch(getTimeZoneStream(store)))
 
 const formatTime = (instant: number): string => {
   return dateFns.format(instant, 'HH:mm', { in: tz(timeZone) })
 }
+
+const reversedRowList = $derived(sliceGrid.rowList.toReversed())
 </script>
 
 <div class="SliceList" style:--stream-count={streamList.length}>
@@ -40,24 +48,23 @@ const formatTime = (instant: number): string => {
     {/each}
   </header>
 
-  {#each sliceGrid.rowList as row, rowIndex (rowIndex)}
-    {@const prevRow = sliceGrid.rowList[rowIndex - 1]}
+  {#each reversedRowList as row, rowIndex (rowIndex)}
+    {@const prevRow = reversedRowList[rowIndex - 1]}
     <section style:--height={getLineHeight(calcDuration(row, now))}>
       <div class="cell time" style:--row={rowIndex + 2} style:--col="1"><a href="/edit/slice/{row.startedAt}">{formatTime(row.startedAt)}</a></div>
 
-      {#each row.cellList as line, columnIndex (columnIndex)}
-        {#if line && line.streamId !== timeZoneStream?.id}
+      {#each streamList as stream, columnIndex (stream.id)}
+        {@const line = row.cellList.find((line) => line?.streamId === stream.id)}
+        {#if line}
+          {@const isEnd = line.stoppedAt === prevRow?.startedAt}
+          {@const isStart = line.startedAt === row.startedAt}
           <div class="cell" style:--row={rowIndex + 2} style:--col={columnIndex + 2}>
-            {#if line}
-              {@const isEnd = line.stoppedAt === prevRow?.startedAt}
-              {@const isStart = line.startedAt === row.startedAt}
-              <Line
-                {store}
-                {line}
-                {isStart}
-                {isEnd}
-              />
-            {/if}
+            <Line
+              {store}
+              {line}
+              {isStart}
+              {isEnd}
+            />
           </div>
         {/if}
       {/each}

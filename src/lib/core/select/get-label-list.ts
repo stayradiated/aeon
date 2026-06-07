@@ -4,6 +4,12 @@ import type { Selection } from '#lib/utils/selector.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
+/**
+ * Returns all labels that belong to a stream, sorted by name.
+ *
+ * Use this as the base selector for label pickers, label-management screens, and
+ * any derived label filters for a single stream.
+ */
 const getLabelList = createSelector(
   'getLabelList',
   (store, streamId: StreamId): Selection<Label[]> => {

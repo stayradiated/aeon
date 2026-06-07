@@ -2,6 +2,12 @@ import type { StreamId } from '#lib/ids.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 
+/**
+ * Returns all points that belong to a stream, sorted by `startedAt` ascending.
+ *
+ * Use this as the base selector for active-point lookup, line construction, and
+ * any stream-local point queries.
+ */
 const getPointList = createSelector(
   'getPointList',
   (store, streamId: StreamId) => {

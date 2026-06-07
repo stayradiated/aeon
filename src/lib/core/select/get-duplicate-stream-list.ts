@@ -7,6 +7,12 @@ const normalizeStreamName = (stream: Stream): string => {
   return stream.name.toLowerCase().trim()
 }
 
+/**
+ * Finds groups of streams that have the same normalized name.
+ *
+ * Use this to power stream cleanup and deduplication UI. Normalization is limited
+ * to trimming whitespace and lower-casing the stream name.
+ */
 const getDuplicateStreamList = createSelector(
   'getDuplicateStreamList',
   (store): Selection<Stream[][]> => {

@@ -8,6 +8,16 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getActivePointList } from './get-active-point-list.js'
 
+/**
+ * Converts a stream's ordered points into line intervals for a time window.
+ *
+ * Each line starts at a point and stops at the next returned point in the same
+ * stream. This is the base representation used by logs, calendars, and duration
+ * calculations.
+ *
+ * Quirk: because `getActivePointList` includes boundary context, the first line
+ * may start before the requested window and the last line may be open-ended.
+ */
 const getLineList = createSelector(
   'getLineList',
   (

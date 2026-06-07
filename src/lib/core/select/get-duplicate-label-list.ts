@@ -10,6 +10,12 @@ const normalizeLabelName = (label: Label): string => {
   return label.name.toLowerCase().trim()
 }
 
+/**
+ * Finds groups of labels in a stream that have the same normalized name.
+ *
+ * Use this to power label cleanup and deduplication UI. Normalization is limited
+ * to trimming whitespace and lower-casing the label name.
+ */
 const getDuplicateLabelList = createSelector(
   'getDuplicateLabelList',
   (store, streamId: StreamId): Selection<Label[][]> => {

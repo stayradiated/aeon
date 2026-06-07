@@ -7,6 +7,16 @@ import { createSelector } from '#lib/utils/selector.js'
 import { findPointIndex } from './find-point-index.js'
 import { getPointList } from './get-point-list.js'
 
+/**
+ * Returns the points needed to represent a stream across a time window.
+ *
+ * This includes boundary context: when a lower bound is provided, the returned
+ * list starts with the point active at that instant, even if it started earlier;
+ * when an upper bound is provided, it includes the first point at or after that
+ * instant so callers can build a closing line segment.
+ *
+ * Quirk: if both bounds are omitted this warns and returns the full point list.
+ */
 const getActivePointList = createSelector(
   'getActivePointList',
   (

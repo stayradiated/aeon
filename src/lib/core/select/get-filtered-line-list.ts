@@ -8,6 +8,15 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getLineList } from './get-line-list.js'
 
+/**
+ * Returns a stream's line intervals filtered by duration and/or label.
+ *
+ * Use this as the shared base for calendar and duration selectors. The time
+ * window is resolved by `getLineList`, while optional filters remove short lines
+ * or lines that do not include the requested label.
+ *
+ * Quirk: open-ended line durations are calculated against `now`.
+ */
 const getFilteredLineList = createSelector(
   'getFilteredLineList',
   (

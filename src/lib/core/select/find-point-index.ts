@@ -6,6 +6,13 @@ import { createSelector } from '#lib/utils/selector.js'
 
 import { getPointList } from './get-point-list.js'
 
+/**
+ * Finds the nearest point index in a stream relative to a `startedAt` boundary.
+ *
+ * Use this as a low-level helper for range selectors: `lte` returns the last
+ * point at or before the target, while `gte` returns the first point at or
+ * after it. The point list is expected to be sorted by `startedAt` ascending.
+ */
 const findPointIndex = createSelector(
   'findPointIndex',
   (

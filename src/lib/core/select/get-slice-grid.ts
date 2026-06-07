@@ -7,8 +7,15 @@ import { buildSliceGrid } from '#lib/utils/slice-grid.js'
 import { getAllLineLists } from './get-all-line-lists.js'
 import { getStreamList } from './get-stream-list.js'
 
+/**
+ * Builds the multi-stream slice grid for a started-at range.
+ *
+ * Use this for log views that need to align all stream lines on shared change
+ * times. The grid includes every stream in sort order; consumers can hide special
+ * streams such as the time-zone stream when rendering.
+ */
 const getSliceGrid = createSelector(
-  'getSliceList',
+  'getSliceGrid',
   (
     store,
     where: {
