@@ -92,11 +92,13 @@ start_postgres() {
       : "${POSTGRES_DB:?Set POSTGRES_DB in .env}"
       : "${POSTGRES_USER:?Set POSTGRES_USER in .env}"
       : "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      mkdir -p scripts/db/mnt
       # Keep the image and data mount in sync with docker-compose.yml.
       podman create --name "$CONTAINER" --restart=unless-stopped --shm-size=128m \
         --publish "127.0.0.1:$DB_PORT:5432" \
         --env POSTGRES_DB --env POSTGRES_USER --env POSTGRES_PASSWORD \
         --volume "$VOLUME:/var/lib/postgresql" \
+        --volume "$PROJECT_ROOT/scripts/db/mnt:/mnt" \
         docker.io/library/postgres:18.1-trixie >/dev/null
     fi
     if ! is_running; then podman start "$CONTAINER" >/dev/null; fi
