@@ -1,7 +1,7 @@
-import type { Handle } from '@sveltejs/kit'
 import { redirect } from '@sveltejs/kit'
+import type { Handle } from '@sveltejs/kit/hooks'
 
-import { building as isBuilding } from '$app/environment'
+import { building as isBuilding } from '$app/env'
 
 import {
   deleteSessionTokenCookie,
@@ -9,7 +9,7 @@ import {
   validateSessionToken,
 } from '#lib/server/auth.js'
 
-import { getDb } from '#lib/server/db/get-db'
+import { getDb } from '#lib/server/db/get-db.js'
 
 import { onInit } from './hooks.server.init.js'
 

@@ -41,6 +41,7 @@ preview:
 # TypeScript + Svelte checking
 check *args: svelte-sync
     svelte-check --tsconfig ./tsconfig.json {{ args }}
+    tsc --noEmit --project src/service-worker
 
 # Check code style with ESLint
 fix:

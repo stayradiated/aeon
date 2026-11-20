@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http'
 import { promisify, styleText } from 'node:util'
-import cookie from 'cookie'
+import { parseCookie } from 'cookie'
 import type { WebSocket } from 'ws'
 import { WebSocketServer } from 'ws'
 
@@ -50,7 +50,7 @@ type TeardownFn = () => Promise<void>
 const getSessionUserId = async (
   request: IncomingMessage,
 ): Promise<UserId | undefined> => {
-  const token = cookie.parse(request.headers.cookie ?? '')[
+  const token = parseCookie(request.headers.cookie ?? '')[
     auth.SESSION_COOKIE_NAME
   ]
   if (!token) {

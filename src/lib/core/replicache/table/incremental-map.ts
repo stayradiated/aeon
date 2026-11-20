@@ -3,7 +3,7 @@ import { computed, isUninitialized, RESET_VALUE } from 'signia'
 
 import type { DiffList } from './diff.js'
 
-import { browser as isBrowser, dev as isDev } from '$app/environment'
+import { browser as isBrowser, dev as isDev } from '$app/env'
 
 import { squashDiffListList } from './diff.js'
 

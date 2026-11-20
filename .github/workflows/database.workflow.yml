@@ -22,7 +22,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17.4
+        image: postgres:18.1-trixie
         env:
           POSTGRES_DB: aeon
           POSTGRES_USER: postgres
@@ -38,7 +38,7 @@ jobs:
     steps:
       - # https://github.com/actions/checkout
         name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Ensure no uncommitted migrations
         run: |
@@ -80,15 +80,15 @@ jobs:
 
       - # https://github.com/pnpm/action-setup
         name: Install pnpm
-        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           run_install: false
 
       - # https://github.com/actions/setup-node
         name: Install Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version-file: "package.json"
+          node-version-file: ".node-version"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -137,14 +137,11 @@ jobs:
 
           echo "✅ Kanel types are up to date"
 
-        # https://github.com/tj-actions/pg-dump
       - name: Generate database schema dump
-        uses: tj-actions/pg-dump@c826d55715b153f5572006e464e69b2bf0422fea # v3.0.1
-        with:
-          database_url: ${{ env.DATABASE_URL }}
-          postgresql_version: "17"
-          path: "migrations/schema.sql"
-          options: "--exclude-schema=pgboss --exclude-schema=graphile_migrate --schema-only --no-owner --format=p --encoding=UTF-8 --restrict-key=xxx"
+        run: |
+          docker exec ${{ job.services.postgres.id }} pg_dump --username=postgres --dbname=aeon \
+            --exclude-schema=pgboss --exclude-schema=graphile_migrate --schema-only --no-owner \
+            --format=p --encoding=UTF-8 --restrict-key=xxx > migrations/schema.sql
 
       - name: Verify DB Schema
         run: |

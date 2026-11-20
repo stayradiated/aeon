@@ -7,4 +7,4 @@
 import { server } from './build/index.js'
 
 // Configure WebSocket Server
-globalThis[Symbol.for('rough:websocket:configureServer')](server.server)
+globalThis[Symbol.for('rough:websocket:configureServer')](server)

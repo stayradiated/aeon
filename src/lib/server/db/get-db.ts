@@ -13,7 +13,7 @@ import pg from 'pg'
 
 import type { DB } from '#lib/server/db/types.js'
 
-import { dev as isDev } from '$app/environment'
+import { dev as isDev } from '$app/env'
 
 import { getDatabaseUrl } from '#lib/server/env.js'
 

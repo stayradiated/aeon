@@ -84,7 +84,7 @@ const getReplicache = memoize(
 
     if (import.meta.hot) {
       import.meta.hot.dispose(() => {
-        replicache.close()
+        void replicache.close().catch(console.error)
       })
     }
 

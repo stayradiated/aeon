@@ -3,7 +3,7 @@ import { dropAllDatabases } from 'replicache'
 
 import type { PageProps } from './$types'
 
-import { dev as isDev } from '$app/environment'
+import { dev as isDev } from '$app/env'
 import { enhance } from '$app/forms'
 
 import { resetReplicache } from '#lib/core/replicache/get-replicache.js'

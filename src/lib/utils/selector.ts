@@ -3,7 +3,7 @@ import { computed } from 'signia'
 
 import type { Store } from '#lib/core/replicache/store.js'
 
-import { memoize } from '#lib/utils/memoize'
+import { memoize } from '#lib/utils/memoize.js'
 
 type WithStoreOptions<Args extends unknown[]> = {
   cacheKey: (args: Args) => string

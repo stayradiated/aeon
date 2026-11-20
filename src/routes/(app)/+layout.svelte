@@ -1,14 +1,13 @@
 <script lang="ts">
 import type { LayoutProps } from './$types'
 
+import { PUBLIC_APP_VERSION } from '$app/env/public'
 import { afterNavigate } from '$app/navigation'
 
 import { watch } from '#lib/utils/watch.svelte.js'
 
 import ServiceWorker from '#lib/components/ServiceWorker.svelte'
 import Status from '#lib/components/Status/Status.svelte'
-
-import { PUBLIC_APP_VERSION } from '$env/static/public'
 
 const { data, children }: LayoutProps = $props()
 const { store } = $derived(data)

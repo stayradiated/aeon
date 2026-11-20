@@ -2,8 +2,6 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import svelte from 'eslint-plugin-svelte'
 import tseslint from 'typescript-eslint'
 
-import svelteConfig from './svelte.config.js'
-
 export default defineConfig(
   globalIgnores([
     '.svelte-kit/',
@@ -21,7 +19,6 @@ export default defineConfig(
       parserOptions: {
         extraFileExtensions: ['.svelte'],
         parser: tseslint.parser,
-        svelteConfig,
         // the official SvelteKit eslint config has this setting enabled
         // but I'm not sure what it does - and it makes linting very slow
         // projectService: true,

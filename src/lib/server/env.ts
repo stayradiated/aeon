@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
-import { createEnvGetter } from '#lib/utils/create-env-getter.js'
+import * as privateEnv from '$app/env/private'
 
-import { env as privateEnv } from '$env/dynamic/private'
+import { createEnvGetter } from '#lib/utils/create-env-getter.js'
 
 const getDatabaseUrl = createEnvGetter(privateEnv, 'DATABASE_URL', z.url())
 
