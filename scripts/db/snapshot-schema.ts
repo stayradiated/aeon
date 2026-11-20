@@ -263,7 +263,7 @@ async function main() {
     '--restrict-key=xxx',
   ]
 
-  const child = spawn('./scripts/db/postgres.sh', dumpArgs, {
+  const child = spawn(path.join(import.meta.dirname, 'postgres.sh'), dumpArgs, {
     stdio: ['ignore', 'pipe', 'inherit'],
   })
 
