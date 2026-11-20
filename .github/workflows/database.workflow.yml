@@ -22,7 +22,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17.4
+        image: postgres:18.1-trixie
         env:
           POSTGRES_DB: aeon
           POSTGRES_USER: postgres
@@ -137,14 +137,11 @@ jobs:
 
           echo "✅ Kanel types are up to date"
 
-        # https://github.com/tj-actions/pg-dump
       - name: Generate database schema dump
-        uses: tj-actions/pg-dump@c826d55715b153f5572006e464e69b2bf0422fea # v3.0.1
-        with:
-          database_url: ${{ env.DATABASE_URL }}
-          postgresql_version: "17"
-          path: "migrations/schema.sql"
-          options: "--exclude-schema=pgboss --exclude-schema=graphile_migrate --schema-only --no-owner --format=p --encoding=UTF-8 --restrict-key=xxx"
+        run: |
+          docker exec ${{ job.services.postgres.id }} pg_dump --username=postgres --dbname=aeon \
+            --exclude-schema=pgboss --exclude-schema=graphile_migrate --schema-only --no-owner \
+            --format=p --encoding=UTF-8 --restrict-key=xxx > migrations/schema.sql
 
       - name: Verify DB Schema
         run: |
