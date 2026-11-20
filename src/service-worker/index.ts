@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
       }
 
       if (response.status === 200) {
-        await cache.put(event.request, response.clone())
+        event.waitUntil(cache.put(event.request, response.clone()))
       }
 
       return response
