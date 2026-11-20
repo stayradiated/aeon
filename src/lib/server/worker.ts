@@ -6,7 +6,7 @@ import { getDatabaseUrl } from '#lib/server/env.js'
 
 import { getDb } from '#lib/server/db/get-db.js'
 
-import { garbageCollectEmailVerification } from '#lib/server/db/email-verification/garabage-collect-email-verification'
+import { garbageCollectEmailVerification } from '#lib/server/db/email-verification/garabage-collect-email-verification.js'
 
 import { fixupAllLabelParents } from '#lib/server/migrate/fixup-all-label-parents.js'
 import { updateUserStatus } from '#lib/server/status/update-user-status.js'

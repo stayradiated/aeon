@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from 'svelte'
 
-import { registerServiceWorker } from '../../service-worker.init.js'
+import { registerServiceWorker } from '../../register-service-worker.js'
 
 let showUpdate = $state(false)
 let applyUpdate = $state<() => void>()

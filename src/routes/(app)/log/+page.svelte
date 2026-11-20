@@ -44,7 +44,7 @@ const handlePrev = () => {
   }
 
   const nextDate = calDateFns.subDays(viewEnd, NAV_DAY_COUNT)
-  const nextUrl = new URL(page.url)
+  const nextUrl = new URL(page.url.href)
   nextUrl.searchParams.set('date', calDateFns.formatISO(nextDate))
   goto(nextUrl)
 }
@@ -55,7 +55,7 @@ const handleNext = () => {
   }
 
   const nextDate = calDateFns.addDays(viewEnd, NAV_DAY_COUNT)
-  const nextUrl = new URL(page.url)
+  const nextUrl = new URL(page.url.href)
   nextUrl.searchParams.set('date', calDateFns.formatISO(nextDate))
   goto(nextUrl)
 }

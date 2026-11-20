@@ -3,7 +3,7 @@
  * PostgreSQL schema dump (TypeScript / Node.js)
  *
  * Mirrors the bash script:
- * - Dumps schema via `docker compose exec postgres pg_dump ...`
+ * - Dumps schema via pg_dump inside the local PostgreSQL container
  * - Strips volatile pg_dump header lines
  * - Writes to migrations/schema.sql (via .tmp then rename)
  * - Prints stats + diffs vs previous dump
@@ -246,15 +246,14 @@ async function main() {
   const start = Date.now()
   console.log(`${styleText('yellow', '⏳ Dumping schema...')}`)
 
-  // Build docker compose pg_dump command
-  // Note: "-T" disables TTY allocation which is friendlier for piping.
-  const dockerArgs = [
-    'compose',
+  const dumpArgs = [
     'exec',
-    '-T',
-    'postgres',
+    'sh',
+    '-c',
+    'exec pg_dump --username="$POSTGRES_USER" "$@"',
     'pg_dump',
-    DATABASE_URL,
+    '--dbname',
+    dbName,
     '--exclude-schema=graphile_migrate',
     '--exclude-schema=pgboss',
     '--schema-only',
@@ -264,7 +263,7 @@ async function main() {
     '--restrict-key=xxx',
   ]
 
-  const child = spawn('docker', dockerArgs, {
+  const child = spawn('./scripts/db/postgres.sh', dumpArgs, {
     stdio: ['ignore', 'pipe', 'inherit'],
   })
 

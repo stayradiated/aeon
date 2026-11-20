@@ -2,7 +2,7 @@ import type { Line } from '#lib/core/shape/types.js'
 import type { LabelId, StreamId } from '#lib/ids.js'
 import type { Selection } from '#lib/utils/selector.js'
 
-import { calcDuration } from '#lib/core/shape/calc-duration'
+import { calcDuration } from '#lib/core/shape/calc-duration.js'
 
 import { createSelector } from '#lib/utils/selector.js'
 

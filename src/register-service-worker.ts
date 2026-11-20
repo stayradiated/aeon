@@ -5,8 +5,12 @@ const registerServiceWorker = async (
     return
   }
 
-  const registration =
-    await navigator.serviceWorker.register('/service-worker.js')
+  const registration = await navigator.serviceWorker.register(
+    '/service-worker.js',
+    {
+      type: 'module',
+    },
+  )
 
   // Ensure we check periodically (useful for long-lived tabs)
   // You can also hook this to visibilitychange.

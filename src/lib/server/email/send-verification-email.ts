@@ -1,6 +1,6 @@
 import { render } from 'svelte/server'
 
-import { dev as isDev } from '$app/environment'
+import { dev as isDev } from '$app/env'
 
 import { getResend } from './get-resend.js'
 import VerifySignupTemplate from './send-verification-email.template.svelte'

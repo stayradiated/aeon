@@ -4,17 +4,17 @@ services:
     restart: unless-stopped
     shm_size: 128mb
     ports:
-      - 5432:5432
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_DB: '${POSTGRES_DB}'
-      POSTGRES_USER: '${POSTGRES_USER}'
-      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
-      DATABASE_URL: '${DATABASE_URL}'
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      DATABASE_URL: "${DATABASE_URL}"
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./scripts/db/mnt:/mnt
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       timeout: 1s
       start_period: 5s
       interval: 1s

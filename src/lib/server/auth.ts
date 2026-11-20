@@ -9,7 +9,7 @@ import type { UserId, UserSessionId } from '#lib/ids.js'
 import type { KyselyDb } from '#lib/server/db/types.js'
 import type { UserSession } from '#lib/server/types.js'
 
-import { dev as isDev } from '$app/environment'
+import { dev as isDev } from '$app/env'
 
 type SessionValidationResult = { session: UserSession } | { session: undefined }
 
