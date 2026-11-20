@@ -5,7 +5,7 @@ export const variables = defineEnvVars({
   PUBLIC_APP_VERSION: {
     public: true,
     static: true,
-    schema: z.string().default('0.0.0'),
+    schema: z.string().default('v0.0.0'),
   },
   // Optional so builds work without it; validated on first use in #lib/server/env.ts
   DATABASE_URL: { schema: z.string().optional() },
